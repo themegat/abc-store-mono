@@ -1,0 +1,9 @@
+/* firebase ui style and overrides */
+@import '@firebase-ui/styles/dist.css';
+
+.fui-screen {
+  width: 100%;
+  .fui-card {
+    width: 100%;
+  }
+}

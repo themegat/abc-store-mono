@@ -1,0 +1,117 @@
+using System.Net;
+using System.Security.Claims;
+using ABCStoreAPI.Configuration;
+using ABCStoreAPI.Database;
+using ABCStoreAPI.Repository;
+using ABCStoreAPI.Service;
+using ABCStoreAPI.Service.Consumer;
+using ABCStoreAPI.Service.Consumer.Base;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+
+namespace ABCStoreAPI.Extension;
+
+public static class ServiceExtensions
+{
+    private static string DevSpecificOrigins = "_devSpecificOrigins";
+
+    public static WebApplicationBuilder ConfigureServices(this WebApplicationBuilder builder)
+    {
+        var portEnv = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+        builder.WebHost.ConfigureKestrel(options =>
+        {
+            options.Listen(IPAddress.Any, int.Parse(portEnv));
+        });
+
+        builder.Services.Configure<ApiConfig>(builder.Configuration.GetSection("ApiSettings"));
+
+        builder.Services.AddHttpClient();
+
+        var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+        builder.Services.AddDbContext<AppDbContext>(options =>
+            options.UseNpgsql(connectionString));
+
+        builder.Services.AddControllers();
+
+        builder.Services.AddOpenApi();
+
+        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+        builder.Services.AddScoped<IExchangeRateRepository, ExchangeRateRepository>();
+        builder.Services.AddScoped<IProductRepository, ProductRepository>();
+        builder.Services.AddScoped<IProductCategoryRepository, ProductCategoryRepository>();
+        builder.Services.AddScoped<IProductImageRepository, ProductImageRepository>();
+        builder.Services.AddScoped<ISupportedCurrenyRepository, SupportedCurrenyRepository>();
+
+        builder.Services.AddScoped<ExchangeRateService>();
+        builder.Services.AddScoped<ProductService>();
+
+        return builder;
+    }
+
+    public static WebApplicationBuilder ConfigureConsumers(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddScoped<ProductConsumerUtil>();
+        builder.Services.AddScoped<IConsumer, FakestoreConsumer>();
+        builder.Services.AddScoped<IConsumer, DummyjsonConsumer>();
+        builder.Services.AddScoped<IConsumer, ExchangerateapiConsumer>();
+
+        return builder;
+    }
+
+    public static WebApplicationBuilder ConfigureCors(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(name: DevSpecificOrigins,
+                    policy =>
+                    {
+                        //FOR-DEV
+                        policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .WithHeaders("Authorization", "Content-Type");
+                    });
+            });
+
+        return builder;
+    }
+
+    public static WebApplicationBuilder ConfigureFirebaseAuthentication(this WebApplicationBuilder builder)
+    {
+
+        var tokenIssuer = builder.Configuration.GetSection("ApiSettings").GetValue<string>("TokenIssuer");
+        var projectId = Environment.GetEnvironmentVariable("FIREBASE_PROJECT_ID");
+
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.Authority = $"{tokenIssuer}/{projectId}";
+
+                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+
+                    ValidateIssuer = true,
+                    ValidIssuer = $"{tokenIssuer}/{projectId}",
+
+                    ValidateAudience = true,
+                    ValidAudience = projectId,
+
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
+                };
+
+                options.TokenValidationParameters.NameClaimType = ClaimTypes.NameIdentifier;
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = context =>
+                    {
+                        var uid = context.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+
+        return builder;
+    }
+}

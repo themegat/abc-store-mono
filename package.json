@@ -1,0 +1,22 @@
+{
+  "name": "abc-store",
+  "version": "1.0.0",
+  "description": "Mono-repo for ABC store",
+  "workspaces": [
+    "abc-store-webapp",
+    "functions"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/themegat/abc-store-mono.git"
+  },
+  "author": "T Motsoeneng",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/themegat/abc-store-mono/issues"
+  },
+  "homepage": "https://github.com/themegat/abc-store-mono#readme"
+}

@@ -1,0 +1,21 @@
+{
+    "dbcode.connections": [
+        {
+            "connectionId": "wHpEmHrzOjZpZpM6QWRlf",
+            "name": "ABCStore",
+            "driver": "postgres",
+            "color": "#00A6FF",
+            "connectionType": "host",
+            "host": "127.0.0.1",
+            "port": 5432,
+            "ssl": false,
+            "username": "admin",
+            "password": "",
+            "savePassword": "secretStorage",
+            "database": "abcstore",
+            "readOnly": false,
+            "connectionTimeout": 30
+        }
+    ],
+    "makefile.configureOnOpen": false
+}

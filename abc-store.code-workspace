@@ -1,0 +1,38 @@
+{
+	"folders": [
+		{
+			"path": "abc-store-api"
+		},
+		{
+			"path": "abc-store-webapp"
+		},
+		{
+			"path": "dataconnect"
+		},
+		{
+			"path": "functions"
+		}
+	],
+	"settings": {
+		"workbench.colorCustomizations": {
+			"activityBar.activeBackground": "#2e717c",
+			"activityBar.background": "#2e717c",
+			"activityBar.foreground": "#e7e7e7",
+			"activityBar.inactiveForeground": "#e7e7e799",
+			"activityBarBadge.background": "#5d2355",
+			"activityBarBadge.foreground": "#e7e7e7",
+			"commandCenter.border": "#e7e7e799",
+			"sash.hoverBorder": "#2e717c",
+			"statusBar.background": "#204f57",
+			"statusBar.foreground": "#e7e7e7",
+			"statusBarItem.hoverBackground": "#2e717c",
+			"statusBarItem.remoteBackground": "#204f57",
+			"statusBarItem.remoteForeground": "#e7e7e7",
+			"titleBar.activeBackground": "#204f57",
+			"titleBar.activeForeground": "#e7e7e7",
+			"titleBar.inactiveBackground": "#204f5799",
+			"titleBar.inactiveForeground": "#e7e7e799"
+		},
+		"peacock.color": "#204F57"
+	}
+}
