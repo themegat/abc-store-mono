@@ -9,7 +9,7 @@ namespace MyApp.Namespace
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok("This is the About controller responding to a GET request. Vieiwing successful deplyment.");
+            return Ok("This is the About controller responding to a GET request. The new connection string works.");
         }
     }
 }
