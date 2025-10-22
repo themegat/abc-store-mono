@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { NumericFormat } from 'react-number-format';
 
 import { Card, CardContent, CardMedia, Stack, SxProps, Typography, useTheme } from '@mui/material';
-
 import tinycolor from 'tinycolor2';
-
 import { ExchangeRateDto } from '@/store/api/abcApi';
+
+import placeholderImg from '../assets/placeholder.webp';
 
 type ProductCardProps = {
   image: string;
@@ -25,7 +25,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ image, title, price, currency
       <CardMedia
         component="img"
         height="140"
-        src="public/placeholder.png"
+        src={placeholderImg}
         alt={'place holder image'}
         sx={{ display: !imageLoaded ? 'block' : 'none' }}
       />

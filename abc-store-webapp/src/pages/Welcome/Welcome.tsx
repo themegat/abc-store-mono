@@ -3,6 +3,9 @@ import { Stack, Typography } from '@mui/material';
 import AuthComponent from '@/components/auth/AuthComponent';
 import useOrientation from '@/hooks/useOrientation';
 
+import backgroundVid from '../../assets/background/background_welcome.mp4';
+import posterImg from '../../assets/background/background_welcome.webp';
+
 function Welcome() {
   const isPortrait = useOrientation();
 
@@ -18,7 +21,7 @@ function Welcome() {
       <meta name="title" content="Welcome" />
       <Stack alignItems="center">
         <video
-          poster="public/background/background_welcome.webp"
+          poster={posterImg}
           style={{ position: 'fixed', zIndex: 1, width: '100%', opacity: 0.4 }}
           autoPlay
           onLoadedData={() => {
@@ -28,7 +31,7 @@ function Welcome() {
           loop
           id="background-video"
         >
-          <source src="public/background/background_welcome.mp4" type="video/mp4" />
+          <source src={backgroundVid} type="video/mp4" />
         </video>
         <Stack
           flexDirection={isPortrait ? 'row' : 'column'}

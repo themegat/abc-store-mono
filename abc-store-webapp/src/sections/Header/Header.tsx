@@ -7,6 +7,8 @@ import { useHotKeysDialog } from '@/sections/HotKeys/hooks';
 import { useSidebar } from '@/sections/Sidebar/hooks';
 import { useThemeMode } from '@/theme';
 
+import headerBackgroundDarkImg from '../../assets/background/header_background_dark.svg';
+import headerBackgroundLightImg from '../../assets/background/header_background_light.svg';
 import { HotKeysButton } from './styled';
 
 type Props = {
@@ -26,10 +28,7 @@ function Header({ enabledSidebar = true }: Props) {
       data-pw={`theme-${themeMode}`}
       enableColorOnDark
       sx={{
-        backgroundImage:
-          themeMode === 'dark'
-            ? "url('public/background/header_background_dark.svg')"
-            : "url('public/background/header_background_light.svg')",
+        backgroundImage: themeMode === 'dark' ? `url(${headerBackgroundDarkImg})` : `url(${headerBackgroundLightImg})`,
         backgroundSize: 'contain',
         paddingBottom: 1,
       }}

@@ -12,6 +12,8 @@ import {
   useGetApiProductFilterByCurrencyCodeQuery,
 } from '@/store/api/abcApi';
 
+import backgroundShopImg from '../../assets/background/background_shop.webp';
+
 function ShoppingPage() {
   const [categoryId, setCategoryId] = useState(0);
   const [inStock, setInStock] = useState(true);
@@ -43,7 +45,7 @@ function ShoppingPage() {
       <Stack
         padding={2}
         sx={{
-          backgroundImage: 'url("public/background/background_shop.webp")',
+          backgroundImage: `url(${backgroundShopImg})`,
           backgroundAttachment: 'fixed',
           backgroundSize: 'cover',
           minHeight: '100vh',
