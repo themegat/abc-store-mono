@@ -34,6 +34,7 @@ steps:
       - --set-secrets=CONNECTION_STRING=projects/377697024091/secrets/CONNECTION_STRING:latest
       - --set-secrets=EXCHANGE_RATE_API_KEY=projects/377697024091/secrets/EXCHANGE_RATE_API_KEY:latest
       - --set-secrets=FIREBASE_PROJECT_ID=projects/377697024091/secrets/FIREBASE_PROJECT_ID:latest
+      - --set-env-vars=BUILD_VERSION=$SHORT_SHA
 
 images:
   - '${_IMAGE}:${SHORT_SHA}'

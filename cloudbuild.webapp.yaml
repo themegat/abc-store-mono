@@ -17,6 +17,7 @@ steps:
         "-t", "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:latest",
         "--build-arg", "API_BASE_URL=${_API_BASE_URL}",
         "--build-arg", "FIREBASE_CONFIG_B64=${_FIREBASE_CONFIG_B64}",
+        "--build-arg", "BUILD_VERSION=${SHORT_SHA}",
         "."
       ]
 
