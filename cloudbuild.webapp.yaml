@@ -1,0 +1,42 @@
+options:
+  logging: CLOUD_LOGGING_ONLY
+  
+substitutions:
+  _REGION: europe-west1
+  _SERVICE: "abc-store-webapp"
+  _REPO: abc-store-docker-repo
+  _IMAGE: abc-store-webapp
+
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    dir: "abc-store-webapp"
+    args:
+      [
+        "build",
+        "-t", "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:${SHORT_SHA}",
+        "-t", "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:latest",
+        "--build-arg", "API_BASE_URL=${_API_BASE_URL}",
+        "--build-arg", "FIREBASE_CONFIG_B64=${_FIREBASE_CONFIG_B64}",
+        "."
+      ]
+
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      ["push", "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:${SHORT_SHA}"]
+
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args:
+      [
+        "run","deploy","${_SERVICE}",
+        "--image","${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:${SHORT_SHA}",
+        "--region","${_REGION}",
+        "--platform","managed",
+        "--allow-unauthenticated",
+        "--memory","512Mi",
+        "--port","8080"
+      ]
+
+images:
+  - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:${SHORT_SHA}"
+  - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:latest"

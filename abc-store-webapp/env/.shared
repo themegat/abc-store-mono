@@ -1,4 +1,4 @@
 # replace with your environment variables
 
-VITE_ENV_VAR_1=
-VITE_ENV_VAR_2=
+VITE_API_BASE_URL=
+VITE_FIREBASE_CONFIG_B64=
