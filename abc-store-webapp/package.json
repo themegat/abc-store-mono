@@ -1,12 +1,13 @@
 {
-  "name": "react-pwa",
-  "version": "3.0.0",
+  "name": "abc-store-webapp",
+  "version": "0.0.1",
   "description": "Starter kit for modern web applications",
-  "homepage": "https://react-pwa.surenatoyan.com/",
+  "homepage": "https://abc-store-webapp-377697024091.europe-west1.run.app/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/suren-atoyan/react-pwa.git"
+    "url": "https://github.com/themegat/abc-store-mono"
   },
+  "author": "T Motsoeneng",
   "license": "MIT",
   "scripts": {
     "dev": "vite",
