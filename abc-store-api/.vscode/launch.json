@@ -22,7 +22,9 @@
                 "ASPNETCORE_ENVIRONMENT": "Development",
                 "CONNECTION_STRING": "",
                 "EXCHANGE_RATE_API_KEY": "",
-                "FIREBASE_PROJECT_ID": ""
+                "FIREBASE_PROJECT_ID": "",
+                "ALLOWED_ORIGINS": "http://localhost:5173",
+                "BUILD_VERSION": "develop"
             },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"

@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MyApp.Namespace
@@ -9,7 +10,11 @@ namespace MyApp.Namespace
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok("This is the About controller responding to a GET request. The new connection string works.");
+            var asm = Assembly.GetExecutingAssembly();
+            var runtimeVersion = asm.GetName().Version;
+            var buidlVersion = Environment.GetEnvironmentVariable("BUILD_VERSION");
+
+            return Ok("Runtime ABC Store API Version: " + runtimeVersion + " Build Version: " + buidlVersion);
         }
     }
 }

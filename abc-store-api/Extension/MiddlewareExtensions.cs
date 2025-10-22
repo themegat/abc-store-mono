@@ -6,17 +6,15 @@ namespace ABCStoreAPI.Extension;
 
 public static class MiddlewareExtensions
 {
-    private static string DevSpecificOrigins = "_devSpecificOrigins";
-
     public static WebApplication ConfigurePipeline(this WebApplication app)
     {
         if (app.Environment.IsDevelopment())
         {
             Console.WriteLine("Running in Development environment");
-
             app.MapOpenApi();
-            app.UseCors(DevSpecificOrigins);
         }
+
+        app.UseCors(ServiceExtensions.AbcStoreWebapp);
 
         app.MigrateDatabase();
 

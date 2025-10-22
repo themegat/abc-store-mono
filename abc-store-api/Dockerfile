@@ -6,10 +6,10 @@ RUN dotnet restore "ABCStoreAPI.csproj"
 
 COPY . .
 WORKDIR "/src/."
-RUN dotnet build "ABCStoreAPI.csproj" -o /app/build
+RUN dotnet build "ABCStoreAPI.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "ABCStoreAPI.csproj" -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "ABCStoreAPI.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app

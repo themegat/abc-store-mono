@@ -13,15 +13,14 @@ namespace ABCStoreAPI.Extension;
 
 public static class ServiceExtensions
 {
-    private static string DevSpecificOrigins = "_devSpecificOrigins";
+    public static string AbcStoreWebapp = "_AbcStoreWebapp";
 
     public static WebApplicationBuilder ConfigureServices(this WebApplicationBuilder builder)
     {
-        var portEnv = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-        builder.WebHost.ConfigureKestrel(options =>
+        if (!builder.Environment.IsDevelopment())
         {
-            options.Listen(IPAddress.Any, int.Parse(portEnv));
-        });
+            ConfigureKestrel(builder);
+        }
 
         builder.Services.Configure<ApiConfig>(builder.Configuration.GetSection("ApiSettings"));
 
@@ -58,19 +57,37 @@ public static class ServiceExtensions
         return builder;
     }
 
+    public static WebApplicationBuilder ConfigureKestrel(this WebApplicationBuilder builder)
+    {
+        var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+        builder.WebHost.ConfigureKestrel(options =>
+        {
+            options.Listen(IPAddress.Any, int.Parse(port));
+        });
+
+        return builder;
+    }
+
     public static WebApplicationBuilder ConfigureCors(this WebApplicationBuilder builder)
     {
-        builder.Services.AddCors(options =>
+        var allowedOriginsCSV = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS");
+
+        if (!string.IsNullOrWhiteSpace(allowedOriginsCSV))
+        {
+            List<string> allowdOrigins = allowedOriginsCSV.Split(',').ToList();
+
+            builder.Services.AddCors(options =>
             {
-                options.AddPolicy(name: DevSpecificOrigins,
+                options.AddPolicy(name: AbcStoreWebapp,
                     policy =>
                     {
-                        //FOR-DEV
-                        policy.AllowAnyOrigin()
+                        policy.WithOrigins(allowdOrigins.ToArray())
                         .AllowAnyMethod()
-                        .WithHeaders("Authorization", "Content-Type");
+                        .AllowAnyHeader()
+                        .AllowCredentials();
                     });
             });
+        }
 
         return builder;
     }
