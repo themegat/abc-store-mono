@@ -1,7 +1,7 @@
 import { BaseQueryApi, createApi, FetchArgs, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { getFirebaseIdToken } from '../firebase-token-fetcher';
 
-const baseUrl = 'https://localhost:7198/';
+const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
 const firebaseAuthBaseQuery = async (args: string | FetchArgs, api: BaseQueryApi, extraOptions: object) => {
   const token = await getFirebaseIdToken();

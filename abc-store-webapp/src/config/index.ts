@@ -11,18 +11,7 @@ const config = {
   dateFormat: 'MMMM DD, YYYY',
   email: 'auther-email@gmail.com',
   title: 'ABC Store',
-  firebase: {
-    firebaseConfig: {
-      apiKey: '',
-      authDomain: '',
-      projectId: '',
-      storageBucket: '',
-      messagingSenderId: '',
-      appId: '',
-      measurementId: '',
-    },
-  },
-  preferedCurrency: "ZAR"
+  preferedCurrency: 'ZAR',
 };
 
 export { config };

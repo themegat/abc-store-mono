@@ -13,14 +13,20 @@ import { Provider as JotaiProvider } from 'jotai';
 import ThemeProvider from '@/theme/Provider';
 
 import { AuthProvider } from './components/auth/AuthContext';
-import { config } from './config';
 import { store } from './store/store';
 
 const container = document.getElementById('root') as HTMLElement;
 const root = createRoot(container);
 
-const app = initializeApp(config.firebase.firebaseConfig); // Ensure Firebase app is initialized
-const auth = getAuth(app); // Initialize Firebase Auth
+const firebaseConfigBase64 = import.meta.env.VITE_FIREBASE_CONFIG_B64;
+if (!firebaseConfigBase64) {
+  throw new Error('Missing Firebase config');
+}
+const firebaseConfigString = atob(firebaseConfigBase64);
+const firebaseConfig = JSON.parse(firebaseConfigString);
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 auth.signOut();
 
 const ui = initializeUI({ app });
