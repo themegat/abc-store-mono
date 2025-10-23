@@ -9,8 +9,13 @@ type GenerateThumbnailRespose = {
   contentType?: string;
 };
 
-type GenerateThumbnailRequest = {
+type ImageData = {
   url: string;
+  id: number;
+};
+
+type GenerateThumbnailRequest = {
+  image: ImageData;
   size: number;
 };
 
@@ -22,11 +27,11 @@ class ThumbnailGeneratorService {
 
     return new Promise(async (resolve, reject) => {
       try {
-        if (request.url === undefined) {
+        if (request.image.url === undefined) {
           throw new Error("Invalid image url provided");
         }
         const imageBuffer = await axios
-          .get(request.url, {
+          .get(request.image.url, {
             responseType: "arraybuffer",
           })
           .catch((err) => {
@@ -43,8 +48,21 @@ class ThumbnailGeneratorService {
 
         fileName += `.${type.ext}`;
 
+        const padding = 10;
+        const background = { r: 255, g: 255, b: 255, alpha: 0.0 };
         const thumbnail = await sharp(imageBuffer.data)
-          .resize(request.size, request.size)
+          .resize(request.size, request.size, {
+            fit: "contain",
+            background,
+          })
+          .extend({
+            top: padding,
+            bottom: padding,
+            left: padding,
+            right: padding,
+            background,
+          })
+
           .toBuffer();
 
         resolve({
@@ -60,6 +78,7 @@ class ThumbnailGeneratorService {
 }
 
 export {
+  ImageData,
   GenerateThumbnailRequest,
   GenerateThumbnailRespose,
   ThumbnailGeneratorService,

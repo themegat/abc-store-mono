@@ -5,9 +5,11 @@
     "lint": "eslint --ext .js,.ts .",
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "serve": "npm run build && firebase emulators:start --only functions --inspect-functions=9229",
+    "serve": "npm run build && firebase emulators:start  --import ./emulator-data --only functions,storage --inspect-functions=9229",
     "shell": "npm run build && firebase functions:shell",
+    "save": "rm -rf emulator-data && firebase emulators:export ./emulator-data && mv firebase-export-* emulator-data",
     "start": "npm run shell",
+    "rename-firebase-export": "rm -rf emulator-data && mv firebase-export-* emulator-data",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log"
   },
