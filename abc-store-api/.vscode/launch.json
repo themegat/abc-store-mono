@@ -23,8 +23,9 @@
                 "CONNECTION_STRING": "",
                 "EXCHANGE_RATE_API_KEY": "",
                 "FIREBASE_PROJECT_ID": "",
+                "FIREBASE_FUNCTION_URL": "http://127.0.0.1:5001/abc-store-cf711/us-central1",
                 "ALLOWED_ORIGINS": "http://localhost:5173",
-                "BUILD_VERSION": "develop"
+                "BUILD_VERSION": "develop",
             },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"

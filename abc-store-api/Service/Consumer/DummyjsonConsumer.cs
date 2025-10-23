@@ -33,8 +33,6 @@ public class DummyjsonConsumer : IConsumer
     {
         int newCount = 0;
         int duplicateCount = 0;
-        List<Tuple<string, List<string>>> imagesToAdd = new List<Tuple<String, List<string>>>();
-
         foreach (var product in products)
         {
             var newProduct = new Product()
@@ -59,19 +57,15 @@ public class DummyjsonConsumer : IConsumer
             if (!_productConsumerUtil.IsExistingProduct(newProduct.Name))
             {
                 _uow.Products.Add(newProduct);
-                imagesToAdd.Add(new Tuple<string, List<string>>(newProduct.Name, product.Images));
+                await _uow.CompleteAsync();
+                await _productConsumerUtil.PersistProductImages(product.Id, product.Images, SysUser);
+
                 newCount++;
             }
             else
             {
                 duplicateCount++;
             }
-        }
-
-        await _uow.CompleteAsync();
-        foreach (var pi in imagesToAdd)
-        {
-            await _productConsumerUtil.PersistProductImages(pi.Item1, pi.Item2, SysUser);
         }
 
         _logger.LogInformation("Added {Count} products. Skipped {Skipped} duplicate products.", newCount, duplicateCount);

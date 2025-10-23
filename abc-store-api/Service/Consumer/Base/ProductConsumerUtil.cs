@@ -1,6 +1,7 @@
 
 using ABCStoreAPI.Database.Model;
 using ABCStoreAPI.Repository;
+using Newtonsoft.Json;
 
 namespace ABCStoreAPI.Service.Consumer.Base;
 
@@ -51,9 +52,9 @@ public class ProductConsumerUtil
         _logger.LogInformation("Added {Count} product categories. Skipped {Skipped} duplicate categories.", newCount, duplicateCount);
     }
 
-    public async Task PersistProductImages(string name, List<string> imageUrls, string user)
+    public async Task PersistProductImages(int productId, List<string> imageUrls, string user)
     {
-        var product = _uow.Products.GetByName(name).ToList().FirstOrDefault();
+        var product = _uow.Products.GetById(productId);
 
         if (product != null)
         {
@@ -74,6 +75,33 @@ public class ProductConsumerUtil
             }
 
             await _uow.CompleteAsync();
+        }
+    }
+
+    public async Task GenerateThumbnailsAsync(HttpClient httpClient, List<Tuple<int, string>> thumbnailsToGenerate)
+    {
+        var request = new FirebaseGenerateThumbnailRequest()
+        {
+            Size = 200,
+            Images = thumbnailsToGenerate.Select(t => new GenerateImageData() { Id = t.Item1, Url = t.Item2 }).ToList()
+        };
+
+        var firebaseBaseUrl = Environment.GetEnvironmentVariable("FIREBASE_FUNCTION_URL");
+        var response = await httpClient.PostAsJsonAsync($"{firebaseBaseUrl}/generateAndStoreThubmnail", request);
+        response.EnsureSuccessStatusCode();
+        string data = await response.Content.ReadAsStringAsync();
+
+        FirebaseGenerateThumbnailResponse generatedThumbnails =
+            JsonConvert.DeserializeObject<FirebaseGenerateThumbnailResponse>(data)!;
+
+        foreach (var thumbnail in generatedThumbnails.Data)
+        {
+            var product = _uow.Products.GetById(thumbnail.Id);
+            if (product != null)
+            {
+                product.ThumbnailUrl = thumbnail.Url;
+                await _uow.CompleteAsync();
+            }
         }
     }
 }
