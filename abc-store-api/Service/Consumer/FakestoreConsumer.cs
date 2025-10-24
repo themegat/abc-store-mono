@@ -61,15 +61,6 @@ public class FakestoreConsumer : IConsumer
                 StockQuantity = product.Stock,
             };
 
-            if (string.IsNullOrWhiteSpace(product.Thumbnail) && !string.IsNullOrWhiteSpace(product.Image))
-            {
-                thumbnailsToGenerate.Add(new Tuple<int, string>(product.Id, product.Image));
-            }
-            else
-            {
-                newProduct.ThumbnailUrl = product.Thumbnail;
-            }
-
             newProduct.CreatedAt = DateTime.UtcNow;
             newProduct.UpdatedAt = DateTime.UtcNow;
             newProduct.CreatedBy = SysUser;
@@ -83,6 +74,15 @@ public class FakestoreConsumer : IConsumer
 
             if (!_productUtil.IsExistingProduct(newProduct.Name))
             {
+                if (string.IsNullOrWhiteSpace(product.Thumbnail) && !string.IsNullOrWhiteSpace(product.Image))
+                {
+                    thumbnailsToGenerate.Add(new Tuple<int, string>(product.Id, product.Image));
+                }
+                else
+                {
+                    newProduct.ThumbnailUrl = product.Thumbnail;
+                }
+                
                 _uow.Products.Add(newProduct);
                 await _uow.CompleteAsync();
                 var images = new List<string> { product.Image };

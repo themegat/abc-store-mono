@@ -86,6 +86,11 @@ public class ProductConsumerUtil
             Images = thumbnailsToGenerate.Select(t => new GenerateImageData() { Id = t.Item1, Url = t.Item2 }).ToList()
         };
 
+        if (request.Images.Count == 0)
+        {
+            return;
+        }
+
         var firebaseBaseUrl = Environment.GetEnvironmentVariable("FIREBASE_FUNCTION_URL");
         var response = await httpClient.PostAsJsonAsync(firebaseBaseUrl, request);
         response.EnsureSuccessStatusCode();
