@@ -20,12 +20,6 @@ let minPrice = 0;
 let maxPrice = MaxPrice;
 
 function ShoppingPage() {
-  // const [categoryId, setCategoryId] = useState(0);
-  // const [inStock, setInStock] = useState(false);
-  // const [, setMinPrice] = useState(0);
-  // const [, setMaxPrice] = useState(MaxPrice);
-  // const [products, setProducts] = useState<ProductDto[]>([]);
-  // const [pageNumber, setPageNumber] = useState(1);
   const [fetchingProducts, setFetchingProducts] = useState(false);
 
   const { preferedCurrency } = useCurrency(config.preferedCurrency);
@@ -52,7 +46,6 @@ function ShoppingPage() {
           pageNumber++;
           setTimeout(() => {
             observer.observe(document.querySelector('#load-more') as Element);
-            console.log('Observer initialized');
           }, 1000);
         }
         setFetchingProducts(false);
@@ -64,10 +57,6 @@ function ShoppingPage() {
     inStock = changes.inStock;
     minPrice = changes.minPrice;
     maxPrice = changes.maxPrice;
-    // setCategoryId(changes.categoryId);
-    // setInStock(changes.inStock);
-    // setMinPrice(changes.minPrice);
-    // setMaxPrice(changes.maxPrice);
     pageNumber = 1;
     products = [];
     fetchProducts();
