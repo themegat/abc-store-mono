@@ -4,10 +4,9 @@
         {
             "type": "node",
             "request": "attach",
-            "name": "Attach to Firebase Functions (9229)",
+            "name": "Debug Functions",
             "port": 9229,
             "restart": true,
-            "protocol": "inspector",
             "skipFiles": [
                 "<node_internals>/**"
             ],
@@ -15,7 +14,8 @@
             "outFiles": [
                 "${workspaceFolder}/lib/**/*.js"
             ],
-            "preLaunchTask": "serve:functions"
+            "preLaunchTask": "serve:functions",
+            "postDebugTask": "terminate:functions"
         }
     ]
 }

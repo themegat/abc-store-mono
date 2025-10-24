@@ -8,6 +8,23 @@ using Newtonsoft.Json;
 
 namespace ABCStoreAPI.Service.Consumer;
 
+class GenerateImageData
+{
+    public int Id { get; set; }
+    public string Url { get; set; } = string.Empty;
+}
+
+class FirebaseGenerateThumbnailRequest
+{
+    public int Size { get; set; }
+    public List<GenerateImageData> Images { get; set; } = new List<GenerateImageData>();
+}
+
+class FirebaseGenerateThumbnailResponse
+{
+    public List<GenerateImageData> Data { get; set; } = new List<GenerateImageData>();
+}
+
 class FakestoreProductConsumable : ProductConsumable
 {
     public string Image { get; set; }
@@ -32,7 +49,7 @@ public class FakestoreConsumer : IConsumer
     {
         int newCount = 0;
         int duplicateCount = 0;
-        List<Tuple<string, List<string>>> imagesToAdd = new List<Tuple<String, List<string>>>();
+        List<Tuple<int, string>> thumbnailsToGenerate = new List<Tuple<int, string>>();
 
         foreach (var product in products)
         {
@@ -42,8 +59,8 @@ public class FakestoreConsumer : IConsumer
                 Description = product.Description,
                 Price = product.Price,
                 StockQuantity = product.Stock,
-                ThumbnailUrl = product.Thumbnail
             };
+
             newProduct.CreatedAt = DateTime.UtcNow;
             newProduct.UpdatedAt = DateTime.UtcNow;
             newProduct.CreatedBy = SysUser;
@@ -57,9 +74,19 @@ public class FakestoreConsumer : IConsumer
 
             if (!_productUtil.IsExistingProduct(newProduct.Name))
             {
+                if (string.IsNullOrWhiteSpace(product.Thumbnail) && !string.IsNullOrWhiteSpace(product.Image))
+                {
+                    thumbnailsToGenerate.Add(new Tuple<int, string>(product.Id, product.Image));
+                }
+                else
+                {
+                    newProduct.ThumbnailUrl = product.Thumbnail;
+                }
+                
                 _uow.Products.Add(newProduct);
+                await _uow.CompleteAsync();
                 var images = new List<string> { product.Image };
-                imagesToAdd.Add(new Tuple<string, List<string>>(newProduct.Name, images));
+                await _productUtil.PersistProductImages(product.Id, images, SysUser);
                 newCount++;
             }
             else
@@ -68,15 +95,12 @@ public class FakestoreConsumer : IConsumer
             }
         }
 
-        await _uow.CompleteAsync();
-        foreach (var pi in imagesToAdd)
-        {
-            await _productUtil.PersistProductImages(pi.Item1, pi.Item2, SysUser);
-        }
-
+        await _productUtil.GenerateThumbnailsAsync(_httpClient, thumbnailsToGenerate);
         _logger.LogInformation("Added {Count} products. Skipped {Skipped} duplicate products.", newCount, duplicateCount);
 
     }
+
+
 
     override
     public async Task ConsumeAsync()

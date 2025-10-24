@@ -1,9 +1,13 @@
 import { initializeApp } from "firebase/app";
 import { getStorage } from "firebase/storage";
-import config from "./config.js";
 
 const initialiseApp = () => {
-  const app = initializeApp(config.firebaseConfig);
+  const firebaseConfigString = process.env.FIREBASE_CONFIG;
+  if (!firebaseConfigString) {
+    throw new Error("Missing Firebase config");
+  }
+  const firebaseConfig = JSON.parse(firebaseConfigString);
+  const app = initializeApp(firebaseConfig);
   const storage = getStorage(app);
 
   return {
