@@ -9,12 +9,12 @@
 
 import { setGlobalOptions } from "firebase-functions";
 import { onRequest } from "firebase-functions/https";
-// import initialiseApp from "./initialiseApp.js";
+import initialiseApp from "./initialiseApp.js";
 import GenerateThunbnailHandler from "./handler/generate_thumbnail_handler.js";
 
 setGlobalOptions({ maxInstances: 2 });
 
-// initialiseApp();
+initialiseApp();
 
 export const generateAndStoreThubmnail = onRequest(
   async (request, response) => await GenerateThunbnailHandler(request, response)

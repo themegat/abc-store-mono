@@ -87,7 +87,7 @@ public class ProductConsumerUtil
         };
 
         var firebaseBaseUrl = Environment.GetEnvironmentVariable("FIREBASE_FUNCTION_URL");
-        var response = await httpClient.PostAsJsonAsync($"{firebaseBaseUrl}/generateAndStoreThubmnail", request);
+        var response = await httpClient.PostAsJsonAsync(firebaseBaseUrl, request);
         response.EnsureSuccessStatusCode();
         string data = await response.Content.ReadAsStringAsync();
 

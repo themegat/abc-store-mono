@@ -8,6 +8,7 @@ import {
   ThumbnailGeneratorService,
 } from "../service/thumbnail_genenerator.js";
 
+const thumbnailGeneratorService = new ThumbnailGeneratorService();
 const GenerateThunbnailHandler = async (
   request: Request,
   response: Response
@@ -35,35 +36,37 @@ const GenerateThunbnailHandler = async (
   }
 };
 
-const generateThumbnail = (
+const generateThumbnail = async (
   image: ImageData,
   size: number,
   storageService: FirebaseStorageService
 ): Promise<ImageData> => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const result = await ThumbnailGeneratorService.generateThumbnail({
+  let thumbnailUrl: string;
+  try {
+    const result = await thumbnailGeneratorService
+      .generateThumbnail({
         image,
         size: size,
-      }).catch((err) => {
+      })
+      .catch((err) => {
         throw new Error(err);
       });
 
-      if (!result.buffer || !result.filename || !result.contentType) {
-        throw new Error("Unable to generate thumbnail");
-      }
-      const uploadRequest: StorageUploadRequest = {
-        filename: result.filename,
-        buffer: result.buffer,
-        contentType: result.contentType,
-      };
-      const { url: thumbnailUrl } =
-        await storageService.uploadThumbnail(uploadRequest);
-      resolve({ url: thumbnailUrl, id: image.id });
-    } catch (err) {
-      reject(err);
+    if (!result.buffer || !result.filename || !result.contentType) {
+      throw new Error("Unable to generate thumbnail");
     }
-  });
+    const uploadRequest: StorageUploadRequest = {
+      filename: result.filename,
+      buffer: result.buffer,
+      contentType: result.contentType,
+    };
+    const uploadResponse = await storageService.uploadThumbnail(uploadRequest);
+    thumbnailUrl = uploadResponse.url;
+  } catch (err) {
+    throw err as Error;
+  }
+
+  return { url: thumbnailUrl, id: image.id };
 };
 
 export default GenerateThunbnailHandler;
