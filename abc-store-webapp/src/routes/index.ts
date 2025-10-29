@@ -1,5 +1,7 @@
-import StorefrontIcon from '@mui/icons-material/Storefront';
 import HomeIcon from '@mui/icons-material/Home';
+import StorefrontIcon from '@mui/icons-material/Storefront';
+
+import { t } from 'i18next';
 
 import asyncComponentLoader from '@/utils/loader';
 
@@ -9,13 +11,13 @@ const routes: Routes = [
   {
     component: asyncComponentLoader(() => import('@/pages/Welcome')),
     path: '/',
-    title: 'Welcome',
+    title: t('routes.welcome'),
     icon: HomeIcon,
   },
   {
     component: asyncComponentLoader(() => import('@/pages/ShoppingPage')),
     path: '/shopping',
-    title: 'Shop',
+    title: t('routes.shop'),
     icon: StorefrontIcon,
     show: true,
   },

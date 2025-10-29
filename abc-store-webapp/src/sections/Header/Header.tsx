@@ -2,6 +2,8 @@ import ThemeIcon from '@mui/icons-material/InvertColors';
 import MenuIcon from '@mui/icons-material/Menu';
 import { AppBar, Divider, IconButton, Stack, Toolbar, Tooltip, Typography } from '@mui/material';
 
+import { t } from 'i18next';
+
 import { config } from '@/config';
 import { useHotKeysDialog } from '@/sections/HotKeys/hooks';
 import { useSidebar } from '@/sections/Sidebar/hooks';
@@ -28,7 +30,10 @@ function Header({ enabledSidebar = true }: Props) {
       data-pw={`theme-${themeMode}`}
       enableColorOnDark
       sx={{
-        backgroundImage: themeMode === 'dark' ? `url(${headerBackgroundDarkImg})` : `url(${headerBackgroundLightImg})`,
+        backgroundImage:
+          themeMode === 'dark'
+            ? `url(${headerBackgroundDarkImg})`
+            : `url(${headerBackgroundLightImg})`,
         backgroundSize: 'contain',
         paddingBottom: 1,
       }}
@@ -54,18 +59,18 @@ function Header({ enabledSidebar = true }: Props) {
             <Stack></Stack>
           )}
           <Stack direction="row" alignItems="center">
-            <Tooltip title="Hot keys" arrow>
+            <Tooltip title={t('hotKeys.title')} arrow>
               <HotKeysButton
                 size="medium"
                 variant="contained"
                 aria-label="open hotkeys dialog"
                 onClick={openHotKeysDialog}
               >
-                Hot Keys
+                {t('hotKeys.title')}
               </HotKeysButton>
             </Tooltip>
             <Divider orientation="vertical" flexItem />
-            <Tooltip title="Switch theme" arrow>
+            <Tooltip title={t('header.switchTheme')} arrow>
               <IconButton
                 color="default"
                 edge="end"

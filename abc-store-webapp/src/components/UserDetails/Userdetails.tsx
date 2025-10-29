@@ -13,6 +13,8 @@ import {
   useTheme,
 } from '@mui/material';
 
+import { t } from 'i18next';
+
 import { config } from '@/config';
 import {
   useGetApiExchangeRateAllQuery,
@@ -97,9 +99,9 @@ const UserDetails = () => {
       >
         <Stack marginBottom={2} gap={1} alignItems="center">
           <Typography fontWeight={600} variant="h6">
-            User Details
+            {t('userDetails.title')}
           </Typography>
-          <Typography fontSize={14}>Please enter your details</Typography>
+          <Typography fontSize={14}>{t('userDetails.subTitle')}</Typography>
         </Stack>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack gap={2}>
@@ -112,12 +114,16 @@ const UserDetails = () => {
                   {...field}
                   sx={{ minWidth: 300 }}
                   size="small"
-                  label="First Name"
+                  label={t('userDetails.firstName')}
                   variant="outlined"
                   id="first-name"
                   type="text"
                   error={fieldState.error ? true : false}
-                  helperText={fieldState.error ? 'First Name is required' : ''}
+                  helperText={
+                    fieldState.error
+                      ? t('validation.required', { fieldName: t('userDetails.firstName') })
+                      : ''
+                  }
                 />
               )}
             />
@@ -129,12 +135,16 @@ const UserDetails = () => {
                 <TextField
                   {...field}
                   size="small"
-                  label="Last Name"
+                  label={t('userDetails.lastName')}
                   variant="outlined"
                   id="last-name"
                   type="text"
                   error={fieldState.error ? true : false}
-                  helperText={fieldState.error ? 'Last Name is required' : ''}
+                  helperText={
+                    fieldState.error
+                      ? t('validation.required', { fieldName: t('userDetails.lastName') })
+                      : ''
+                  }
                 />
               )}
             />
@@ -145,12 +155,14 @@ const UserDetails = () => {
               render={({ field, fieldState }) => (
                 <>
                   <FormControl>
-                    <InputLabel id="preferred-currency-label">Preferred Currency</InputLabel>
+                    <InputLabel id="preferred-currency-label">
+                      {t('userDetails.preferredCurrency')}
+                    </InputLabel>
                     <Select
                       {...field}
                       size="small"
                       id="preferred-currency"
-                      label="Preferred Currency"
+                      label={t('userDetails.preferredCurrency')}
                       labelId="preferred-currency-label"
                       error={fieldState.error ? true : false}
                     >
@@ -162,19 +174,23 @@ const UserDetails = () => {
                         );
                       })}
                     </Select>
+                    {fieldState.error && (
+                      <Typography marginTop={1} fontSize={12} color="error">
+                        {t('validation.required', {
+                          fieldName: t('userDetails.preferredCurrency'),
+                        })}
+                      </Typography>
+                    )}
                   </FormControl>
-                  {fieldState.error && (
-                    <Typography color="error">{fieldState.error?.message}</Typography>
-                  )}
                 </>
               )}
             />
             <Stack direction="row" width="100%" justifyContent="space-between">
               <Button disabled={isLoading} onClick={handleOnSkip} variant="contained" color="info">
-                Skip for now
+                {t('userDetails.skipButton')}
               </Button>
               <Button type="submit" variant="contained" loading={isLoading}>
-                Continue
+                {t('userDetails.okButton')}
               </Button>
             </Stack>
             {error && <Typography color="error">{error}</Typography>}

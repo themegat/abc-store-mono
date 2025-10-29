@@ -11,6 +11,7 @@ import { User } from '@/store/app-reducer';
 import { store } from '@/store/store';
 
 import backgroundShopImg from '../../assets/background/background_shop.webp';
+import { t } from 'i18next';
 
 const pageSize = 10;
 let pageNumber = 1;
@@ -99,11 +100,11 @@ function ShoppingPage() {
       >
         <Grid container spacing={2}>
           <Grid size={12} textAlign="center">
-            <Typography variant="h3">Shop</Typography>
+            <Typography variant="h3">{t('routes.shop')}</Typography>
           </Grid>
           <Grid size={3}>
             <Typography variant="h6" marginBottom={2}>
-              Filter Products
+              {t('productFilter.title')}
             </Typography>
             <ProductFilter
               onFilterChange={onFilterChanged}

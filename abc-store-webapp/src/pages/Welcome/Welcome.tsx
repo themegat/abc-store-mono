@@ -2,6 +2,8 @@ import { useState } from 'react';
 
 import { Button, Stack, Step, StepContent, StepLabel, Stepper, Typography } from '@mui/material';
 
+import { t } from 'i18next';
+
 import UserDetails from '@/components/UserDetails/Userdetails';
 import AuthComponent from '@/components/auth/AuthComponent';
 import useOrientation from '@/hooks/useOrientation';
@@ -9,6 +11,7 @@ import { store } from '@/store/store';
 
 import backgroundVid from '../../assets/background/background_welcome.mp4';
 import posterImg from '../../assets/background/background_welcome.webp';
+import { config } from '@/config';
 
 function Welcome() {
   const isPortrait = useOrientation();
@@ -52,7 +55,7 @@ function Welcome() {
           marginTop={12}
         >
           <Typography margin={0} variant="h3" align="center" gutterBottom>
-            Welcome to ABC Store!
+            {t('title', {storeName: `${config.title}!`})}
           </Typography>
           <Button
             onClick={() => {

@@ -14,6 +14,8 @@ import {
   Typography,
 } from '@mui/material';
 
+import { t } from 'i18next';
+
 import { AuthContext } from '@/components/auth/AuthContext';
 import routes from '@/routes';
 import { User } from '@/store/app-reducer';
@@ -70,7 +72,7 @@ function Sidebar({ enabled = true }: Props) {
               ))}
           </List>
           <Stack padding={2} textAlign="center">
-            <Typography variant="subtitle1">Signed in as</Typography>
+            <Typography variant="subtitle1">{t('sideBar.signedInAs')}</Typography>
             <Typography variant="body1" fontWeight="bold">
               {username}
             </Typography>
@@ -79,7 +81,7 @@ function Sidebar({ enabled = true }: Props) {
                 signout();
               }}
             >
-              Sign out
+              {t('sideBar.signOut')}
             </Button>
           </Stack>
         </SwipeableDrawer>

@@ -1,0 +1,41 @@
+{
+  "title": "Welcome to {{storeName}}",
+  "header": {
+    "switchTheme": "Switch Theme"
+  },
+  "sideBar": {
+    "signedInAs": "Signed in as",
+    "signOut": " Sign out"
+  },
+  "hotKeys": {
+    "title": "Hot Keys",
+    "toggleTheme": "Toggle Theme",
+    "toggleSidebar": "Toggle Sidebar",
+    "toggleHotKeysDialog": "Toggle Hot Keys' Dialog"
+  },
+  "userDetails": {
+    "title": "User Details",
+    "subTitle": "Please enter your details",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "preferredCurrency": "Preferred Currency",
+    "skipButton": "Skip for now",
+    "okButton": "Continue"
+  },
+  "validation": {
+    "required": "{{fieldName}} is required!"
+  },
+  "routes": {
+    "welcome": "Welcome",
+    "shop": "Start Shopping"
+  },
+  "productFilter": {
+    "title": "Filter Products",
+    "category": "Category",
+    "all": "All",
+    "inStock": "Show only products in stock",
+    "minPrice": "Min Price",
+    "maxPrice": "Max Price",
+    "btnApply": "Apply Pricing"
+  }
+}
