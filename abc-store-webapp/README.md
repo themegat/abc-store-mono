@@ -21,7 +21,7 @@ Also make sure to set these environment variables in the [env](/.env) file:
 
 > **Note**
 > 
-> If the .env files is missing, create it in the root of this project and then add the environment variables.
+> If the .env file is missing, create it in the root of this project and then add the environment variables.
 
 ### Running the project
 
