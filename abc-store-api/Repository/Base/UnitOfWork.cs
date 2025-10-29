@@ -9,6 +9,7 @@ public interface IUnitOfWork : IDisposable
     IProductCategoryRepository ProductCategories { get; }
     IProductImageRepository ProductImages { get; }
     ISupportedCurrenyRepository SupportedCurrencies { get; }
+    IUserDetailsRepository UserDetails { get; }
 
     int Complete();
     Task<int> CompleteAsync();
@@ -22,13 +23,15 @@ public class UnitOfWork : IUnitOfWork
     public IProductCategoryRepository ProductCategories { get; private set; }
     public IProductImageRepository ProductImages { get; private set; }
     public ISupportedCurrenyRepository SupportedCurrencies { get; private set; }
+    public IUserDetailsRepository UserDetails { get; private set; }
 
     public UnitOfWork(AppDbContext context,
     IExchangeRateRepository exchangeRateRepository,
     IProductRepository productRepository,
     IProductCategoryRepository productCategoryRepository,
     IProductImageRepository productImageRepository,
-    ISupportedCurrenyRepository supportedCurrenyRepository)
+    ISupportedCurrenyRepository supportedCurrenyRepository,
+    IUserDetailsRepository userDetails)
     {
         _context = context;
         ExchangeRates = exchangeRateRepository;
@@ -36,6 +39,7 @@ public class UnitOfWork : IUnitOfWork
         ProductCategories = productCategoryRepository;
         ProductImages = productImageRepository;
         SupportedCurrencies = supportedCurrenyRepository;
+        UserDetails = userDetails;
     }
 
     public int Complete()

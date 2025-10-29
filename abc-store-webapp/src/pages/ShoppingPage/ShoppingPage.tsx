@@ -3,13 +3,15 @@ import { useCallback, useEffect, useState } from 'react';
 import { Grid2 as Grid, Stack, Typography } from '@mui/material';
 
 import Loading from '@/components/Loading';
-import ProductCard from '@/components/ProductCard';
-import { MaxPrice, ProductFilter, ProductFilterChanges } from '@/components/ProductFilter';
+import ProductCard from '@/components/Product/ProductCard';
+import { MaxPrice, ProductFilter, ProductFilterChanges } from '@/components/Product/ProductFilter';
 import { config } from '@/config';
-import useCurrency from '@/hooks/useCurrency';
 import { ProductDto, abcApi, useGetApiProductCategoriesQuery } from '@/store/api/abcApi';
+import { User } from '@/store/app-reducer';
+import { store } from '@/store/store';
 
 import backgroundShopImg from '../../assets/background/background_shop.webp';
+import { t } from 'i18next';
 
 const pageSize = 10;
 let pageNumber = 1;
@@ -22,16 +24,16 @@ let maxPrice = MaxPrice;
 function ShoppingPage() {
   const [fetchingProducts, setFetchingProducts] = useState(false);
 
-  const { preferedCurrency } = useCurrency(config.preferedCurrency);
-
   const { data: categoriesResponse } = useGetApiProductCategoriesQuery();
 
   const [getProducts] = abcApi.endpoints.getApiProductFilterByCurrencyCode.useLazyQuery();
 
+  const user: User = store.getState().app.user;
+
   const fetchProducts = useCallback(() => {
     setFetchingProducts(true);
     getProducts({
-      currencyCode: config.preferedCurrency,
+      currencyCode: user?.preferredCurrency || config.preferedCurrency,
       categoryId,
       inStock,
       minPrice,
@@ -98,11 +100,11 @@ function ShoppingPage() {
       >
         <Grid container spacing={2}>
           <Grid size={12} textAlign="center">
-            <Typography variant="h3">Shop</Typography>
+            <Typography variant="h3">{t('routes.shop')}</Typography>
           </Grid>
           <Grid size={3}>
             <Typography variant="h6" marginBottom={2}>
-              Filter Products
+              {t('productFilter.title')}
             </Typography>
             <ProductFilter
               onFilterChange={onFilterChanged}
@@ -118,7 +120,7 @@ function ShoppingPage() {
                   image={item?.thumbnailUrl ? item.thumbnailUrl : ''}
                   title={item.name ?? ''}
                   price={item.price ?? 0}
-                  currency={preferedCurrency ?? {}}
+                  currency={{}}
                 ></ProductCard>
               ))}
               {fetchingProducts && <Loading></Loading>}

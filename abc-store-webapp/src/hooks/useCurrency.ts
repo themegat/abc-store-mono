@@ -1,23 +1,20 @@
 import { useEffect, useState } from 'react';
 
 import { ExchangeRateDto, useGetApiExchangeRateAllQuery } from '@/store/api/abcApi';
+import { store } from '@/store/store';
 
-const useCurrency = (preferedCurrencyCode: string) => {
+const useCurrency = () => {
   const { data: currencyResponse } = useGetApiExchangeRateAllQuery();
-  const [preferedCurrency, setPreferedCurrency] = useState<ExchangeRateDto | undefined>();
   const [supportedCurrencies, setSupportedCurrencies] = useState<ExchangeRateDto[]>([]);
 
   useEffect(() => {
     if (currencyResponse) {
       setSupportedCurrencies(currencyResponse);
-      setPreferedCurrency(
-        currencyResponse.find((currency) => currency.code === preferedCurrencyCode),
-      );
+      store.dispatch({ type: 'SET_SUPPORTED_CURRENCIES', payload: currencyResponse });
     }
-  }, [currencyResponse, preferedCurrencyCode]);
+  }, [currencyResponse]);
 
   return {
-    preferedCurrency,
     supportedCurrencies,
   };
 };

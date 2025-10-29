@@ -1,6 +1,8 @@
+using ABCStoreAPI.Service.Dto.Base;
+
 namespace ABCStoreAPI.Service.Dto;
 
-public class ProductDto
+public class ProductDto : IDto<ProductDto, Database.Model.Product>
 {
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;

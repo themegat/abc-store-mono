@@ -41,6 +41,27 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: () => ({ url: `/api/Product/categories` }),
     }),
+    getApiUserDetails: build.query<
+      GetApiUserDetailsApiResponse,
+      GetApiUserDetailsApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/UserDetails`,
+        params: {
+          userId: queryArg.userId,
+        },
+      }),
+    }),
+    postApiUserDetailsUpdateCreate: build.mutation<
+      PostApiUserDetailsUpdateCreateApiResponse,
+      PostApiUserDetailsUpdateCreateApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/UserDetails/update-create`,
+        method: "POST",
+        body: queryArg.userDetailsDto,
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -70,6 +91,15 @@ export type GetApiProductFilterByCurrencyCodeApiArg = {
 export type GetApiProductCategoriesApiResponse =
   /** status 200 OK */ ProductCategoryDto[];
 export type GetApiProductCategoriesApiArg = void;
+export type GetApiUserDetailsApiResponse = /** status 200 OK */ UserDetailsDto;
+export type GetApiUserDetailsApiArg = {
+  userId?: string;
+};
+export type PostApiUserDetailsUpdateCreateApiResponse =
+  /** status 200 OK */ UserDetailsDto;
+export type PostApiUserDetailsUpdateCreateApiArg = {
+  userDetailsDto: UserDetailsDto;
+};
 export type ExchangeRateDto = {
   code?: string;
   name?: string;
@@ -96,10 +126,18 @@ export type ProductCategoryDto = {
   id?: number;
   name?: string;
 };
+export type UserDetailsDto = {
+  userId?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  preferredCurrency?: string | null;
+};
 export const {
   useGetApiAboutQuery,
   useGetApiExchangeRateAllQuery,
   useGetApiExchangeRateByCurrencyCodeQuery,
   useGetApiProductFilterByCurrencyCodeQuery,
   useGetApiProductCategoriesQuery,
+  useGetApiUserDetailsQuery,
+  usePostApiUserDetailsUpdateCreateMutation,
 } = injectedRtkApi;

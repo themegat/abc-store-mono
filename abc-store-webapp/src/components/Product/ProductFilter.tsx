@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import { Stack } from '@mui/system';
 
+import { t } from 'i18next';
 import tinycolor from 'tinycolor2';
 
 import { GetApiProductCategoriesApiResponse } from '@/store/api/abcApi';
@@ -51,19 +52,19 @@ const ProductFilter = ({ categories, onFilterChange, sx }: Props) => {
   return (
     <Paper sx={{ ...sx, borderWidth: 1, borderRadius: 1, padding: 2, backgroundColor }}>
       <FormControl fullWidth>
-        <InputLabel id="category-select-label">Category</InputLabel>
+        <InputLabel id="category-select-label">{t('productFilter.category')}</InputLabel>
         <Select
           labelId="category-select-label"
           id="category-select"
           value={category}
-          label="category"
+          label={t('productFilter.category')}
           onChange={(event) => {
             const id = Number(event.target.value);
             setCategory(id);
             onFilterChange({ categoryId: id, inStock, minPrice, maxPrice });
           }}
         >
-          <MenuItem value={0}>All</MenuItem>
+          <MenuItem value={0}>{t('productFilter.all')}</MenuItem>
           {categories?.map((item) => (
             <MenuItem value={item.id}>
               <Typography sx={{ textTransform: 'capitalize' }}>{item.name}</Typography>
@@ -78,12 +79,12 @@ const ProductFilter = ({ categories, onFilterChange, sx }: Props) => {
           onFilterChange({ categoryId: category, inStock: checked, minPrice, maxPrice });
         }}
         control={<Checkbox defaultChecked />}
-        label="In Stock"
+        label={t('productFilter.inStock')}
       />
       <PricingDivider />
       <Stack gap={2}>
         <TextField
-          label="Min Price"
+          label={t('productFilter.minPrice')}
           id="min-price"
           type="number"
           defaultValue={minPrice}
@@ -93,7 +94,7 @@ const ProductFilter = ({ categories, onFilterChange, sx }: Props) => {
           }}
         />
         <TextField
-          label="Max Price"
+          label={t('productFilter.maxPrice')}
           id="max-price"
           type="number"
           defaultValue={maxPrice}
@@ -109,7 +110,7 @@ const ProductFilter = ({ categories, onFilterChange, sx }: Props) => {
             onFilterChange({ categoryId: category, inStock, minPrice, maxPrice });
           }}
         >
-          Apply Pricing
+          {t('productFilter.btnApply')}
         </Button>
       </Stack>
       <PricingDivider />

@@ -1,13 +1,28 @@
-import { Stack, Typography } from '@mui/material';
+import { useState } from 'react';
 
+import { Stack, Step, StepContent, Stepper, Typography } from '@mui/material';
+
+import { t } from 'i18next';
+
+import UserDetails from '@/components/UserDetails/Userdetails';
 import AuthComponent from '@/components/auth/AuthComponent';
+import { config } from '@/config';
 import useOrientation from '@/hooks/useOrientation';
+import { store } from '@/store/store';
 
 import backgroundVid from '../../assets/background/background_welcome.mp4';
 import posterImg from '../../assets/background/background_welcome.webp';
 
 function Welcome() {
   const isPortrait = useOrientation();
+  const [activeStep, setActiveStep] = useState(0);
+
+  store.subscribe(() => {
+    const user = store.getState().app.user;
+    if (user) {
+      setActiveStep(1);
+    }
+  });
 
   const setPlaybackSpeed = () => {
     const element = document.querySelector('video');
@@ -35,14 +50,39 @@ function Welcome() {
         </video>
         <Stack
           flexDirection={isPortrait ? 'row' : 'column'}
-          sx={{ position: 'fixed', zIndex: 2, width: '100%', height: '100%' }}
+          sx={{ position: 'absolute', zIndex: 2, width: '100%', height: '100%' }}
           alignItems="center"
           marginTop={12}
         >
           <Typography margin={0} variant="h3" align="center" gutterBottom>
-            Welcome to ABC Store!
+            {t('title', { storeName: `${config.title}!` })}
           </Typography>
-          <AuthComponent sx={{ width: 400 }} />
+          <Stepper
+            orientation="vertical"
+            activeStep={activeStep}
+            sx={{
+              '.MuiStepContent-root.css-aprk75-MuiStepContent-root': {
+                border: 'none',
+              },
+              '.MuiStepConnector-line.MuiStepConnector-lineVertical.css-2ednpa-MuiStepConnector-line':
+                {
+                  display: 'none',
+                },
+            }}
+          >
+            <Step key={1}>
+              {/* <StepLabel>Step 1</StepLabel> */}
+              <StepContent>
+                <AuthComponent sx={{ width: 400 }} />
+              </StepContent>
+            </Step>
+            <Step key={2}>
+              {/* <StepLabel>Step 2</StepLabel> */}
+              <StepContent sx={{marginTop: 7}}>
+                <UserDetails></UserDetails>
+              </StepContent>
+            </Step>
+          </Stepper>
         </Stack>
       </Stack>
     </>
