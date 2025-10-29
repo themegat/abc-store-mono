@@ -1,17 +1,17 @@
 import { useState } from 'react';
 
-import { Button, Stack, Step, StepContent, StepLabel, Stepper, Typography } from '@mui/material';
+import { Stack, Step, StepContent, Stepper, Typography } from '@mui/material';
 
 import { t } from 'i18next';
 
 import UserDetails from '@/components/UserDetails/Userdetails';
 import AuthComponent from '@/components/auth/AuthComponent';
+import { config } from '@/config';
 import useOrientation from '@/hooks/useOrientation';
 import { store } from '@/store/store';
 
 import backgroundVid from '../../assets/background/background_welcome.mp4';
 import posterImg from '../../assets/background/background_welcome.webp';
-import { config } from '@/config';
 
 function Welcome() {
   const isPortrait = useOrientation();
@@ -55,20 +55,21 @@ function Welcome() {
           marginTop={12}
         >
           <Typography margin={0} variant="h3" align="center" gutterBottom>
-            {t('title', {storeName: `${config.title}!`})}
+            {t('title', { storeName: `${config.title}!` })}
           </Typography>
-          <Button
-            onClick={() => {
-              if (activeStep === 0) {
-                setActiveStep(1);
-              } else {
-                setActiveStep(0);
-              }
+          <Stepper
+            orientation="vertical"
+            activeStep={activeStep}
+            sx={{
+              '.MuiStepContent-root.css-aprk75-MuiStepContent-root': {
+                border: 'none',
+              },
+              '.MuiStepConnector-line.MuiStepConnector-lineVertical.css-2ednpa-MuiStepConnector-line':
+                {
+                  display: 'none',
+                },
             }}
           >
-            change stepp
-          </Button>
-          <Stepper orientation="vertical" activeStep={activeStep}>
             <Step key={1}>
               {/* <StepLabel>Step 1</StepLabel> */}
               <StepContent>
@@ -77,7 +78,7 @@ function Welcome() {
             </Step>
             <Step key={2}>
               {/* <StepLabel>Step 2</StepLabel> */}
-              <StepContent>
+              <StepContent sx={{marginTop: 7}}>
                 <UserDetails></UserDetails>
               </StepContent>
             </Step>
