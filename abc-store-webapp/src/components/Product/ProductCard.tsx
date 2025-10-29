@@ -5,7 +5,7 @@ import { Card, CardContent, CardMedia, Stack, SxProps, Typography, useTheme } fr
 import tinycolor from 'tinycolor2';
 import { ExchangeRateDto } from '@/store/api/abcApi';
 
-import placeholderImg from '../assets/placeholder.webp';
+import placeholderImg from '../../assets/placeholder.webp';
 
 type ProductCardProps = {
   image: string;

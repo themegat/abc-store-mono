@@ -16,6 +16,8 @@ import {
 
 import { AuthContext } from '@/components/auth/AuthContext';
 import routes from '@/routes';
+import { User } from '@/store/app-reducer';
+import { store } from '@/store/store';
 
 import { useSidebar } from './hooks';
 
@@ -27,7 +29,15 @@ function Sidebar({ enabled = true }: Props) {
   const { isOpen, open, close } = useSidebar();
   const authContext = useContext(AuthContext);
 
-  const username = authContext.user?.email;
+  const user: User = store.getState().app.user;
+  let username = '';
+  if (user) {
+    if (user.firstName && user.lastName) {
+      username = `${user.firstName} ${user.lastName}`;
+    } else if (user.email) {
+      username = user.email;
+    }
+  }
 
   const signout = () => {
     authContext.auth?.signOut().finally(() => {
@@ -59,7 +69,7 @@ function Sidebar({ enabled = true }: Props) {
                 </ListItem>
               ))}
           </List>
-          <Stack padding={2} textAlign='center'>
+          <Stack padding={2} textAlign="center">
             <Typography variant="subtitle1">Signed in as</Typography>
             <Typography variant="body1" fontWeight="bold">
               {username}

@@ -1,0 +1,188 @@
+import { useState } from 'react';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+
+import {
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+  Typography,
+  useTheme,
+} from '@mui/material';
+
+import { config } from '@/config';
+import {
+  useGetApiExchangeRateAllQuery,
+  usePostApiUserDetailsUpdateCreateMutation,
+} from '@/store/api/abcApi';
+import { User, UserState } from '@/store/app-reducer';
+import { store } from '@/store/store';
+
+interface IFormInputs {
+  firstName: string;
+  lastName: string;
+  preferredCurrency: string;
+}
+
+const UserDetails = () => {
+  const theme = useTheme();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | undefined>();
+  const { data: currencyResponse } = useGetApiExchangeRateAllQuery();
+  const [postApiUserDetailsUpdateCreate] = usePostApiUserDetailsUpdateCreateMutation();
+
+  const { control, handleSubmit } = useForm<IFormInputs>({
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      preferredCurrency: '',
+    },
+  });
+
+  const onSubmit: SubmitHandler<IFormInputs> = (data) => {
+    const user: User = store.getState().app.user;
+    setIsLoading(true);
+
+    const updateUser: User = {
+      ...user,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      preferredCurrency: data.preferredCurrency,
+    };
+    postApiUserDetailsUpdateCreate({
+      userDetailsDto: {
+        firstName: updateUser.firstName,
+        lastName: updateUser.lastName,
+        preferredCurrency: updateUser.preferredCurrency,
+        userId: updateUser.uid,
+      },
+    })
+      .unwrap()
+      .then(() => {
+        updateUser.state = UserState.COMPLETE;
+        store.dispatch({ type: 'SET_USER', payload: updateUser });
+      })
+      .catch((err) => {
+        setError(err.message);
+      })
+      .finally(() => setIsLoading(false));
+  };
+
+  const handleOnSkip = () => {
+    let user: User = store.getState().app.user;
+    if (user) {
+      const updateUser: User = {
+        ...user,
+        state: UserState.SKIPPED,
+        preferredCurrency: config.preferedCurrency,
+      };
+      store.dispatch({ type: 'SET_USER', payload: updateUser });
+    }
+  };
+
+  return (
+    <Stack>
+      <Stack
+        sx={{
+          borderWidth: 1,
+          borderColor: theme.palette.text.primary,
+          backgroundColor: theme.palette.background.paper,
+          paddingX: 5,
+          paddingY: 5,
+          borderRadius: 2,
+        }}
+      >
+        <Stack marginBottom={2} gap={1} alignItems="center">
+          <Typography fontWeight={600} variant="h6">
+            User Details
+          </Typography>
+          <Typography fontSize={14}>Please enter your details</Typography>
+        </Stack>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Stack gap={2}>
+            <Controller
+              name="firstName"
+              control={control}
+              rules={{ required: true }}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  sx={{ minWidth: 300 }}
+                  size="small"
+                  label="First Name"
+                  variant="outlined"
+                  id="first-name"
+                  type="text"
+                  error={fieldState.error ? true : false}
+                  helperText={fieldState.error ? 'First Name is required' : ''}
+                />
+              )}
+            />
+            <Controller
+              name="lastName"
+              control={control}
+              rules={{ required: true }}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  size="small"
+                  label="Last Name"
+                  variant="outlined"
+                  id="last-name"
+                  type="text"
+                  error={fieldState.error ? true : false}
+                  helperText={fieldState.error ? 'Last Name is required' : ''}
+                />
+              )}
+            />
+            <Controller
+              name="preferredCurrency"
+              control={control}
+              rules={{ required: true }}
+              render={({ field, fieldState }) => (
+                <>
+                  <FormControl>
+                    <InputLabel id="preferred-currency-label">Preferred Currency</InputLabel>
+                    <Select
+                      {...field}
+                      size="small"
+                      id="preferred-currency"
+                      label="Preferred Currency"
+                      labelId="preferred-currency-label"
+                      error={fieldState.error ? true : false}
+                    >
+                      {currencyResponse?.map((currency) => {
+                        return (
+                          <MenuItem key={currency.code} value={currency.code}>
+                            {currency.code}
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
+                  </FormControl>
+                  {fieldState.error && (
+                    <Typography color="error">{fieldState.error?.message}</Typography>
+                  )}
+                </>
+              )}
+            />
+            <Stack direction="row" width="100%" justifyContent="space-between">
+              <Button disabled={isLoading} onClick={handleOnSkip} variant="contained" color="info">
+                Skip for now
+              </Button>
+              <Button type="submit" variant="contained" loading={isLoading}>
+                Continue
+              </Button>
+            </Stack>
+            {error && <Typography color="error">{error}</Typography>}
+          </Stack>
+        </form>
+      </Stack>
+    </Stack>
+  );
+};
+
+export default UserDetails;
