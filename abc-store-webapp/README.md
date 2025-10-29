@@ -19,6 +19,10 @@ Also make sure to set these environment variables in the [env](/.env) file:
 - **VITE_FIREBASE_CONFIG_B64**: Your Firebase configuration, *(obtain from the Firebase Console)*, as a Base64 encoded string. Use https://jsonformatter.org/json-to-base64 to encode the firebase configuration.
 - **VITE_BUILD_VERSION**: Can be any string indicating a build number for the application, such a *Develop*.  
 
+> **Note**
+> 
+> If the .env file is missing, create it in the root of this project and then add the environment variables.
+
 ### Running the project
 
 ```bash

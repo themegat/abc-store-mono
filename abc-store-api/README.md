@@ -45,7 +45,7 @@ BUILD_VERSION [YOUR_BUILD_VERSION]
 
 > **Note**
 >
-> During start up the projec will consume the following,
+> During start up the application will consume the following,
 >
 > Product information from:
 > - https://dummyjson.com
