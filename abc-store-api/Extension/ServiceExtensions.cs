@@ -40,9 +40,11 @@ public static class ServiceExtensions
         builder.Services.AddScoped<IProductCategoryRepository, ProductCategoryRepository>();
         builder.Services.AddScoped<IProductImageRepository, ProductImageRepository>();
         builder.Services.AddScoped<ISupportedCurrenyRepository, SupportedCurrenyRepository>();
+        builder.Services.AddScoped<IUserDetailsRepository, UserDetailsRepository>();
 
         builder.Services.AddScoped<ExchangeRateService>();
         builder.Services.AddScoped<ProductService>();
+        builder.Services.AddScoped<UserDetailsService>();
 
         return builder;
     }

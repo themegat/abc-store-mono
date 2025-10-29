@@ -1,6 +1,8 @@
+using ABCStoreAPI.Service.Dto.Base;
+
 namespace ABCStoreAPI.Service.Dto;
 
-public class ExchangeRateDto
+public class ExchangeRateDto : IDto<ExchangeRateDto, Database.Model.ExchangeRate>
 {
     public string Code { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
