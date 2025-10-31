@@ -1,4 +1,5 @@
 using ABCStoreAPI.Database;
+using ABCStoreAPI.Repository.Base;
 
 namespace ABCStoreAPI.Repository;
 
@@ -10,6 +11,8 @@ public interface IUnitOfWork : IDisposable
     IProductImageRepository ProductImages { get; }
     ISupportedCurrenyRepository SupportedCurrencies { get; }
     IUserDetailsRepository UserDetails { get; }
+    ICartRepository Cart { get; }
+    ICartProductRepository CartProduct{ get; }
 
     int Complete();
     Task<int> CompleteAsync();
@@ -24,6 +27,8 @@ public class UnitOfWork : IUnitOfWork
     public IProductImageRepository ProductImages { get; private set; }
     public ISupportedCurrenyRepository SupportedCurrencies { get; private set; }
     public IUserDetailsRepository UserDetails { get; private set; }
+    public ICartRepository Cart { get; private set; }
+    public ICartProductRepository CartProduct { get; private set; }
 
     public UnitOfWork(AppDbContext context,
     IExchangeRateRepository exchangeRateRepository,
@@ -31,7 +36,9 @@ public class UnitOfWork : IUnitOfWork
     IProductCategoryRepository productCategoryRepository,
     IProductImageRepository productImageRepository,
     ISupportedCurrenyRepository supportedCurrenyRepository,
-    IUserDetailsRepository userDetails)
+    IUserDetailsRepository userDetails,
+    ICartRepository cart,
+    ICartProductRepository cartProduct)
     {
         _context = context;
         ExchangeRates = exchangeRateRepository;
@@ -40,6 +47,8 @@ public class UnitOfWork : IUnitOfWork
         ProductImages = productImageRepository;
         SupportedCurrencies = supportedCurrenyRepository;
         UserDetails = userDetails;
+        Cart = cart;
+        CartProduct = cartProduct;
     }
 
     public int Complete()

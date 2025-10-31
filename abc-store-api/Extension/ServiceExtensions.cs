@@ -3,6 +3,7 @@ using System.Security.Claims;
 using ABCStoreAPI.Configuration;
 using ABCStoreAPI.Database;
 using ABCStoreAPI.Repository;
+using ABCStoreAPI.Repository.Base;
 using ABCStoreAPI.Service;
 using ABCStoreAPI.Service.Consumer;
 using ABCStoreAPI.Service.Consumer.Base;
@@ -41,10 +42,13 @@ public static class ServiceExtensions
         builder.Services.AddScoped<IProductImageRepository, ProductImageRepository>();
         builder.Services.AddScoped<ISupportedCurrenyRepository, SupportedCurrenyRepository>();
         builder.Services.AddScoped<IUserDetailsRepository, UserDetailsRepository>();
+        builder.Services.AddScoped<ICartRepository, CartRepository>();
+        builder.Services.AddScoped<ICartProductRepository, CartProductRepository>();
 
         builder.Services.AddScoped<ExchangeRateService>();
         builder.Services.AddScoped<ProductService>();
         builder.Services.AddScoped<UserDetailsService>();
+        builder.Services.AddScoped<CartService>();
 
         return builder;
     }
