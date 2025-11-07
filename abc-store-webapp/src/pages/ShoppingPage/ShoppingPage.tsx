@@ -7,11 +7,11 @@ import ProductCard from '@/components/Product/ProductCard';
 import { MaxPrice, ProductFilter, ProductFilterChanges } from '@/components/Product/ProductFilter';
 import { config } from '@/config';
 import { ProductDto, abcApi, useGetApiProductCategoriesQuery } from '@/store/api/abcApi';
-import { User } from '@/store/app-reducer';
-import { store } from '@/store/store';
 
 import backgroundShopImg from '../../assets/background/background_shop.webp';
 import { t } from 'i18next';
+import { useSelector } from 'react-redux';
+import { selectUser } from '@/store/slice/userSlice';
 
 const pageSize = 10;
 let pageNumber = 1;
@@ -28,7 +28,7 @@ function ShoppingPage() {
 
   const [getProducts] = abcApi.endpoints.getApiProductFilterByCurrencyCode.useLazyQuery();
 
-  const user: User = store.getState().app.user;
+  const user = useSelector(selectUser);
 
   const fetchProducts = useCallback(() => {
     setFetchingProducts(true);
@@ -118,8 +118,8 @@ function ShoppingPage() {
                   key={`product-${index}`}
                   sx={{ width: 240 }}
                   image={item?.thumbnailUrl ? item.thumbnailUrl : ''}
-                  title={item.name ?? ''}
-                  price={item.price ?? 0}
+                  title={item?.name ?? ''}
+                  price={item?.price ?? 0}
                   currency={{}}
                 ></ProductCard>
               ))}

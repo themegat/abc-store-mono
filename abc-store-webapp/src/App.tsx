@@ -17,7 +17,7 @@ function App() {
   const [signedIn, setSignedIn] = useState(false);
 
   useEffect(() => {
-    if (authContext.user) {
+    if (authContext.firebaseUser) {
       setSignedIn(true);
     } else {
       setSignedIn(false);

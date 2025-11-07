@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import { Stack, Step, StepContent, Stepper, Typography } from '@mui/material';
 
@@ -8,7 +9,7 @@ import UserDetails from '@/components/UserDetails/Userdetails';
 import AuthComponent from '@/components/auth/AuthComponent';
 import { config } from '@/config';
 import useOrientation from '@/hooks/useOrientation';
-import { store } from '@/store/store';
+import { selectUser } from '@/store/slice/userSlice';
 
 import backgroundVid from '../../assets/background/background_welcome.mp4';
 import posterImg from '../../assets/background/background_welcome.webp';
@@ -16,14 +17,13 @@ import posterImg from '../../assets/background/background_welcome.webp';
 function Welcome() {
   const isPortrait = useOrientation();
   const [activeStep, setActiveStep] = useState(0);
+  const user = useSelector(selectUser);
 
-  store.subscribe(() => {
-    const user = store.getState().app.user;
-    if (user) {
+  useEffect(() => {
+    if (user && user.accessToken && user.email) {
       setActiveStep(1);
     }
-  });
-
+  }, [user]);
   const setPlaybackSpeed = () => {
     const element = document.querySelector('video');
     if (element) {
@@ -78,7 +78,7 @@ function Welcome() {
             </Step>
             <Step key={2}>
               {/* <StepLabel>Step 2</StepLabel> */}
-              <StepContent sx={{marginTop: 7}}>
+              <StepContent sx={{ marginTop: 7 }}>
                 <UserDetails></UserDetails>
               </StepContent>
             </Step>
