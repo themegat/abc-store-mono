@@ -3,12 +3,12 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "serve:functions",
+            "label": "npm:dev",
             "type": "shell",
             "command": "npm",
             "args": [
                 "run",
-                "serve"
+                "dev"
             ],
             "isBackground": true,
             "group": {
@@ -16,7 +16,7 @@
                 "isDefault": true
             },
             "problemMatcher": {
-                "owner": "firebase",
+                "owner": "tsc",
                 "pattern": [
                     {
                         "regexp": ".",
@@ -27,16 +27,16 @@
                 ],
                 "background": {
                     "activeOnStart": true,
-                    "beginsPattern": "Starting emulators:",
-                    "endsPattern": "All emulators ready!"
+                    "beginsPattern": ".*",
+                    "endsPattern": "VITE .* ready in"
                 }
             },
             "detail": "Start the app in development mode"
         },
         {
-            "label": "terminate:functions",
+            "label": "terminate:dev",
             "type": "shell",
-            "command": "ehco ${input:terminate}",
+            "command": "echo ${input:terminate}",
             "problemMatcher": []
         }
     ],
@@ -45,7 +45,7 @@
             "id": "terminate",
             "type": "command",
             "command": "workbench.action.tasks.terminate",
-            "args": "serve:functions"
+            "args": "npm:dev"
         }
     ]
 }
