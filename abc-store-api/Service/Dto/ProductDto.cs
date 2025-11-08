@@ -4,6 +4,7 @@ namespace ABCStoreAPI.Service.Dto;
 
 public class ProductDto : IDto<ProductDto, Database.Model.Product>
 {
+    public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public decimal Price { get; set; }
@@ -16,6 +17,7 @@ public class ProductDto : IDto<ProductDto, Database.Model.Product>
     {
         return new ProductDto
         {
+            Id = product.Id,
             Name = product.Name,
             Description = product.Description,
             Price = product.Price,

@@ -18,10 +18,10 @@ import { t } from 'i18next';
 
 import { AuthContext } from '@/components/auth/AuthContext';
 import routes from '@/routes';
-import { User } from '@/store/app-reducer';
-import { store } from '@/store/store';
 
 import { useSidebar } from './hooks';
+import { useSelector } from 'react-redux';
+import { selectUser } from '@/store/slice/userSlice';
 
 type Props = {
   enabled?: boolean;
@@ -31,7 +31,8 @@ function Sidebar({ enabled = true }: Props) {
   const { isOpen, open, close } = useSidebar();
   const authContext = useContext(AuthContext);
 
-  const user: User = store.getState().app.user;
+  const user = useSelector(selectUser);
+  
   let username = '';
   if (user) {
     if (user.firstName && user.lastName) {

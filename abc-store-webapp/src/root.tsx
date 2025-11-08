@@ -7,13 +7,15 @@ import { ConfigProvider } from '@firebase-ui/react';
 // from MUI's toolpad we only use Notifications
 import { NotificationsProvider } from '@toolpad/core/useNotifications';
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { connectAuthEmulator, getAuth } from 'firebase/auth';
 import { Provider as JotaiProvider } from 'jotai';
 
 import ThemeProvider from '@/theme/Provider';
 
 import { AuthProvider } from './components/auth/AuthContext';
 import { store } from './store/store';
+
+const ENV = import.meta.env.VITE_ENVIRONMENT;
 
 const container = document.getElementById('root') as HTMLElement;
 const root = createRoot(container);
@@ -27,6 +29,10 @@ const firebaseConfig = JSON.parse(firebaseConfigString);
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+
+if (ENV && ENV === 'Development') {
+  connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true });
+}
 auth.signOut();
 
 const ui = initializeUI({ app });

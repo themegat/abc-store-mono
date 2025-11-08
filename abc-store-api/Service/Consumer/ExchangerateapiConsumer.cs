@@ -81,21 +81,28 @@ public class ExchangerateapiConsumer : IConsumer
     override
     public async Task ConsumeAsync()
     {
-        var response = await _httpClient.GetAsync($"{_apiUrl}/{_apiKey}/latest/{_baseCurrency}");
-        response.EnsureSuccessStatusCode();
-        var content = await response.Content.ReadAsStringAsync();
-        var exchangeRateResponse = JsonConvert.DeserializeObject<ExchangerateapiConsumable>(content);
-
-        if (exchangeRateResponse != null)
+        try
         {
-            if (await _uow.ExchangeRates.Truncate())
+            var response = await _httpClient.GetAsync($"{_apiUrl}/{_apiKey}/latest/{_baseCurrency}");
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            var exchangeRateResponse = JsonConvert.DeserializeObject<ExchangerateapiConsumable>(content);
+
+            if (exchangeRateResponse != null)
             {
-                await PersistExchangeRates(exchangeRateResponse);
+                if (await _uow.ExchangeRates.Truncate())
+                {
+                    await PersistExchangeRates(exchangeRateResponse);
+                }
+                else
+                {
+                    _logger.LogError("Failed to truncate ExchangeRate table, skipping import.");
+                }
             }
-            else
-            {
-                _logger.LogError("Failed to truncate ExchangeRate table, skipping import.");
-            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
         }
     }
 }

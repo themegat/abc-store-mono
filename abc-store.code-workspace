@@ -33,6 +33,8 @@
 			"titleBar.inactiveBackground": "#204f5799",
 			"titleBar.inactiveForeground": "#e7e7e799"
 		},
-		"peacock.color": "#204F57"
+		"peacock.color": "#204F57",
+		"npm.packageManager": "npm",
+		"npm.scriptRunner": "npm"
 	}
 }

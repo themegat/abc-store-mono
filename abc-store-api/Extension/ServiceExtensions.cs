@@ -3,6 +3,7 @@ using System.Security.Claims;
 using ABCStoreAPI.Configuration;
 using ABCStoreAPI.Database;
 using ABCStoreAPI.Repository;
+using ABCStoreAPI.Repository.Base;
 using ABCStoreAPI.Service;
 using ABCStoreAPI.Service.Consumer;
 using ABCStoreAPI.Service.Consumer.Base;
@@ -41,10 +42,13 @@ public static class ServiceExtensions
         builder.Services.AddScoped<IProductImageRepository, ProductImageRepository>();
         builder.Services.AddScoped<ISupportedCurrenyRepository, SupportedCurrenyRepository>();
         builder.Services.AddScoped<IUserDetailsRepository, UserDetailsRepository>();
+        builder.Services.AddScoped<ICartRepository, CartRepository>();
+        builder.Services.AddScoped<ICartProductRepository, CartProductRepository>();
 
         builder.Services.AddScoped<ExchangeRateService>();
         builder.Services.AddScoped<ProductService>();
         builder.Services.AddScoped<UserDetailsService>();
+        builder.Services.AddScoped<CartService>();
 
         return builder;
     }
@@ -99,25 +103,42 @@ public static class ServiceExtensions
 
         var tokenIssuer = builder.Configuration.GetSection("ApiSettings").GetValue<string>("TokenIssuer");
         var projectId = Environment.GetEnvironmentVariable("FIREBASE_PROJECT_ID");
+        var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
 
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
-                options.Authority = $"{tokenIssuer}/{projectId}";
-
-                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                if (isDevelopment)
                 {
-                    ValidateIssuerSigningKey = true,
+                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        RequireSignedTokens = false,
+                        RequireAudience = false,
+                        ValidateIssuerSigningKey = false,
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
 
-                    ValidateIssuer = true,
-                    ValidIssuer = $"{tokenIssuer}/{projectId}",
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero
+                    };
+                }
+                else
+                {
+                    options.Authority = $"{tokenIssuer}/{projectId}";
+                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
 
-                    ValidateAudience = true,
-                    ValidAudience = projectId,
+                        ValidateIssuer = true,
+                        ValidIssuer = $"{tokenIssuer}/{projectId}",
 
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero
-                };
+                        ValidateAudience = true,
+                        ValidAudience = projectId,
+
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero
+                    };
+                }
 
                 options.TokenValidationParameters.NameClaimType = ClaimTypes.NameIdentifier;
 

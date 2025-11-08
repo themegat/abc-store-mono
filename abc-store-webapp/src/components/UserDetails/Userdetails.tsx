@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
 
 import {
   Button,
@@ -20,8 +21,9 @@ import {
   useGetApiExchangeRateAllQuery,
   usePostApiUserDetailsUpdateCreateMutation,
 } from '@/store/api/abcApi';
-import { User, UserState } from '@/store/app-reducer';
-import { store } from '@/store/store';
+import { AppDispatch } from '@/store/store';
+
+import { User, UserState, selectUser, setUser } from '../../store/slice/userSlice';
 
 interface IFormInputs {
   firstName: string;
@@ -35,6 +37,8 @@ const UserDetails = () => {
   const [error, setError] = useState<string | undefined>();
   const { data: currencyResponse } = useGetApiExchangeRateAllQuery();
   const [postApiUserDetailsUpdateCreate] = usePostApiUserDetailsUpdateCreateMutation();
+  const dispatch = useDispatch<AppDispatch>();
+  const user = useSelector(selectUser);
 
   const { control, handleSubmit } = useForm<IFormInputs>({
     defaultValues: {
@@ -45,8 +49,13 @@ const UserDetails = () => {
   });
 
   const onSubmit: SubmitHandler<IFormInputs> = (data) => {
-    const user: User = store.getState().app.user;
     setIsLoading(true);
+
+    if (!user) {
+      setError('User not found');
+      setIsLoading(false);
+      return;
+    }
 
     const updateUser: User = {
       ...user,
@@ -65,7 +74,7 @@ const UserDetails = () => {
       .unwrap()
       .then(() => {
         updateUser.state = UserState.COMPLETE;
-        store.dispatch({ type: 'SET_USER', payload: updateUser });
+        dispatch(setUser(updateUser));
       })
       .catch((err) => {
         setError(err.message);
@@ -74,14 +83,13 @@ const UserDetails = () => {
   };
 
   const handleOnSkip = () => {
-    let user: User = store.getState().app.user;
     if (user) {
       const updateUser: User = {
         ...user,
         state: UserState.SKIPPED,
         preferredCurrency: config.preferedCurrency,
       };
-      store.dispatch({ type: 'SET_USER', payload: updateUser });
+      dispatch(setUser(updateUser));
     }
   };
 

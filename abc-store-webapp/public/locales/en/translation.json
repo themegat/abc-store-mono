@@ -37,5 +37,14 @@
     "minPrice": "Min Price",
     "maxPrice": "Max Price",
     "btnApply": "Apply Pricing"
+  },
+  "product": {
+    "limitedStock": "Only {{count}} left in stock",
+    "outOfStock": "Out of stock",
+    "itemsInStock": "{{count}} items in stock"
+  },
+  "cart": {
+    "addToCart": "Add to cart",
+    "viewCart": "View Cart"
   }
 }

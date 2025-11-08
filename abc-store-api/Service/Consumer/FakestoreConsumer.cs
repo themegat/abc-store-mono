@@ -82,11 +82,20 @@ public class FakestoreConsumer : IConsumer
                 {
                     newProduct.ThumbnailUrl = product.Thumbnail;
                 }
-                
+
+                var images = new List<string> { product.Image };
+                newProduct.ProductImages = images.Select(image => new ProductImage()
+                {
+                    Url = image,
+                    ProductId = product.Id,
+                    CreatedBy = SysUser,
+                    UpdatedBy = SysUser
+                })
+                    .ToList();
+
                 _uow.Products.Add(newProduct);
                 await _uow.CompleteAsync();
-                var images = new List<string> { product.Image };
-                await _productUtil.PersistProductImages(product.Id, images, SysUser);
+
                 newCount++;
             }
             else
@@ -105,16 +114,23 @@ public class FakestoreConsumer : IConsumer
     override
     public async Task ConsumeAsync()
     {
-        var response = await _httpClient.GetAsync($"{_baseUrl}/products");
-        response.EnsureSuccessStatusCode();
-        string data = await response.Content.ReadAsStringAsync();
+        try
+        {
+            var response = await _httpClient.GetAsync($"{_baseUrl}/products");
+            response.EnsureSuccessStatusCode();
+            string data = await response.Content.ReadAsStringAsync();
 
-        List<FakestoreProductConsumable> products =
-        JsonConvert.DeserializeObject<List<FakestoreProductConsumable>>(data)!;
+            List<FakestoreProductConsumable> products =
+            JsonConvert.DeserializeObject<List<FakestoreProductConsumable>>(data)!;
 
-        var categories = new HashSet<string>(products.Select(p => p.Category).Distinct().ToList());
+            var categories = new HashSet<string>(products.Select(p => p.Category).Distinct().ToList());
 
-        await _productUtil.ImportProductCategories(categories, SysUser);
-        await ImportProductsAsync(products);
+            await _productUtil.ImportProductCategories(categories, SysUser);
+            await ImportProductsAsync(products);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+        }
     }
 }

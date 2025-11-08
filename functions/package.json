@@ -5,9 +5,9 @@
     "lint": "eslint -c eslint.config.ts --ext .js,.ts .",
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "serve": "npm run build && firebase emulators:start  --import ./emulator-data --only functions,storage --inspect-functions=9229",
+    "serve": "npm run build && firebase emulators:start --import ./emulator-data --export-on-exit --only auth,functions,storage --inspect-functions=9229",
     "shell": "npm run build && firebase functions:shell",
-    "save": "rm -rf emulator-data && firebase emulators:export ./emulator-data && mv firebase-export-* emulator-data",
+    "save": "firebase emulators:export ./emulator-data",
     "start": "npm run shell",
     "rename-firebase-export": "rm -rf emulator-data && mv firebase-export-* emulator-data",
     "deploy": "firebase deploy --only functions",
@@ -20,9 +20,9 @@
   "dependencies": {
     "axios": "^1.12.2",
     "file-type": "^21.0.0",
-    "firebase": "^12.4.0",
+    "firebase": "^11.10.0",
     "firebase-admin": "^13.5.0",
-    "firebase-functions": "^6.6.0",
+    "firebase-functions": "^6.4.0",
     "sharp": "^0.34.4"
   },
   "devDependencies": {

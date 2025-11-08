@@ -7,6 +7,7 @@
     "type": "git",
     "url": "https://github.com/themegat/abc-store-mono"
   },
+  "type": "module",
   "author": "T Motsoeneng",
   "license": "MIT",
   "scripts": {
@@ -23,7 +24,7 @@
     "test:e2e:ui": "playwright test --ui",
     "get-api-schema": "curl -k https://localhost:7198/openapi/v1.json -o openapi-schema.json",
     "remove-api-schema": "rm -rf openapi-schema.json",
-    "gen:api": "npm run get-api-schema && npx @rtk-query/codegen-openapi openapi-config.ts && npm run remove-api-schema"
+    "gen:api": "npm run get-api-schema && npx @rtk-query/codegen-openapi openapi-config.cjs && npm run remove-api-schema"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

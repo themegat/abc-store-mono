@@ -4,6 +4,83 @@ const injectedRtkApi = api.injectEndpoints({
     getApiAbout: build.query<GetApiAboutApiResponse, GetApiAboutApiArg>({
       query: () => ({ url: `/api/About` }),
     }),
+    getApiCart: build.query<GetApiCartApiResponse, GetApiCartApiArg>({
+      query: (queryArg) => ({
+        url: `/api/Cart`,
+        params: {
+          userId: queryArg.userId,
+        },
+      }),
+    }),
+    postApiCartCreate: build.mutation<
+      PostApiCartCreateApiResponse,
+      PostApiCartCreateApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Cart/create`,
+        method: "POST",
+        body: queryArg.cartDto,
+      }),
+    }),
+    putApiCartComplete: build.mutation<
+      PutApiCartCompleteApiResponse,
+      PutApiCartCompleteApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Cart/complete`,
+        method: "PUT",
+        body: queryArg.cartDto,
+      }),
+    }),
+    deleteApiCartRemove: build.mutation<
+      DeleteApiCartRemoveApiResponse,
+      DeleteApiCartRemoveApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Cart/remove`,
+        method: "DELETE",
+        body: queryArg.cartDto,
+      }),
+    }),
+    postApiCartProductAdd: build.mutation<
+      PostApiCartProductAddApiResponse,
+      PostApiCartProductAddApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Cart/product/add`,
+        method: "POST",
+        body: queryArg.cartProductDto,
+        params: {
+          cartId: queryArg.cartId,
+        },
+      }),
+    }),
+    putApiCartProductUpdate: build.mutation<
+      PutApiCartProductUpdateApiResponse,
+      PutApiCartProductUpdateApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Cart/product/update`,
+        method: "PUT",
+        body: queryArg.cartProductDto,
+        params: {
+          cartId: queryArg.cartId,
+        },
+      }),
+    }),
+    deleteApiCartProductRemove: build.mutation<
+      DeleteApiCartProductRemoveApiResponse,
+      DeleteApiCartProductRemoveApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Cart/product/remove`,
+        method: "DELETE",
+        body: queryArg.cartProductDto,
+        params: {
+          cartId: queryArg.cartId,
+        },
+      }),
+    }),
     getApiExchangeRateAll: build.query<
       GetApiExchangeRateAllApiResponse,
       GetApiExchangeRateAllApiArg
@@ -68,6 +145,40 @@ const injectedRtkApi = api.injectEndpoints({
 export { injectedRtkApi as abcApi };
 export type GetApiAboutApiResponse = unknown;
 export type GetApiAboutApiArg = void;
+export type GetApiCartApiResponse = /** status 200 OK */ CartDto;
+export type GetApiCartApiArg = {
+  userId?: string;
+};
+export type PostApiCartCreateApiResponse = /** status 200 OK */ CartDto;
+export type PostApiCartCreateApiArg = {
+  cartDto: CartDto;
+};
+export type PutApiCartCompleteApiResponse = /** status 200 OK */ CartDto;
+export type PutApiCartCompleteApiArg = {
+  cartDto: CartDto;
+};
+export type DeleteApiCartRemoveApiResponse = /** status 200 OK */ CartDto;
+export type DeleteApiCartRemoveApiArg = {
+  cartDto: CartDto;
+};
+export type PostApiCartProductAddApiResponse =
+  /** status 200 OK */ CartProductDto;
+export type PostApiCartProductAddApiArg = {
+  cartId?: number;
+  cartProductDto: CartProductDto;
+};
+export type PutApiCartProductUpdateApiResponse =
+  /** status 200 OK */ CartProductDto;
+export type PutApiCartProductUpdateApiArg = {
+  cartId?: number;
+  cartProductDto: CartProductDto;
+};
+export type DeleteApiCartProductRemoveApiResponse =
+  /** status 200 OK */ CartProductDto;
+export type DeleteApiCartProductRemoveApiArg = {
+  cartId?: number;
+  cartProductDto: CartProductDto;
+};
 export type GetApiExchangeRateAllApiResponse =
   /** status 200 OK */ ExchangeRateDto[];
 export type GetApiExchangeRateAllApiArg = void;
@@ -100,13 +211,36 @@ export type PostApiUserDetailsUpdateCreateApiResponse =
 export type PostApiUserDetailsUpdateCreateApiArg = {
   userDetailsDto: UserDetailsDto;
 };
+export type CartStatus = number;
+export type ProductDto = {
+  id?: number;
+  name?: string;
+  description?: string;
+  price?: number;
+  stockQuantity?: number;
+  thumbnailUrl?: string;
+  productCategory?: string | null;
+  productImages?: string[] | null;
+} | null;
+export type CartProductDto = {
+  quantity?: number;
+  productId?: number;
+  product?: ProductDto;
+};
+export type CartDto = {
+  id?: number;
+  userId?: string | null;
+  status?: CartStatus;
+  cartProducts?: CartProductDto[];
+};
 export type ExchangeRateDto = {
   code?: string;
   name?: string;
   rate?: number;
   symbol?: string;
 };
-export type ProductDto = {
+export type ProductDto2 = {
+  id?: number;
   name?: string;
   description?: string;
   price?: number;
@@ -120,7 +254,7 @@ export type PagedResultOfProductDto = {
   pageSize?: number;
   totalPages?: number;
   totalCount?: number;
-  items?: ProductDto[];
+  items?: ProductDto2[];
 };
 export type ProductCategoryDto = {
   id?: number;
@@ -134,6 +268,13 @@ export type UserDetailsDto = {
 };
 export const {
   useGetApiAboutQuery,
+  useGetApiCartQuery,
+  usePostApiCartCreateMutation,
+  usePutApiCartCompleteMutation,
+  useDeleteApiCartRemoveMutation,
+  usePostApiCartProductAddMutation,
+  usePutApiCartProductUpdateMutation,
+  useDeleteApiCartProductRemoveMutation,
   useGetApiExchangeRateAllQuery,
   useGetApiExchangeRateByCurrencyCodeQuery,
   useGetApiProductFilterByCurrencyCodeQuery,

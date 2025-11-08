@@ -11,13 +11,15 @@ import Pages from './routes/Pages';
 import Header from './sections/Header';
 import HotKeys from './sections/HotKeys';
 import Sidebar from './sections/Sidebar';
+import Toaster from './sections/Toaster/Toaster';
+import ToasterProvider from './sections/Toaster/ToasterProvider';
 
 function App() {
   const authContext = useContext(AuthContext);
   const [signedIn, setSignedIn] = useState(false);
 
   useEffect(() => {
-    if (authContext.user) {
+    if (authContext.firebaseUser) {
       setSignedIn(true);
     } else {
       setSignedIn(false);
@@ -29,9 +31,12 @@ function App() {
       <CssBaseline />
       <HotKeys />
       <BrowserRouter>
-        <Header enabledSidebar={signedIn} />
-        <Sidebar enabled={signedIn} />
-        <Pages />
+        <ToasterProvider>
+          <Header enabledSidebar={signedIn} />
+          <Sidebar enabled={signedIn} />
+          <Pages />
+          <Toaster />
+        </ToasterProvider>
       </BrowserRouter>
     </Fragment>
   );

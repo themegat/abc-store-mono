@@ -1,12 +1,13 @@
 using ABCStoreAPI.Service;
 using ABCStoreAPI.Service.Dto;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ABCStoreAPI.Controller
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UserDetailsController : ControllerBase
     {
         private readonly UserDetailsService _userDetailsService;

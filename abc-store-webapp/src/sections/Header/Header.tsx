@@ -1,10 +1,23 @@
+import { useMemo } from 'react';
+
 import ThemeIcon from '@mui/icons-material/InvertColors';
 import MenuIcon from '@mui/icons-material/Menu';
-import { AppBar, Divider, IconButton, Stack, Toolbar, Tooltip, Typography } from '@mui/material';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import {
+  AppBar,
+  Badge,
+  Divider,
+  IconButton,
+  Stack,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 
 import { t } from 'i18next';
 
 import { config } from '@/config';
+import useCart from '@/hooks/useCart';
 import { useHotKeysDialog } from '@/sections/HotKeys/hooks';
 import { useSidebar } from '@/sections/Sidebar/hooks';
 import { useThemeMode } from '@/theme';
@@ -15,6 +28,39 @@ import { HotKeysButton } from './styled';
 
 type Props = {
   enabledSidebar?: boolean;
+};
+
+const CartButton = () => {
+  const { observeCart } = useCart();
+
+  const show = useMemo(
+    () => observeCart && observeCart.cartProducts && observeCart?.cartProducts?.length > 0,
+    [observeCart],
+  );
+  const totalItems = observeCart?.cartProducts
+    ?.map((item) => item.quantity)
+    .reduce((prev, curr) => (prev ?? 0) + (curr ?? 0), 0);
+
+  return (
+    <>
+      {show && (
+        <>
+          <Tooltip title={t('cart.viewCart')} arrow>
+            <IconButton size="large" sx={{ display: 'grid' }}>
+              <Badge
+                badgeContent={totalItems}
+                overlap="circular"
+                sx={{ fontSize: 14 }}
+                color="primary"
+              ></Badge>
+              <ShoppingCartIcon />
+            </IconButton>
+          </Tooltip>
+          <Divider orientation="vertical" flexItem />
+        </>
+      )}
+    </>
+  );
 };
 
 function Header({ enabledSidebar = true }: Props) {
@@ -30,6 +76,8 @@ function Header({ enabledSidebar = true }: Props) {
       data-pw={`theme-${themeMode}`}
       enableColorOnDark
       sx={{
+        position: 'fixed',
+        zIndex: 500,
         backgroundImage:
           themeMode === 'dark'
             ? `url(${headerBackgroundDarkImg})`
@@ -59,6 +107,7 @@ function Header({ enabledSidebar = true }: Props) {
             <Stack></Stack>
           )}
           <Stack direction="row" alignItems="center">
+            <CartButton />
             <Tooltip title={t('hotKeys.title')} arrow>
               <HotKeysButton
                 size="medium"

@@ -5,35 +5,30 @@ import { Stack, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 
 import { AuthContext } from '@/components/auth/AuthContext';
-import { UserState } from '@/store/app-reducer';
-import { store } from '@/store/store';
+import { UserState, selectUserState } from '@/store/slice/userSlice';
 
 import routes from '..';
 import packageJson from '../../../package.json';
 import { getPageHeight, renderRoutes } from './utils';
+import { useSelector } from 'react-redux';
 
 const buildVersion = import.meta.env.VITE_BUILD_VERSION;
 
 function Pages() {
   const authContext = useContext(AuthContext);
   const [defaultRoute, setDefaultRoute] = useState('/');
-  const unsubscribe = store.subscribe(() => {
-    const user = store.getState().app.user;
+  const userState = useSelector(selectUserState);
+
+  useEffect(() => {
     if (
-      (authContext.user && user?.state === UserState.COMPLETE) ||
-      user?.state === UserState.SKIPPED
+      (userState && authContext.firebaseUser && userState === UserState.COMPLETE) ||
+      userState === UserState.SKIPPED
     ) {
       setDefaultRoute('/shopping');
     } else {
       setDefaultRoute('/');
     }
-  });
-
-  useEffect(() => {
-    return () => {
-      unsubscribe();
-    };
-  }, []);
+  }, [userState]);
 
   return (
     <Box sx={{ height: (theme) => getPageHeight(theme) }}>

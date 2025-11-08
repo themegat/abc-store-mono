@@ -1,41 +1,42 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { ReactNode } from 'react';
+import { useDispatch } from 'react-redux';
 
-import { User, getAuth, onAuthStateChanged } from 'firebase/auth';
+import { User as FirebaseUser, getAuth, onAuthStateChanged } from 'firebase/auth';
 
 import { abcApi } from '@/store/api/abcApi';
-import { UserState } from '@/store/app-reducer';
-import { store } from '@/store/store';
-
-import { User as AppUser } from '../../store/app-reducer';
+import { User, UserState, setUser } from '@/store/slice/userSlice';
+import { AppDispatch } from '@/store/store';
+import { setCart } from '@/store/slice/cartSlice';
 
 interface AuthContextType {
-  user: User | null;
+  firebaseUser: FirebaseUser | null;
   loading: boolean;
   auth: ReturnType<typeof getAuth> | null;
 }
 
 export const AuthContext = createContext<AuthContextType>({
-  user: null,
+  firebaseUser: null,
   loading: true,
   auth: null,
 });
 
 export const useAuthStatus = () => {
-  const [user, setUser] = useState<User | null>(null);
+  const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [getUserDetails] = abcApi.endpoints.getApiUserDetails.useLazyQuery();
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     const authInstance = getAuth();
 
     const unsubscribe = onAuthStateChanged(authInstance, async (currentUser) => {
       if (currentUser) {
-        setUser(currentUser);
-        const token = currentUser.toJSON() as any;
+        setFirebaseUser(currentUser);
+        const token = await authInstance.currentUser?.getIdToken();
         const UserDetails = await getUserDetails({ userId: currentUser.uid });
-        const newUser: AppUser = {
-          accessToken: token.stsTokenManager.accessToken,
+        const newUser: User = {
+          accessToken: token ?? '',
           uid: currentUser.uid,
           email: currentUser.email ?? '',
           firstName: UserDetails.data?.firstName ?? undefined,
@@ -44,13 +45,11 @@ export const useAuthStatus = () => {
           state: UserDetails.data ? UserState.COMPLETE : UserState.PENDING,
         };
 
-        store.dispatch({
-          type: 'SET_USER',
-          payload: newUser,
-        });
+        dispatch(setUser(newUser));
       } else {
-        setUser(null);
-        store.dispatch({ type: 'SET_USER', payload: null });
+        setFirebaseUser(null);
+        dispatch(setUser(null));
+        dispatch(setCart(null));
       }
       setLoading(false);
     });
@@ -58,7 +57,7 @@ export const useAuthStatus = () => {
     return unsubscribe;
   }, []);
 
-  return { user, loading, auth: getAuth() };
+  return { firebaseUser, loading, auth: getAuth() };
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
