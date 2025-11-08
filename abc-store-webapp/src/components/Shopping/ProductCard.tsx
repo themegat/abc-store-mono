@@ -81,7 +81,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   return (
     <Card
-      onClick={onClick}
       sx={{
         ...sx,
         height: 'fit-content',
@@ -92,38 +91,42 @@ const ProductCard: React.FC<ProductCardProps> = ({
         },
       }}
     >
-      {stockQuantity <= MinStockQuantity && (
-        <Paper
-          elevation={4}
-          sx={{
-            position: 'absolute',
-            margin: 2,
-            width: 'inherit',
-            justifyContent: 'center',
-            textAlign: 'center',
-            backgroundColor:
-              stockQuantity === 0 ? theme.palette.error.main : theme.palette.warning.main,
-          }}
-        >
-          <Typography fontSize={16} fontWeight="bold">
-            {stockQuantity === 0
-              ? t('product.outOfStock')
-              : t('product.limitedStock', { count: stockQuantity })}
-          </Typography>
-        </Paper>
-      )}
-      {containsValidImage() ? (
-        <>
+      <Stack sx={{ cursor: 'pointer' }} onClick={onClick}>
+        {stockQuantity <= MinStockQuantity && (
+          <Paper
+            elevation={4}
+            sx={{
+              position: 'absolute',
+              margin: 2,
+              width: 'inherit',
+              justifyContent: 'center',
+              textAlign: 'center',
+              backgroundColor:
+                stockQuantity === 0 ? theme.palette.error.main : theme.palette.warning.main,
+            }}
+          >
+            <Typography fontSize={16} fontWeight="bold">
+              {stockQuantity === 0
+                ? t('product.outOfStock')
+                : t('product.limitedStock', { count: stockQuantity })}
+            </Typography>
+          </Paper>
+        )}
+        {containsValidImage() ? (
+          <>
+            <PlaceholderImage />
+            <ProductImage />
+          </>
+        ) : (
           <PlaceholderImage />
-          <ProductImage />
-        </>
-      ) : (
-        <PlaceholderImage />
-      )}
+        )}
+      </Stack>
       <CardContent
+        onClick={onClick}
         sx={{
           height: '-webkit-fill-available',
           display: 'inherit',
+          cursor: 'pointer',
         }}
       >
         <Typography fontWeight={600} variant="body2" component="div">
