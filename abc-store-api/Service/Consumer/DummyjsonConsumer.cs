@@ -56,14 +56,14 @@ public class DummyjsonConsumer : IConsumer
 
             if (!_productConsumerUtil.IsExistingProduct(newProduct.Name))
             {
-                var productImage = new ProductImage()
+                newProduct.ProductImages = product.Images.Select(image => new ProductImage()
                 {
-                    Url = product.Thumbnail,
-                    ProductId = newProduct.Id,
+                    Url = image,
+                    ProductId = product.Id,
                     CreatedBy = SysUser,
                     UpdatedBy = SysUser
-                };
-                newProduct.ProductImages = new List<ProductImage>() { productImage };
+                })
+                    .ToList();
                 _uow.Products.Add(newProduct);
                 await _uow.CompleteAsync();
 
