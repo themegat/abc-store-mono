@@ -15,9 +15,9 @@ import {
 import { t } from 'i18next';
 
 import Loading from '@/components/Loading';
-import ProductCard from '@/components/Product/ProductCard';
-import ProductDetails from '@/components/Product/ProductDetails';
-import { MaxPrice, ProductFilter, ProductFilterChanges } from '@/components/Product/ProductFilter';
+import ProductCard from '@/components/Shopping/ProductCard';
+import ProductDetails from '@/components/Shopping/ProductDetails';
+import { MaxPrice, ProductFilter, ProductFilterChanges } from '@/components/Shopping/ProductFilter';
 import { config } from '@/config';
 import { ProductDto, abcApi, useGetApiProductCategoriesQuery } from '@/store/api/abcApi';
 import { selectUser } from '@/store/slice/userSlice';
@@ -211,7 +211,7 @@ const ShoppingPage = () => {
               {selectedProduct != null && (
                 <ProductDetails
                   productId={selectedProduct.id ?? 0}
-                  image={selectedProduct.productImages ? selectedProduct.productImages[0] : ''}
+                  images={selectedProduct.productImages ?? []}
                   title={selectedProduct.name ?? ''}
                   price={selectedProduct.price ?? 0}
                   currency={user?.preferredCurrency || config.preferedCurrency}

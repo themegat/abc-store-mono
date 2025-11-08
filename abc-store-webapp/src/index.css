@@ -1,9 +1,16 @@
 /* firebase ui style and overrides */
 @import '@firebase-ui/styles/dist.css';
+@import 'slick-carousel/slick/slick.css';
+@import 'slick-carousel/slick/slick-theme.css';
 
 .fui-screen {
   width: 100%;
   .fui-card {
     width: 100%;
   }
+}
+
+.slider-carousel {
+  width: 90%;
+  display: grid;
 }
