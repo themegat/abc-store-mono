@@ -7,6 +7,7 @@ import { User as FirebaseUser, getAuth, onAuthStateChanged } from 'firebase/auth
 import { abcApi } from '@/store/api/abcApi';
 import { User, UserState, setUser } from '@/store/slice/userSlice';
 import { AppDispatch } from '@/store/store';
+import { setCart } from '@/store/slice/cartSlice';
 
 interface AuthContextType {
   firebaseUser: FirebaseUser | null;
@@ -44,14 +45,11 @@ export const useAuthStatus = () => {
           state: UserDetails.data ? UserState.COMPLETE : UserState.PENDING,
         };
 
-        dispatch({
-          type: 'SET_USER',
-          payload: newUser,
-        });
         dispatch(setUser(newUser));
       } else {
         setFirebaseUser(null);
         dispatch(setUser(null));
+        dispatch(setCart(null));
       }
       setLoading(false);
     });

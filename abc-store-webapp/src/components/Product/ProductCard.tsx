@@ -1,21 +1,49 @@
 import React, { useState } from 'react';
-import { NumericFormat } from 'react-number-format';
 
-import { Card, CardContent, CardMedia, Stack, SxProps, Typography, useTheme } from '@mui/material';
+import {
+  Card,
+  CardActions,
+  CardContent,
+  CardMedia,
+  Paper,
+  Stack,
+  SxProps,
+  Typography,
+  useTheme,
+} from '@mui/material';
+
+import { t } from 'i18next';
 import tinycolor from 'tinycolor2';
-import { ExchangeRateDto } from '@/store/api/abcApi';
+
+import { config } from '@/config';
+import { formatCurrency } from '@/utils/shopping';
 
 import placeholderImg from '../../assets/placeholder.webp';
+import AddToCart from './AddToCart';
 
 type ProductCardProps = {
+  id: number;
   image: string;
   title: string;
   price: number;
-  currency: ExchangeRateDto;
+  currency: string;
+  stockQuantity: number;
   sx?: SxProps;
+  onClick?: () => void;
 };
 
-const ProductCard: React.FC<ProductCardProps> = ({ image, title, price, currency, sx }) => {
+const MinStockQuantity = 10;
+
+const ProductCard: React.FC<ProductCardProps> = ({
+  id,
+  image,
+  title,
+  price,
+  stockQuantity,
+  currency = config.preferedCurrency,
+  sx,
+  onClick,
+}) => {
   const theme = useTheme();
   const backgroundColor = tinycolor(theme.palette.background.default).setAlpha(0.6).toRgbString();
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -53,8 +81,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ image, title, price, currency
 
   return (
     <Card
+      onClick={onClick}
       sx={{
         ...sx,
+        height: 'fit-content',
         backgroundColor,
         '&:hover': {
           borderWidth: 1,
@@ -62,6 +92,26 @@ const ProductCard: React.FC<ProductCardProps> = ({ image, title, price, currency
         },
       }}
     >
+      {stockQuantity <= MinStockQuantity && (
+        <Paper
+          elevation={4}
+          sx={{
+            position: 'absolute',
+            margin: 2,
+            width: 'inherit',
+            justifyContent: 'center',
+            textAlign: 'center',
+            backgroundColor:
+              stockQuantity === 0 ? theme.palette.error.main : theme.palette.warning.main,
+          }}
+        >
+          <Typography fontSize={16} fontWeight="bold">
+            {stockQuantity === 0
+              ? t('product.outOfStock')
+              : t('product.limitedStock', { count: stockQuantity })}
+          </Typography>
+        </Paper>
+      )}
       {containsValidImage() ? (
         <>
           <PlaceholderImage />
@@ -70,29 +120,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ image, title, price, currency
       ) : (
         <PlaceholderImage />
       )}
-
       <CardContent
         sx={{
           height: '-webkit-fill-available',
           display: 'inherit',
         }}
       >
-        <Typography variant="h6" component="div">
+        <Typography fontWeight={600} variant="body2" component="div">
           {title}
         </Typography>
         <Stack>
-          <Typography height={'-webkit-fill-available'} variant="body2" color="text.secondary">
-            <NumericFormat
-              readOnly
-              thousandSeparator={true}
-              decimalScale={2}
-              fixedDecimalScale={true}
-              prefix={currency.symbol?.concat(' ')}
-              value={price}
-            />
+          <Typography variant="h6" height={'-webkit-fill-available'} color="text.secondary">
+            {formatCurrency(price, 'en-US', currency)}
           </Typography>
         </Stack>
       </CardContent>
+      <CardActions sx={{ justifyContent: 'center' }}>
+        <AddToCart productId={id} maxQty={stockQuantity} />
+      </CardActions>
     </Card>
   );
 };
