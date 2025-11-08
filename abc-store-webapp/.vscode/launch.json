@@ -9,7 +9,7 @@
             "request": "launch",
             "name": "Debug App",
             "url": "http://localhost:5173/",
-            "webRoot": "${workspaceFolder}/abc-store-webapp/dev-dist",
+            "webRoot": "${workspaceFolder}",
             "preLaunchTask": "npm:dev",
             "postDebugTask": "terminate:dev",
             "runtimeExecutable": "C:/Program Files/Google/Chrome/Application/chrome.exe"
