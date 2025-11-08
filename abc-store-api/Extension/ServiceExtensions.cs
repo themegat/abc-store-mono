@@ -103,25 +103,42 @@ public static class ServiceExtensions
 
         var tokenIssuer = builder.Configuration.GetSection("ApiSettings").GetValue<string>("TokenIssuer");
         var projectId = Environment.GetEnvironmentVariable("FIREBASE_PROJECT_ID");
+        var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
 
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
-                options.Authority = $"{tokenIssuer}/{projectId}";
-
-                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                if (isDevelopment)
                 {
-                    ValidateIssuerSigningKey = true,
+                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        RequireSignedTokens = false,
+                        RequireAudience = false,
+                        ValidateIssuerSigningKey = false,
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
 
-                    ValidateIssuer = true,
-                    ValidIssuer = $"{tokenIssuer}/{projectId}",
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero
+                    };
+                }
+                else
+                {
+                    options.Authority = $"{tokenIssuer}/{projectId}";
+                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
 
-                    ValidateAudience = true,
-                    ValidAudience = projectId,
+                        ValidateIssuer = true,
+                        ValidIssuer = $"{tokenIssuer}/{projectId}",
 
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero
-                };
+                        ValidateAudience = true,
+                        ValidAudience = projectId,
+
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero
+                    };
+                }
 
                 options.TokenValidationParameters.NameClaimType = ClaimTypes.NameIdentifier;
 
