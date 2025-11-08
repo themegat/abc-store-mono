@@ -83,16 +83,18 @@ const ShoppingPage = () => {
     },
   );
 
-  const test = useCallback(
-    debounce(
-      () => observer.observe(document.querySelector('#load-more') as Element),
-      debounceDelay * 2,
-    ),
+  const resetLazyLoading = useCallback(
+    debounce(() => {
+      const moreElement = document.querySelector('#load-more');
+      if (moreElement) {
+        observer.observe(moreElement);
+      }
+    }, debounceDelay * 2),
     [],
   );
   const setScrollObserver = (itemsLoaded: number) => {
     if (itemsLoaded === pageSize) {
-      test();
+      resetLazyLoading();
     }
   };
 
@@ -121,7 +123,10 @@ const ShoppingPage = () => {
   }, []);
 
   const openProductDetails = (product: ProductDto) => {
-    observer.unobserve(document.querySelector('#load-more') as Element);
+    const moreElement = document.querySelector('#load-more');
+    if (moreElement) {
+      observer.unobserve(moreElement);
+    }
     setSelectedProduct(product);
   };
 
