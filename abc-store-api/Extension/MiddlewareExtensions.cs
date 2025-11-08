@@ -1,4 +1,5 @@
 using ABCStoreAPI.Database;
+using ABCStoreAPI.Extension.Base;
 using ABCStoreAPI.Service.Consumer.Base;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,10 +22,10 @@ public static class MiddlewareExtensions
         app.SeedData();
         app.RunConsumers();
 
+        app.UseMiddleware<ExceptionMiddleware>();
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();
-
         app.MapControllers();
 
         return app;

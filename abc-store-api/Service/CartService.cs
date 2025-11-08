@@ -3,6 +3,7 @@ using ABCStoreAPI.Database.Model;
 using ABCStoreAPI.Repository;
 using ABCStoreAPI.Service.Base;
 using ABCStoreAPI.Service.Dto;
+using Microsoft.EntityFrameworkCore;
 
 namespace ABCStoreAPI.Service;
 
@@ -20,13 +21,14 @@ public class CartService
 
     private IQueryable<Cart> GetCart(string userId, CartStatus status)
     {
-        return _uow.Cart.GetByUserIdAndStatus(userId, status);
+        return _uow.Cart.GetByUserIdAndStatus(userId, status).Include(c => c.CartProducts)
+            .ThenInclude(cp => cp.Product);
     }
 
     public async Task<CartDto> CreateCart(CartDto cartDto)
     {
         var cartQuery = GetCart(cartDto.UserId, CartStatus.IN_PROGRESS);
-        if (cartQuery == null)
+        if (cartQuery.FirstOrDefault() == null)
         {
             var cartProducts = cartDto.CartProducts.Select(cp => new CartProduct
             {
@@ -143,7 +145,7 @@ public class CartService
     {
         CheckProductStockAgainstQuantity(cartProductDto.ProductId, cartProductDto.Quantity);
         var cartProductQuery = GetCartProduct(cartId, cartProductDto.ProductId);
-        if (cartProductQuery == null)
+        if (cartProductQuery.FirstOrDefault() == null)
         {
 
             var cartProduct = new CartProduct
@@ -170,7 +172,7 @@ public class CartService
     {
         CheckProductStockAgainstQuantity(cartProductDto.ProductId, cartProductDto.Quantity);
         var cartProductQuery = GetCartProduct(cartId, cartProductDto.ProductId);
-        if (cartProductQuery == null)
+        if (cartProductQuery.FirstOrDefault() == null)
         {
             var message = "Product does not exist on cart";
             _logger.LogDebug(message);
@@ -197,7 +199,7 @@ public class CartService
     public async Task RemoveCartProduct(int cartId, CartProductDto cartProductDto)
     {
         var cartProductQuery = GetCartProduct(cartId, cartProductDto.ProductId);
-        if (cartProductQuery == null)
+        if (cartProductQuery.FirstOrDefault() == null)
         {
             var message = "Product does not exist on cart";
             _logger.LogDebug(message);

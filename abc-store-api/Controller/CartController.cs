@@ -18,7 +18,6 @@ namespace ABCStoreAPI.Controller
         }
 
         [HttpGet]
-        [Route("{userId}")]
         public async Task<ActionResult<CartDto>> GetActiveCart([FromQuery] string userId)
         {
             var cart = await _cartService.GetCartInProgress(userId);
@@ -29,8 +28,8 @@ namespace ABCStoreAPI.Controller
         [Route("create")]
         public async Task<ActionResult<CartDto>> CreateCart([FromBody] CartDto cartDto)
         {
-            await _cartService.CreateCart(cartDto);
-            return new ActionResult<CartDto>(cartDto);
+            var cart =await _cartService.CreateCart(cartDto);
+            return new ActionResult<CartDto>(cart);
         }
 
         [HttpPut]
@@ -50,7 +49,7 @@ namespace ABCStoreAPI.Controller
         }
 
         [HttpPost]
-        [Route("product/add/{cartId}")]
+        [Route("product/add")]
         public async Task<ActionResult<CartProductDto>> AddProductToCart(
             [FromQuery] int cartId,
             [FromBody] CartProductDto cartProductDto)
@@ -60,7 +59,7 @@ namespace ABCStoreAPI.Controller
         }
 
         [HttpPut]
-        [Route("product/update/{cartId}")]
+        [Route("product/update")]
         public async Task<ActionResult<CartProductDto>> UpdateCartProduct(
             [FromQuery] int cartId,
             [FromBody] CartProductDto cartProductDto)
@@ -70,7 +69,7 @@ namespace ABCStoreAPI.Controller
         }
 
         [HttpDelete]
-        [Route("product/remove/{cartId}")]
+        [Route("product/remove")]
         public async Task<ActionResult<CartProductDto>> RemoveCartProduct(
             [FromQuery] int cartId,
             [FromBody] CartProductDto cartProductDto)
