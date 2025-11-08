@@ -36,9 +36,9 @@
         {
             "label": "terminate:functions",
             "type": "shell",
-            "command": "ehco ${input:terminate}",
+            "command": "${input:terminate} && npm run rename-firebase-export",
             "problemMatcher": []
-        }
+        },
     ],
     "inputs": [
         {
