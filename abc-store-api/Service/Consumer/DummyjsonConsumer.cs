@@ -56,9 +56,16 @@ public class DummyjsonConsumer : IConsumer
 
             if (!_productConsumerUtil.IsExistingProduct(newProduct.Name))
             {
+                var productImage = new ProductImage()
+                {
+                    Url = product.Thumbnail,
+                    ProductId = newProduct.Id,
+                    CreatedBy = SysUser,
+                    UpdatedBy = SysUser
+                };
+                newProduct.ProductImages = new List<ProductImage>() { productImage };
                 _uow.Products.Add(newProduct);
                 await _uow.CompleteAsync();
-                await _productConsumerUtil.PersistProductImages(product.Id, product.Images, SysUser);
 
                 newCount++;
             }
@@ -74,17 +81,24 @@ public class DummyjsonConsumer : IConsumer
     override
     public async Task ConsumeAsync()
     {
-        var response = await _httpClient.GetAsync($"{_baseUrl}/products");
-        response.EnsureSuccessStatusCode();
-        string data = await response.Content.ReadAsStringAsync();
-
-        DummyjsonProductResponse result = JsonConvert.DeserializeObject<DummyjsonProductResponse>(data)!;
-
-        if (result.products != null)
+        try
         {
-            var categories = new HashSet<string>(result.products.Select(p => p.Category).Distinct().ToList());
-            await _productConsumerUtil.ImportProductCategories(categories, SysUser);
-            await ImportProductsAsync(result.products);
+            var response = await _httpClient.GetAsync($"{_baseUrl}/products");
+            response.EnsureSuccessStatusCode();
+            string data = await response.Content.ReadAsStringAsync();
+
+            DummyjsonProductResponse result = JsonConvert.DeserializeObject<DummyjsonProductResponse>(data)!;
+
+            if (result.products != null)
+            {
+                var categories = new HashSet<string>(result.products.Select(p => p.Category).Distinct().ToList());
+                await _productConsumerUtil.ImportProductCategories(categories, SysUser);
+                await ImportProductsAsync(result.products);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
         }
     }
 }
