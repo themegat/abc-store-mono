@@ -6,7 +6,11 @@
 .fui-screen {
   width: 100%;
   .fui-card {
-    width: 100%;
+    width: -webkit-fill-available;
+    @media screen and (max-width: 400px) {
+      width: min-content;
+      justify-self: center;
+    }
   }
 }
 

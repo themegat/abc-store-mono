@@ -8,16 +8,14 @@ import manifest from './manifest.json';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    react(
-      {
+    react({
         babel: {
-          plugins: ['babel-plugin-react-compiler']
-        }
-      }
-    ),
+        plugins: ['babel-plugin-react-compiler'],
+      },
+    }),
     VitePWA({
       manifest,
-      includeAssets: ['favicon.svg', 'favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
+      includeAssets: ['icon.png', 'favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
       // switch to "true" to enable sw on development
       devOptions: { enabled: false },
       registerType: 'autoUpdate',
