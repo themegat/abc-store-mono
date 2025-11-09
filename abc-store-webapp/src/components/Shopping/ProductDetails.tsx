@@ -1,3 +1,5 @@
+import Slider from 'react-slick';
+
 import { Stack, Typography } from '@mui/material';
 
 import { t } from 'i18next';
@@ -9,7 +11,7 @@ import AddToCart from './AddToCart';
 
 type Props = {
   productId: number;
-  image: string;
+  images: string[];
   title: string;
   price: number;
   currency: string;
@@ -21,17 +23,31 @@ const MinStockQuantity = 10;
 
 const ProductDetails = ({
   productId,
-  image,
+  images,
   title,
   price,
   currency,
   stockQuantity,
   description,
 }: Props) => {
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    className: 'slider-carousel',
+  };
+
   return (
     <Stack id={`product-${productId}`} gap={2}>
-      <Stack width="100%" alignItems="center">
-        <img width="80%" src={image ?? placeholderImg} alt={title} />
+      <Stack width="100%" minHeight={300} alignItems="center">
+        <Slider lazyLoad="ondemand" {...settings}>
+          {images.length === 0 && <img width="80%" src={placeholderImg} alt={title} />}
+          {images.map((imgUrl, index) => (
+            <img key={index} width="80%" src={imgUrl} alt={title} />
+          ))}
+        </Slider>
       </Stack>
       <Typography variant="h5" sx={{ textDecoration: 'underline' }}>
         {title}

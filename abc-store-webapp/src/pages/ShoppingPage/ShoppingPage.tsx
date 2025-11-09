@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import CloseIcon from '@mui/icons-material/Close';
@@ -15,113 +15,94 @@ import {
 import { t } from 'i18next';
 
 import Loading from '@/components/Loading';
-import ProductCard from '@/components/Product/ProductCard';
-import ProductDetails from '@/components/Product/ProductDetails';
-import { MaxPrice, ProductFilter, ProductFilterChanges } from '@/components/Product/ProductFilter';
+import ProductCard from '@/components/Shopping/ProductCard';
+import ProductDetails from '@/components/Shopping/ProductDetails';
+import { MaxPrice, ProductFilter, ProductFilterChanges } from '@/components/Shopping/ProductFilter';
 import { config } from '@/config';
-import { ProductDto, abcApi, useGetApiProductCategoriesQuery } from '@/store/api/abcApi';
+import useShopping from '@/hooks/useShopping';
+import { ProductDto } from '@/store/api/abcApi';
 import { selectUser } from '@/store/slice/userSlice';
 
 import backgroundShopImg from '../../assets/background/background_shop.webp';
 
 const pageSize = 10;
-let products: ProductDto[] = [];
-let pageNumber = 1;
-let inStock = true;
-let categoryId = 0;
-let minPrice = 0;
-let maxPrice = MaxPrice;
-let loaded = false;
-const drawerWidth = 500;
+const drawerWidth = 600;
 const debounceDelay = 500;
 
 const ShoppingPage = () => {
   const theme = useTheme();
-  const [selectedProduct, setSelectedProduct] = useState<ProductDto | null>(null);
-
-  const [fetchingProducts, setFetchingProducts] = useState(false);
-  const { data: categoriesResponse } = useGetApiProductCategoriesQuery();
-  const [getProducts] = abcApi.endpoints.getApiProductFilterByCurrencyCode.useLazyQuery();
-
   const user = useSelector(selectUser);
 
-  const fetchProducts = useCallback(async () => {
-    setFetchingProducts(true);
-    const response = await getProducts({
-      currencyCode: user?.preferredCurrency || config.preferedCurrency,
-      categoryId,
-      inStock,
-      minPrice,
-      maxPrice,
-      pageNumber: pageNumber,
-      pageSize,
-    }).unwrap();
+  const [selectedProduct, setSelectedProduct] = useState<ProductDto | null>(null);
+  const {
+    products,
+    loadMore,
+    loadCount,
+    setProductFilter,
+    fetchingProducts,
+    setProducts,
+    productCategories,
+  } = useShopping(MaxPrice, pageSize);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
-    if (response.items && response.items.length > 0) {
-      products = Array.from(new Set([...products, ...response.items]));
-      pageNumber++;
-    }
-    setFetchingProducts(false);
-    return response.items?.length;
-  }, [getProducts, user]);
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach(async (entry) => {
-        if (entry.isIntersecting) {
-          observer.unobserve(entry.target);
-          const itemsLoaded = await fetchProducts();
-          if (itemsLoaded === pageSize) {
-            observer.observe(entry.target);
+  useEffect(() => {
+    observerRef.current?.disconnect();
+    observerRef.current = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && loadCount === pageSize) {
+            observer.unobserve(entry.target);
+            loadMore();
           }
-        }
-      });
-    },
-    {
-      rootMargin: '0px',
-      threshold: 0.1,
-    },
-  );
+        });
+      },
+      { rootMargin: '0px', threshold: 0.1 },
+    );
 
-  const test = useCallback(
-    debounce(
-      () => observer.observe(document.querySelector('#load-more') as Element),
-      debounceDelay * 2,
-    ),
+    return () => observerRef.current?.disconnect();
+  }, [loadMore, loadCount]);
+
+  const resetLazyLoading = useCallback(
+    debounce(() => {
+      const moreElement = document.querySelector('#load-more');
+      if (moreElement) {
+        observerRef.current?.observe(moreElement);
+      }
+    }, debounceDelay * 2),
     [],
   );
-  const setScrollObserver = (itemsLoaded: number) => {
-    if (itemsLoaded === pageSize) {
-      test();
-    }
-  };
+
+  const setScrollObserver = useCallback(
+    (itemsLoaded: number) => {
+      if (itemsLoaded === pageSize) {
+        resetLazyLoading();
+      }
+    },
+    [resetLazyLoading],
+  );
 
   const onFilterChanged = async (changes: ProductFilterChanges) => {
-    categoryId = changes.categoryId;
-    inStock = changes.inStock;
-    minPrice = changes.minPrice;
-    maxPrice = changes.maxPrice;
-    pageNumber = 1;
-    products = [];
-    const itemsLoaded = await fetchProducts();
-    setScrollObserver(itemsLoaded ?? 0);
+    setProducts([]);
+    setProductFilter({
+      categoryId: changes.categoryId,
+      inStock: changes.inStock,
+      minPrice: changes.minPrice,
+      maxPrice: changes.maxPrice,
+      pageNumber: 1,
+      pageSize: pageSize,
+      currencyCode: user?.preferredCurrency || config.preferedCurrency,
+    });
   };
 
   useEffect(() => {
-    const load = async () => {
-      const itemsLoaded = await fetchProducts();
-      setScrollObserver(itemsLoaded ?? 0);
-    };
-    if (!loaded) load();
-    loaded = true;
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
+    resetLazyLoading();
+  }, [resetLazyLoading, products]);
 
   const openProductDetails = (product: ProductDto) => {
-    observer.unobserve(document.querySelector('#load-more') as Element);
+    const moreElement = document.querySelector('#load-more');
+    if (moreElement) {
+      observerRef.current?.unobserve(moreElement);
+    }
     setSelectedProduct(product);
   };
 
@@ -153,7 +134,7 @@ const ShoppingPage = () => {
               </Typography>
               <ProductFilter
                 onFilterChange={onFilterChanged}
-                categories={categoriesResponse}
+                categories={productCategories}
               ></ProductFilter>
             </Stack>
           </Grid>
@@ -175,7 +156,7 @@ const ShoppingPage = () => {
               {fetchingProducts && <Loading></Loading>}
             </Stack>
           </Grid>
-          {products.length >= 10 && <Stack width={'50%'} height={20} id="load-more"></Stack>}
+          <Stack width={'50%'} height={20} id="load-more"></Stack>
         </Grid>
         <Drawer
           variant="temporary"
@@ -211,7 +192,7 @@ const ShoppingPage = () => {
               {selectedProduct != null && (
                 <ProductDetails
                   productId={selectedProduct.id ?? 0}
-                  image={selectedProduct.productImages ? selectedProduct.productImages[0] : ''}
+                  images={selectedProduct.productImages ?? []}
                   title={selectedProduct.name ?? ''}
                   price={selectedProduct.price ?? 0}
                   currency={user?.preferredCurrency || config.preferedCurrency}

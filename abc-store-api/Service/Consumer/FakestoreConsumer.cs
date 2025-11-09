@@ -83,15 +83,14 @@ public class FakestoreConsumer : IConsumer
                     newProduct.ThumbnailUrl = product.Thumbnail;
                 }
 
-                var images = new List<string> { product.Image };
-                newProduct.ProductImages = images.Select(image => new ProductImage()
+                var productImage = new ProductImage()
                 {
-                    Url = image,
-                    ProductId = product.Id,
+                    Url = product.Image,
+                    ProductId = newProduct.Id,
                     CreatedBy = SysUser,
                     UpdatedBy = SysUser
-                })
-                    .ToList();
+                };
+                newProduct.ProductImages = new List<ProductImage>() { productImage };
 
                 _uow.Products.Add(newProduct);
                 await _uow.CompleteAsync();

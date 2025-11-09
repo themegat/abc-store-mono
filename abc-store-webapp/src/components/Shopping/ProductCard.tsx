@@ -81,7 +81,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   return (
     <Card
-      onClick={onClick}
       sx={{
         ...sx,
         height: 'fit-content',
@@ -112,18 +111,22 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </Typography>
         </Paper>
       )}
-      {containsValidImage() ? (
-        <>
+      <Stack sx={{ cursor: 'pointer' }} onClick={onClick}>
+        {containsValidImage() ? (
+          <>
+            <PlaceholderImage />
+            <ProductImage />
+          </>
+        ) : (
           <PlaceholderImage />
-          <ProductImage />
-        </>
-      ) : (
-        <PlaceholderImage />
-      )}
+        )}
+      </Stack>
       <CardContent
+        onClick={onClick}
         sx={{
           height: '-webkit-fill-available',
           display: 'inherit',
+          cursor: 'pointer',
         }}
       >
         <Typography fontWeight={600} variant="body2" component="div">
