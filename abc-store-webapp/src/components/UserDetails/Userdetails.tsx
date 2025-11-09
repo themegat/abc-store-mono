@@ -9,6 +9,7 @@ import {
   MenuItem,
   Select,
   Stack,
+  SxProps,
   TextField,
   Typography,
   useTheme,
@@ -17,6 +18,7 @@ import {
 import { t } from 'i18next';
 
 import { config } from '@/config';
+import useOrientation from '@/hooks/useOrientation';
 import {
   useGetApiExchangeRateAllQuery,
   usePostApiUserDetailsUpdateCreateMutation,
@@ -31,7 +33,11 @@ interface IFormInputs {
   preferredCurrency: string;
 }
 
-const UserDetails = () => {
+type Props = {
+  sx?: SxProps;
+};
+
+const UserDetails = ({ sx }: Props) => {
   const theme = useTheme();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>();
@@ -39,6 +45,7 @@ const UserDetails = () => {
   const [postApiUserDetailsUpdateCreate] = usePostApiUserDetailsUpdateCreateMutation();
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector(selectUser);
+  const isPortrait = useOrientation();
 
   const { control, handleSubmit } = useForm<IFormInputs>({
     defaultValues: {
@@ -97,6 +104,7 @@ const UserDetails = () => {
     <Stack>
       <Stack
         sx={{
+          ...sx,
           borderWidth: 1,
           borderColor: theme.palette.text.primary,
           backgroundColor: theme.palette.background.paper,
@@ -120,7 +128,6 @@ const UserDetails = () => {
               render={({ field, fieldState }) => (
                 <TextField
                   {...field}
-                  sx={{ minWidth: 300 }}
                   size="small"
                   label={t('userDetails.firstName')}
                   variant="outlined"
@@ -193,7 +200,12 @@ const UserDetails = () => {
                 </>
               )}
             />
-            <Stack direction="row" width="100%" justifyContent="space-between">
+            <Stack
+              gap={2}
+              direction={isPortrait ? 'column' : 'row'}
+              width="100%"
+              justifyContent="space-between"
+            >
               <Button disabled={isLoading} onClick={handleOnSkip} variant="contained" color="info">
                 {t('userDetails.skipButton')}
               </Button>

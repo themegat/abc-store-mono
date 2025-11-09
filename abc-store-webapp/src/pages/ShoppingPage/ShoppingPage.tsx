@@ -2,7 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import CloseIcon from '@mui/icons-material/Close';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Drawer,
   Grid2 as Grid,
   IconButton,
@@ -19,6 +23,7 @@ import ProductCard from '@/components/Shopping/ProductCard';
 import ProductDetails from '@/components/Shopping/ProductDetails';
 import { MaxPrice, ProductFilter, ProductFilterChanges } from '@/components/Shopping/ProductFilter';
 import { config } from '@/config';
+import useDevice from '@/hooks/useDevice';
 import useShopping from '@/hooks/useShopping';
 import { ProductDto } from '@/store/api/abcApi';
 import { selectUser } from '@/store/slice/userSlice';
@@ -32,6 +37,7 @@ const debounceDelay = 500;
 const ShoppingPage = () => {
   const theme = useTheme();
   const user = useSelector(selectUser);
+  const { isDesktop, isMobile, isTablet } = useDevice();
 
   const [selectedProduct, setSelectedProduct] = useState<ProductDto | null>(null);
   const {
@@ -111,6 +117,49 @@ const ShoppingPage = () => {
     setScrollObserver(pageSize);
   };
 
+  const FilterTitle = () => {
+    return (
+      <Typography variant="h6" marginBottom={2}>
+        {t('productFilter.title')}
+      </Typography>
+    );
+  };
+
+  const Filter = () => {
+    return (
+      <ProductFilter
+        onFilterChange={onFilterChanged}
+        categories={productCategories}
+      ></ProductFilter>
+    );
+  };
+
+  const DeskTopFilter = () => {
+    return (
+      <Stack position="sticky" top={75}>
+        <FilterTitle />
+        <Filter />
+      </Stack>
+    );
+  };
+
+  const MobileFilter = () => {
+    return (
+      <Accordion>
+        <AccordionSummary
+          aria-controls="product-filter"
+          id="product-filter"
+          expandIcon={<ExpandMoreIcon />}
+        >
+          <FilterTitle />
+        </AccordionSummary>
+        <AccordionDetails>
+          <Filter />
+        </AccordionDetails>
+      </Accordion>
+    );
+  };
+
   return (
     <>
       <meta name="title" content="Shop" />
@@ -127,24 +176,22 @@ const ShoppingPage = () => {
           <Grid size={12} textAlign="center">
             <Typography variant="h3">{t('routes.shop')}</Typography>
           </Grid>
-          <Grid size={3}>
-            <Stack position="sticky" top={75}>
-              <Typography variant="h6" marginBottom={2}>
-                {t('productFilter.title')}
-              </Typography>
-              <ProductFilter
-                onFilterChange={onFilterChanged}
-                categories={productCategories}
-              ></ProductFilter>
-            </Stack>
+          <Grid
+            sx={{
+              maxWidth: isMobile ? '100%' : isTablet ? '80%' : 'unset',
+              marginLeft: isMobile ? 0 : isTablet ? '10%' : 'unset',
+            }}
+            size={{ xs: 12, sm: 12, md: 3 }}
+          >
+            {isDesktop ? <DeskTopFilter /> : <MobileFilter />}
           </Grid>
-          <Grid size={9}>
-            <Stack gap={5} direction="row" flexWrap="wrap">
+          <Grid size={{ xs: 12, sm: 12, md: 9 }}>
+            <Stack justifyContent="center" gap={5} direction="row" flexWrap="wrap">
               {products.map((item, index) => (
                 <ProductCard
                   key={`product-${index}`}
                   id={item?.id ?? 0}
-                  sx={{ width: 240 }}
+                  sx={{ width: 250 }}
                   image={item?.thumbnailUrl ? item.thumbnailUrl : ''}
                   title={item?.name ?? ''}
                   price={item?.price ?? 0}
@@ -162,16 +209,15 @@ const ShoppingPage = () => {
           variant="temporary"
           open={Boolean(selectedProduct)}
           onClose={() => closeProductDetails()}
-          anchor="right"
+          anchor={isDesktop ? 'right' : 'bottom'}
           sx={{
             zIndex: 0,
-            width: drawerWidth,
             flexShrink: 0,
             [`& .MuiDrawer-paper`]: {
               backgroundColor:
                 theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.85)',
               padding: 3,
-              width: drawerWidth,
+              width: isDesktop ? drawerWidth : '100%',
               height: '92vh',
               top: '8vh',
               boxSizing: 'border-box',
