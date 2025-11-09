@@ -8,7 +8,13 @@ import manifest from './manifest.json';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    react(),
+    react(
+      {
+        babel: {
+          plugins: ['babel-plugin-react-compiler']
+        }
+      }
+    ),
     VitePWA({
       manifest,
       includeAssets: ['favicon.svg', 'favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
