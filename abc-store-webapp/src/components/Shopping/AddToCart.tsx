@@ -110,7 +110,7 @@ const AddToCart = ({ productId, maxQty }: Props) => {
               </IconButton>
             }
             sx={{
-              width: isMobile ? 100 : 150,
+              width: isMobile ? 120 : 150,
               fontWeight: 'bold',
               input: {
                 textAlign: 'center',

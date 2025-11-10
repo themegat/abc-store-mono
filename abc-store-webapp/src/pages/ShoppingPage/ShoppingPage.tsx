@@ -194,18 +194,19 @@ const ShoppingPage = () => {
             {isDesktop ? <DeskTopFilter /> : <MobileFilter />}
           </Grid>
           <Grid size={{ xs: 12, sm: 12, md: 9 }}>
-            <Stack justifyContent="center" gap={5} direction="row" flexWrap="wrap">
+            <Stack justifyContent="center" gap={isMobile ? 1.5 : 5} direction="row" flexWrap="wrap">
               {products.map((item, index) => (
                 <ProductCard
                   key={`product-${index}`}
                   id={item?.id ?? 0}
-                  sx={{ width: isMobile ? 150 : 250 }}
+                  sx={{ width: isMobile ? 165 : 250 }}
                   image={item?.thumbnailUrl ? item.thumbnailUrl : ''}
                   title={item?.name ?? ''}
                   price={item?.price ?? 0}
                   stockQuantity={item?.stockQuantity ?? 0}
                   currency={user?.preferredCurrency || config.preferedCurrency}
                   onClick={() => openProductDetails(item)}
+                  hasFocus={selectedProduct?.id === item?.id}
                 ></ProductCard>
               ))}
               {fetchingProducts && <Loading></Loading>}

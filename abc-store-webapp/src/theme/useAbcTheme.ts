@@ -1,5 +1,6 @@
-import { createTheme, useTheme } from "@mui/material";
-import { useThemeMode } from "./hooks";
+import { createTheme, useTheme } from '@mui/material';
+
+import { useThemeMode } from './hooks';
 import themes from './themes';
 
 const useAbcTheme = () => {
@@ -42,8 +43,16 @@ const useAbcTheme = () => {
           root: {
             ':before': {
               [_theme.breakpoints.down('sm')]: {
-                padding: '4.4px !important',
+                padding: '5.4px !important',
               },
+            },
+            [_theme.breakpoints.down('sm')]: {
+              height: '38px',
+              marginTop: '5px',
+            },
+            [_theme.breakpoints.up('lg')]: {
+              height: '40px',
+              marginTop: '5px !important',
             },
           },
           input: {
@@ -58,7 +67,13 @@ const useAbcTheme = () => {
       MuiSvgIcon: {
         styleOverrides: {
           fontSizeMedium: {
-            fontSize: '1.2rem',
+            [_theme.breakpoints.down('sm')]: {
+              fontSize: '1.2rem',
+            },
+            [_theme.breakpoints.down('md')]: {
+              fontSize: '1.4rem',
+            },
+            fontSize: '1.85rem',
           },
         },
       },
