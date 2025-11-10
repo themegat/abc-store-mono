@@ -1,4 +1,5 @@
 import { useContext } from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
 import DefaultIcon from '@mui/icons-material/Deblur';
@@ -17,11 +18,11 @@ import {
 import { t } from 'i18next';
 
 import { AuthContext } from '@/components/auth/AuthContext';
+import useCart from '@/hooks/useCart';
 import routes from '@/routes';
+import { selectUser } from '@/store/slice/userSlice';
 
 import { useSidebar } from './hooks';
-import { useSelector } from 'react-redux';
-import { selectUser } from '@/store/slice/userSlice';
 
 type Props = {
   enabled?: boolean;
@@ -32,7 +33,8 @@ function Sidebar({ enabled = true }: Props) {
   const authContext = useContext(AuthContext);
 
   const user = useSelector(selectUser);
-  
+  const { observeCart } = useCart();
+
   let username = '';
   if (user) {
     if (user.firstName && user.lastName) {
@@ -46,6 +48,13 @@ function Sidebar({ enabled = true }: Props) {
     authContext.auth?.signOut().finally(() => {
       close();
     });
+  };
+
+  const showCheckout = (title: string) => {
+    if (title === t('checkout.title')) {
+      return observeCart?.cartProducts && observeCart.cartProducts.length > 0;
+    }
+    return true;
   };
 
   return (
@@ -62,7 +71,7 @@ function Sidebar({ enabled = true }: Props) {
         >
           <List sx={{ width: 250, pt: (theme) => `${theme.mixins.toolbar.minHeight}px` }}>
             {routes
-              .filter((route) => route.title && route.show)
+              .filter((route) => route.title && route.show && showCheckout(route.title))
               .map(({ path, title, icon: Icon }) => (
                 <ListItem sx={{ p: 0 }} key={path} onClick={close}>
                   <ListItemButton component={Link} to={path as string}>

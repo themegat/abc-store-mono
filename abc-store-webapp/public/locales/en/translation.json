@@ -20,7 +20,16 @@
     "lastName": "Last Name",
     "preferredCurrency": "Preferred Currency",
     "skipButton": "Skip for now",
-    "okButton": "Continue"
+    "okButton": "Continue",
+    "emailAddress": "Email Address",
+    "contactNumber": "Contact Number"
+  },
+  "address": {
+    "shippingAddress": "Shipping Address",
+    "billingAddress": "Billing Address",
+    "line1": "Street name and number",
+    "suburb": "Suburb",
+    "areaCode": "Area Code"
   },
   "validation": {
     "required": "{{fieldName}} is required!"
@@ -46,6 +55,10 @@
   },
   "cart": {
     "addToCart": "Add to cart",
-    "viewCart": "View Cart"
+    "title": "Cart"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "customerDetails": "Customer Details"
   }
 }

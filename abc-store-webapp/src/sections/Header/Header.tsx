@@ -1,8 +1,10 @@
 import { useMemo } from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router';
 
 import ThemeIcon from '@mui/icons-material/InvertColors';
 import MenuIcon from '@mui/icons-material/Menu';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import {
   AppBar,
   Badge,
@@ -20,6 +22,7 @@ import { config } from '@/config';
 import useCart from '@/hooks/useCart';
 import { useHotKeysDialog } from '@/sections/HotKeys/hooks';
 import { useSidebar } from '@/sections/Sidebar/hooks';
+import { UserState, selectUser } from '@/store/slice/userSlice';
 import { useThemeMode } from '@/theme';
 
 import headerBackgroundDarkImg from '../../assets/background/header_background_dark.svg';
@@ -30,13 +33,21 @@ type Props = {
   enabledSidebar?: boolean;
 };
 
-const CartButton = () => {
+const CheckoutButton = () => {
   const { observeCart } = useCart();
+  const user = useSelector(selectUser);
 
-  const show = useMemo(
-    () => observeCart && observeCart.cartProducts && observeCart?.cartProducts?.length > 0,
-    [observeCart],
-  );
+  const navigate = useNavigate();
+
+  const show = useMemo(() => {
+    const userAuthorized = user && (user.state === UserState.COMPLETE || user.state === UserState.SKIPPED);
+    return (
+      observeCart &&
+      observeCart.cartProducts &&
+      observeCart?.cartProducts?.length > 0 &&
+      userAuthorized
+    );
+  }, [observeCart, user]);
   const totalItems = observeCart?.cartProducts
     ?.map((item) => item.quantity)
     .reduce((prev, curr) => (prev ?? 0) + (curr ?? 0), 0);
@@ -45,14 +56,10 @@ const CartButton = () => {
     <>
       {show && (
         <>
-          <Tooltip title={t('cart.viewCart')} arrow>
-            <IconButton size="large" sx={{ display: 'grid' }}>
-              <Badge
-                badgeContent={totalItems}
-                overlap="circular"
-                color="primary"
-              ></Badge>
-              <ShoppingCartIcon />
+          <Tooltip title={t('checkout.title')} arrow>
+            <IconButton onClick={() => navigate('/checkout')} size="large" sx={{ display: 'grid' }}>
+              <Badge badgeContent={totalItems} overlap="circular" color="primary"></Badge>
+              <ShoppingCartCheckoutIcon />
             </IconButton>
           </Tooltip>
           <Divider orientation="vertical" flexItem />
@@ -106,7 +113,7 @@ function Header({ enabledSidebar = true }: Props) {
             <Stack></Stack>
           )}
           <Stack direction="row" alignItems="center">
-            <CartButton />
+            <CheckoutButton />
             <Tooltip title={t('hotKeys.title')} arrow>
               <HotKeysButton
                 size="medium"

@@ -34,9 +34,13 @@ const useObserveCartProduct = (productId: number) => {
   return useSelector((state: RootState) => selectCartProduct(state, productId));
 };
 
+const useObserveCart = () => {
+  return useSelector(selectCart);
+};
+
 const useCart = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const observeCart = useSelector(selectCart);
+  const observeCart = useObserveCart();
   const user = useSelector(selectUser);
 
   const [createCartRequest] = usePostApiCartCreateMutation();

@@ -10,13 +10,12 @@ const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
-    setCart: (state, action: { payload: CartDto | null }) => {
+    setCart: (_state, action: { payload: CartDto | null }) => {
       if (action.payload) {
-        state = { ...action.payload };
+        return { ...action.payload };
       } else {
-        state = initialState;
+        return initialState;
       }
-      return state;
     },
     addUpdateCartProduct: (state, action: { payload: CartProductDto }) => {
       const existingProductIndex =
@@ -24,14 +23,17 @@ const cartSlice = createSlice({
           (product) => product.productId === action.payload.productId,
         ) ?? -1;
       if (action.payload.quantity === 0 && existingProductIndex > -1) {
-        state.cartProducts?.splice(existingProductIndex, 1);
+        return { ...state, cartProducts: state.cartProducts?.splice(existingProductIndex, 1) };
       } else if (action?.payload?.quantity && action?.payload?.quantity > 0) {
         if (existingProductIndex > -1) {
-          state.cartProducts![existingProductIndex] = action.payload;
+          const cartProducts = [...state.cartProducts!];
+          cartProducts[existingProductIndex] = action.payload;
+          return { ...state, cartProducts };
         } else {
-          state.cartProducts?.push(action.payload);
+          const cartProducts = [...state.cartProducts!];
+          cartProducts.push(action.payload);
+          return { ...state, cartProducts };
         }
-        return state;
       }
     },
   },
