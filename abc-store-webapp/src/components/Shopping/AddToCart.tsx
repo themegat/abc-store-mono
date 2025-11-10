@@ -9,6 +9,7 @@ import { Button, IconButton, Input, Stack, SxProps, debounce } from '@mui/materi
 import { t } from 'i18next';
 
 import useCart from '@/hooks/useCart';
+import useDevice from '@/hooks/useDevice';
 
 type Props = {
   productId: number;
@@ -22,6 +23,8 @@ const buttonStyle: SxProps = {
 const DebounceDelay = 1000;
 
 const AddToCart = ({ productId, maxQty }: Props) => {
+  const { isDesktop, isMobile } = useDevice();
+  
   const { useObserveCartProduct, updateProduct } = useCart();
   const cartProduct = useObserveCartProduct(productId);
   const [qty, setQty] = useState<number>(cartProduct?.quantity || 0);
@@ -70,8 +73,9 @@ const AddToCart = ({ productId, maxQty }: Props) => {
   return (
     <Stack>
       {qty > 0 ? (
-        <Stack direction="row" spacing={1}>
+        <Stack direction="row" spacing={isMobile ? 0 : 1}>
           <IconButton
+            size={isDesktop ? 'medium' : 'small'}
             onClick={remove}
             disabled={loading}
             id={`product-qty-remove-button-${productId}`}
@@ -80,6 +84,7 @@ const AddToCart = ({ productId, maxQty }: Props) => {
             <DeleteIcon />
           </IconButton>
           <Input
+            size={isDesktop ? 'medium' : 'small'}
             id={`product-qty-input-${productId}`}
             type="number"
             value={qty}
@@ -105,7 +110,7 @@ const AddToCart = ({ productId, maxQty }: Props) => {
               </IconButton>
             }
             sx={{
-              width: 150,
+              width: isMobile ? 100 : 150,
               fontWeight: 'bold',
               input: {
                 textAlign: 'center',
@@ -128,7 +133,7 @@ const AddToCart = ({ productId, maxQty }: Props) => {
           disabled={loading || maxQty === 0}
           endIcon={<ShoppingCartIcon />}
           variant="outlined"
-          size="medium"
+          size={isDesktop ? 'medium' : 'small'}
         >
           {t('cart.addToCart')}
         </Button>

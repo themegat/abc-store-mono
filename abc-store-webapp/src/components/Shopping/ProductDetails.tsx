@@ -53,7 +53,7 @@ const ProductDetails = ({
         {title}
       </Typography>
       <Typography variant="body2">{description}</Typography>
-      <Typography fontSize={20} fontWeight={600} variant="body1">
+      <Typography fontWeight={600} variant="h6">
         {formatCurrency(price, 'en-US', currency)}
       </Typography>
       <Typography
@@ -64,7 +64,6 @@ const ProductDetails = ({
               ? 'warning'
               : 'textPrimary'
         }
-        fontSize={18}
         fontWeight={400}
         variant="body1"
       >

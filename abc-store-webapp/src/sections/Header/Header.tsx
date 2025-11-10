@@ -50,7 +50,6 @@ const CartButton = () => {
               <Badge
                 badgeContent={totalItems}
                 overlap="circular"
-                sx={{ fontSize: 14 }}
                 color="primary"
               ></Badge>
               <ShoppingCartIcon />
@@ -93,13 +92,13 @@ function Header({ enabledSidebar = true }: Props) {
               <IconButton
                 size="large"
                 edge="start"
-                sx={{ color: '#fff', '.MuiSvgIcon-root': { fontSize: 30 } }}
+                sx={{ color: '#fff' }}
                 aria-label="menu"
                 onClick={openSidebar}
               >
                 <MenuIcon />
               </IconButton>
-              <Typography sx={{ color: '#fff' }} fontSize={24} fontWeight="bold">
+              <Typography sx={{ color: '#fff' }} variant="h6" fontWeight="bold">
                 {config.title}
               </Typography>
             </Stack>
@@ -124,7 +123,6 @@ function Header({ enabledSidebar = true }: Props) {
                 color="default"
                 edge="end"
                 size="large"
-                sx={{ fontSize: 50, '.MuiSvgIcon-root': { fontSize: 30 } }}
                 onClick={toggleThemeMode}
                 data-pw="theme-toggle"
               >

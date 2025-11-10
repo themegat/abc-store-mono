@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { ChangeEvent, SyntheticEvent, useCallback, useState } from 'react';
 
 import {
   Button,
@@ -10,6 +10,7 @@ import {
   MenuItem,
   Paper,
   Select,
+  SelectChangeEvent,
   SxProps,
   TextField,
   Typography,
@@ -49,6 +50,39 @@ const ProductFilter = ({ categories, onFilterChange, sx }: Props) => {
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(MaxPrice);
 
+  const handleCategoryChange = useCallback(
+    (event: SelectChangeEvent<number>) => {
+      const id = Number(event.target.value);
+      setCategory(id);
+      onFilterChange({ categoryId: id, inStock, minPrice, maxPrice });
+    },
+    [setCategory, onFilterChange, inStock, minPrice, maxPrice],
+  );
+
+  const handleInStockChange = useCallback(
+    (_event: SyntheticEvent<Element, Event>, checked: boolean) => {
+      setInStock(checked);
+      onFilterChange({ categoryId: category, inStock: checked, minPrice, maxPrice });
+    },
+    [onFilterChange, category, minPrice, maxPrice],
+  );
+
+  const handleMinPriceChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const minPrice = Number(event.target.value);
+      setMinPrice(minPrice);
+    },
+    [],
+  );
+
+  const handleMaxPriceChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const maxPrice = Number(event.target.value);
+      setMaxPrice(maxPrice);
+    },
+    [],
+  );
+
   return (
     <Paper sx={{ ...sx, borderWidth: 1, borderRadius: 1, padding: 2, backgroundColor }}>
       <FormControl fullWidth>
@@ -58,11 +92,7 @@ const ProductFilter = ({ categories, onFilterChange, sx }: Props) => {
           id="category-select"
           value={category}
           label={t('productFilter.category')}
-          onChange={(event) => {
-            const id = Number(event.target.value);
-            setCategory(id);
-            onFilterChange({ categoryId: id, inStock, minPrice, maxPrice });
-          }}
+          onChange={handleCategoryChange}
         >
           <MenuItem value={0}>{t('productFilter.all')}</MenuItem>
           {categories?.map((item) => (
@@ -74,10 +104,7 @@ const ProductFilter = ({ categories, onFilterChange, sx }: Props) => {
       </FormControl>
       <PricingDivider />
       <FormControlLabel
-        onChange={(_event, checked) => {
-          setInStock(checked);
-          onFilterChange({ categoryId: category, inStock: checked, minPrice, maxPrice });
-        }}
+        onChange={handleInStockChange}
         control={<Checkbox defaultChecked />}
         label={t('productFilter.inStock')}
       />
@@ -88,20 +115,14 @@ const ProductFilter = ({ categories, onFilterChange, sx }: Props) => {
           id="min-price"
           type="number"
           defaultValue={minPrice}
-          onChange={(event) => {
-            const minPrice = Number(event.target.value);
-            setMinPrice(minPrice);
-          }}
+          onChange={handleMinPriceChange}
         />
         <TextField
           label={t('productFilter.maxPrice')}
           id="max-price"
           type="number"
           defaultValue={maxPrice}
-          onChange={(event) => {
-            const maxPrice = Number(event.target.value);
-            setMaxPrice(maxPrice);
-          }}
+          onChange={handleMaxPriceChange}
         />
         <Button
           variant="contained"

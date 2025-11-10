@@ -1,13 +1,11 @@
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 
-import { useThemeMode } from './hooks';
-import themes from './themes';
 import type { CustomThemeProviderProps } from './types';
+import useAbcTheme from './useAbcTheme';
 
 function CustomThemeProvider({ children }: CustomThemeProviderProps) {
-  const { themeMode } = useThemeMode();
-
-  return <ThemeProvider theme={createTheme(themes[themeMode])}>{children}</ThemeProvider>;
+  const { theme } = useAbcTheme();
+  return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 }
 
 export default CustomThemeProvider;

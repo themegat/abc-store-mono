@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 
 import { t } from 'i18next';
+import tinycolor from 'tinycolor2';
 
 import Loading from '@/components/Loading';
 import ProductCard from '@/components/Shopping/ProductCard';
@@ -49,8 +50,8 @@ const ShoppingPage = () => {
     setProducts,
     productCategories,
   } = useShopping(MaxPrice, pageSize);
-  const observerRef = useRef<IntersectionObserver | null>(null);
 
+  const observerRef = useRef<IntersectionObserver | null>(null);
   useEffect(() => {
     observerRef.current?.disconnect();
     observerRef.current = new IntersectionObserver(
@@ -87,18 +88,21 @@ const ShoppingPage = () => {
     [resetLazyLoading],
   );
 
-  const onFilterChanged = async (changes: ProductFilterChanges) => {
-    setProducts([]);
-    setProductFilter({
-      categoryId: changes.categoryId,
-      inStock: changes.inStock,
-      minPrice: changes.minPrice,
-      maxPrice: changes.maxPrice,
-      pageNumber: 1,
-      pageSize: pageSize,
-      currencyCode: user?.preferredCurrency || config.preferedCurrency,
-    });
-  };
+  const onFilterChanged = useCallback(
+    async (changes: ProductFilterChanges) => {
+      setProducts([]);
+      setProductFilter({
+        categoryId: changes.categoryId,
+        inStock: changes.inStock,
+        minPrice: changes.minPrice,
+        maxPrice: changes.maxPrice,
+        pageNumber: 1,
+        pageSize: pageSize,
+        currencyCode: user?.preferredCurrency || config.preferedCurrency,
+      });
+    },
+    [setProducts, setProductFilter, user?.preferredCurrency],
+  );
 
   useEffect(() => {
     resetLazyLoading();
@@ -117,35 +121,39 @@ const ShoppingPage = () => {
     setScrollObserver(pageSize);
   };
 
-  const FilterTitle = () => {
+  const FilterTitle = useCallback(() => {
     return (
       <Typography variant="h6" marginBottom={2}>
         {t('productFilter.title')}
       </Typography>
     );
-  };
+  }, []);
 
-  const Filter = () => {
+  const Filter = useCallback(() => {
     return (
       <ProductFilter
         onFilterChange={onFilterChanged}
         categories={productCategories}
       ></ProductFilter>
     );
-  };
+  }, [onFilterChanged, productCategories]);
 
-  const DeskTopFilter = () => {
+  const DeskTopFilter = useCallback(() => {
     return (
       <Stack position="sticky" top={75}>
         <FilterTitle />
         <Filter />
       </Stack>
     );
-  };
+  }, [Filter, FilterTitle]);
 
-  const MobileFilter = () => {
+  const MobileFilter = useCallback(() => {
     return (
-      <Accordion>
+      <Accordion
+        sx={{
+          backgroundColor: tinycolor(theme.palette.background.default).setAlpha(0.8).toRgbString(),
+        }}
+      >
         <AccordionSummary
           aria-controls="product-filter"
           id="product-filter"
@@ -158,7 +166,7 @@ const ShoppingPage = () => {
         </AccordionDetails>
       </Accordion>
     );
-  };
+  }, [Filter, FilterTitle, theme.palette.background.default]);
 
   return (
     <>
@@ -191,7 +199,7 @@ const ShoppingPage = () => {
                 <ProductCard
                   key={`product-${index}`}
                   id={item?.id ?? 0}
-                  sx={{ width: 250 }}
+                  sx={{ width: isMobile ? 150 : 250 }}
                   image={item?.thumbnailUrl ? item.thumbnailUrl : ''}
                   title={item?.name ?? ''}
                   price={item?.price ?? 0}

@@ -104,7 +104,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               stockQuantity === 0 ? theme.palette.error.main : theme.palette.warning.main,
           }}
         >
-          <Typography fontSize={16} fontWeight="bold">
+          <Typography variant="body1" fontWeight="bold">
             {stockQuantity === 0
               ? t('product.outOfStock')
               : t('product.limitedStock', { count: stockQuantity })}
