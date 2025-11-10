@@ -41,7 +41,8 @@
   "product": {
     "limitedStock": "Only {{count}} left in stock",
     "outOfStock": "Out of stock",
-    "itemsInStock": "{{count}} items in stock"
+    "itemsInStock": "{{count}} items in stock",
+    "notItemsFound": "No items found"
   },
   "cart": {
     "addToCart": "Add to cart",

@@ -1,14 +1,19 @@
-import { FullSizeCentered } from '@/components/styled';
+import { Stack, SxProps, Typography } from '@mui/material';
 
-import notFoundGif from './404.gif';
+import noItemFoundIcon from '../../assets/no_item_found.png';
 import { Image } from './styled';
 
-function NotFound() {
+type Props = {
+  title: string;
+  sx?: SxProps;
+};
+const NotFound = ({ title, sx }: Props) => {
   return (
-    <FullSizeCentered flexDirection="column">
-      <Image src={notFoundGif} />
-    </FullSizeCentered>
+    <Stack sx={sx} textAlign="center">
+      <Image src={noItemFoundIcon} alt={title} />
+      <Typography variant="h4">{title}</Typography>
+    </Stack>
   );
-}
+};
 
 export default NotFound;

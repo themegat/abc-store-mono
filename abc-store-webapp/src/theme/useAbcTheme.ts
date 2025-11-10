@@ -18,6 +18,14 @@ const useAbcTheme = () => {
           fontSize: '2.5rem',
         },
       },
+      h4: {
+        [_theme.breakpoints.down('sm')]: {
+          fontSize: '1.6rem',
+        },
+        [_theme.breakpoints.down('md')]: {
+          fontSize: '1.87rem',
+        },
+      },
       h6: {
         [_theme.breakpoints.down('sm')]: {
           fontSize: '1.024rem',

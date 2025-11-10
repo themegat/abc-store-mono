@@ -30,6 +30,7 @@ import { ProductDto } from '@/store/api/abcApi';
 import { selectUser } from '@/store/slice/userSlice';
 
 import backgroundShopImg from '../../assets/background/background_shop.webp';
+import NotFound from '../NotFound';
 
 const pageSize = 10;
 const drawerWidth = 600;
@@ -195,20 +196,24 @@ const ShoppingPage = () => {
           </Grid>
           <Grid size={{ xs: 12, sm: 12, md: 9 }}>
             <Stack justifyContent="center" gap={isMobile ? 1.5 : 5} direction="row" flexWrap="wrap">
-              {products.map((item, index) => (
-                <ProductCard
-                  key={`product-${index}`}
-                  id={item?.id ?? 0}
-                  sx={{ width: isMobile ? 165 : 250 }}
-                  image={item?.thumbnailUrl ? item.thumbnailUrl : ''}
-                  title={item?.name ?? ''}
-                  price={item?.price ?? 0}
-                  stockQuantity={item?.stockQuantity ?? 0}
-                  currency={user?.preferredCurrency || config.preferedCurrency}
-                  onClick={() => openProductDetails(item)}
-                  hasFocus={selectedProduct?.id === item?.id}
-                ></ProductCard>
-              ))}
+              {products.length === 0 && !fetchingProducts ? (
+                <NotFound sx={{ marginTop: 10 }} title={t('product.notItemsFound')} />
+              ) : (
+                products.map((item, index) => (
+                  <ProductCard
+                    key={`product-${index}`}
+                    id={item?.id ?? 0}
+                    sx={{ width: isMobile ? 165 : 250 }}
+                    image={item?.thumbnailUrl ? item.thumbnailUrl : ''}
+                    title={item?.name ?? ''}
+                    price={item?.price ?? 0}
+                    stockQuantity={item?.stockQuantity ?? 0}
+                    currency={user?.preferredCurrency || config.preferedCurrency}
+                    onClick={() => openProductDetails(item)}
+                    hasFocus={selectedProduct?.id === item?.id}
+                  ></ProductCard>
+                ))
+              )}
               {fetchingProducts && <Loading></Loading>}
             </Stack>
           </Grid>
