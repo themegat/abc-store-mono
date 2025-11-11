@@ -1,8 +1,11 @@
+import { useState } from 'react';
+
 import { Card, CardContent, CardMedia, Stack, SxProps, Typography, useTheme } from '@mui/material';
 
 import { config } from '@/config';
 import { formatCurrency } from '@/utils/shopping';
 
+import placeholderImg from '../../assets/placeholder.webp';
 import AddToCart from '../Shopping/AddToCart';
 
 type Props = {
@@ -25,6 +28,7 @@ const ProductCard = ({
   sx,
 }: Props) => {
   const theme = useTheme();
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
     <Card
@@ -34,10 +38,23 @@ const ProductCard = ({
         display: 'flex',
         backgroundColor: 'transparent',
         borderBottom: `1px solid ${theme.palette.text.primary}`,
-        borderRadius: 0
+        borderRadius: 0,
       }}
     >
-      <CardMedia component="img" sx={{ width: 151 }} image={image} alt={title} />
+      <CardMedia
+        onLoad={() => setImageLoaded(true)}
+        component="img"
+        sx={{ width: 151, display: imageLoaded ? 'block' : 'none' }}
+        image={image}
+        alt={title}
+      />
+      <CardMedia
+        component="img"
+        sx={{ width: 151, display: imageLoaded ? 'none' : 'block' }}
+        image={placeholderImg}
+        alt={title}
+      />
+
       <CardContent sx={{ width: '100%' }}>
         <Stack sx={{ height: '100%' }}>
           <Typography variant="h6">{title}</Typography>

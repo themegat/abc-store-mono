@@ -4,8 +4,7 @@ import { t } from 'i18next';
 import tinycolor from 'tinycolor2';
 
 import CartItems from '@/components/Checkout/CartItems';
-import AddressDetails from '@/components/UserDetails/AddressDetails';
-import BasicDetails from '@/components/UserDetails/BasicDetails';
+import CheckoutSteps from '@/components/Checkout/CheckoutSteps';
 import useCart from '@/hooks/useCart';
 
 import backgroundImg from '../../assets/background/background_checkout.webp';
@@ -32,7 +31,6 @@ const DividerElement = ({ orientation }: DividerElementProps) => {
 const CheckoutPage = () => {
   const { observeCart } = useCart();
   const theme = useTheme();
-
   return (
     <>
       <meta name="title" content={t('checkout.title')} />
@@ -70,17 +68,7 @@ const CheckoutPage = () => {
           </Grid>
 
           <Grid size={6}>
-            <Typography variant="h5">{t('checkout.customerDetails')}</Typography>
-            <br />
-            <BasicDetails />
-            <DividerElement orientation="horizontal" />
-            <Typography variant="h5">{t('address.shippingAddress')}</Typography>
-            <br />
-            <AddressDetails id="shipping-address" />
-            <DividerElement orientation="horizontal" />
-            <Typography variant="h5">{t('address.billingAddress')}</Typography>
-            <br />
-            <AddressDetails id="billing-address" />
+            <CheckoutSteps />
           </Grid>
         </Grid>
       </Stack>

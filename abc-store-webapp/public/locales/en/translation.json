@@ -59,6 +59,10 @@
   },
   "checkout": {
     "title": "Checkout",
-    "customerDetails": "Customer Details"
+    "customerDetails": "Customer Details",
+    "next": "Continue",
+    "previous": "Back",
+    "complete": "Complete Checkout",
+    "sameAsBilling": "Same as Billing Address"
   }
 }
