@@ -1,4 +1,3 @@
-using System;
 using ABCStoreAPI.Database.Model;
 using ABCStoreAPI.Repository;
 using ABCStoreAPI.Service.Dto;
@@ -30,9 +29,26 @@ public class UserDetailsService
             FirstName = userDetails.FirstName,
             LastName = userDetails.LastName,
             PreferredCurrency = userDetails.PreferredCurrency,
+            ContactNumber = userDetails.ContactNumber,
             CreatedBy = "System",
             UpdatedBy = "System"
         };
+
+        if (userDetails.BillingAddress != null)
+        {
+            newUserDetails.BillingAddress = new Address()
+            {
+                AddressLine1 = userDetails.BillingAddress.AddressLine1,
+                AddressLine2 = userDetails.BillingAddress.AddressLine2,
+                ZipCode = userDetails.BillingAddress.ZipCode,
+                AddressType = AddressType.BILLING,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                CreatedBy = "System",
+                UpdatedBy = "System"
+            };
+        }
+
         _uow.UserDetails.Add(newUserDetails);
         _uow.Complete();
     }
@@ -51,6 +67,34 @@ public class UserDetailsService
         existingUserDetails.LastName = userDetails.LastName;
         existingUserDetails.PreferredCurrency = userDetails.PreferredCurrency;
         existingUserDetails.UpdatedAt = DateTime.UtcNow;
+        existingUserDetails.ContactNumber = userDetails.ContactNumber;
+
+        if (userDetails.BillingAddress != null)
+        {
+            if (existingUserDetails.BillingAddress == null)
+            {
+                existingUserDetails.BillingAddress = new Address()
+                {
+                    AddressLine1 = userDetails.BillingAddress.AddressLine1,
+                    AddressLine2 = userDetails.BillingAddress.AddressLine2,
+                    ZipCode = userDetails.BillingAddress.ZipCode,
+                    AddressType = AddressType.BILLING,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    CreatedBy = "System",
+                    UpdatedBy = "System"
+                };
+            }
+            else
+            {
+                existingUserDetails.BillingAddress.AddressLine1 = userDetails.BillingAddress.AddressLine1;
+                existingUserDetails.BillingAddress.AddressLine2 = userDetails.BillingAddress.AddressLine2;
+                existingUserDetails.BillingAddress.ZipCode = userDetails.BillingAddress.ZipCode;
+                existingUserDetails.BillingAddress.AddressType = AddressType.SHIPPING;
+                existingUserDetails.BillingAddress.UpdatedAt = DateTime.UtcNow;
+                existingUserDetails.BillingAddress.UpdatedBy = "System";
+            }
+        }
 
         _uow.Complete();
     }

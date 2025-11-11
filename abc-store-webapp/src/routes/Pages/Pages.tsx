@@ -1,7 +1,8 @@
-import { useContext, useEffect, useState } from 'react';
-import { Routes } from 'react-router';
+import { useContext, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { Routes, useLocation, useNavigate } from 'react-router';
 
-import { Stack, Typography } from '@mui/material';
+import { Stack, Typography, debounce } from '@mui/material';
 import Box from '@mui/material/Box';
 
 import { AuthContext } from '@/components/auth/AuthContext';
@@ -10,29 +11,39 @@ import { UserState, selectUserState } from '@/store/slice/userSlice';
 import routes from '..';
 import packageJson from '../../../package.json';
 import { getPageHeight, renderRoutes } from './utils';
-import { useSelector } from 'react-redux';
 
 const buildVersion = import.meta.env.VITE_BUILD_VERSION;
 
 function Pages() {
   const authContext = useContext(AuthContext);
-  const [defaultRoute, setDefaultRoute] = useState('/');
   const userState = useSelector(selectUserState);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const gotoShopping = debounce(() => {
+    navigate('/shopping');
+  }, 100);
+
+  const goToWelcome = debounce(() => {
+    navigate('/');
+  }, 100);
 
   useEffect(() => {
     if (
       (userState && authContext.firebaseUser && userState === UserState.COMPLETE) ||
       userState === UserState.SKIPPED
     ) {
-      setDefaultRoute('/shopping');
+      if (location.pathname === '/') {
+        gotoShopping();
+      }
     } else {
-      setDefaultRoute('/');
+      goToWelcome();
     }
-  }, [userState]);
+  }, [userState, authContext.firebaseUser, goToWelcome, gotoShopping, location.pathname]);
 
   return (
     <Box sx={{ height: (theme) => getPageHeight(theme) }}>
-      <Routes location={defaultRoute}>{renderRoutes(routes)}</Routes>
+      <Routes>{renderRoutes(routes)}</Routes>
       <footer
         style={{ position: 'fixed', bottom: 0, backgroundColor: 'transparent', paddingLeft: 8 }}
       >

@@ -20,7 +20,16 @@
     "lastName": "Last Name",
     "preferredCurrency": "Preferred Currency",
     "skipButton": "Skip for now",
-    "okButton": "Continue"
+    "okButton": "Continue",
+    "emailAddress": "Email Address",
+    "contactNumber": "Contact Number"
+  },
+  "address": {
+    "shippingAddress": "Shipping Address",
+    "billingAddress": "Billing Address",
+    "line1": "Street name and number",
+    "suburb": "Suburb",
+    "areaCode": "Area Code"
   },
   "validation": {
     "required": "{{fieldName}} is required!"
@@ -41,10 +50,19 @@
   "product": {
     "limitedStock": "Only {{count}} left in stock",
     "outOfStock": "Out of stock",
-    "itemsInStock": "{{count}} items in stock"
+    "itemsInStock": "{{count}} items in stock",
+    "notItemsFound": "No items found"
   },
   "cart": {
     "addToCart": "Add to cart",
-    "viewCart": "View Cart"
+    "title": "Cart"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "customerDetails": "Customer Details",
+    "next": "Continue",
+    "previous": "Back",
+    "complete": "Complete Checkout",
+    "sameAsBilling": "Same as Billing Address"
   }
 }

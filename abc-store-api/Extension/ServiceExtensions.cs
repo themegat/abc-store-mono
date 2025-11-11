@@ -44,11 +44,14 @@ public static class ServiceExtensions
         builder.Services.AddScoped<IUserDetailsRepository, UserDetailsRepository>();
         builder.Services.AddScoped<ICartRepository, CartRepository>();
         builder.Services.AddScoped<ICartProductRepository, CartProductRepository>();
+        builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+        builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
         builder.Services.AddScoped<ExchangeRateService>();
         builder.Services.AddScoped<ProductService>();
         builder.Services.AddScoped<UserDetailsService>();
         builder.Services.AddScoped<CartService>();
+        builder.Services.AddScoped<OrderService>();
 
         return builder;
     }

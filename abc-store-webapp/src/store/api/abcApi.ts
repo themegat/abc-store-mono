@@ -95,6 +95,16 @@ const injectedRtkApi = api.injectEndpoints({
         url: `/api/ExchangeRate/${queryArg.currencyCode}`,
       }),
     }),
+    postApiOrderCreate: build.mutation<
+      PostApiOrderCreateApiResponse,
+      PostApiOrderCreateApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Order/create`,
+        method: "POST",
+        body: queryArg.orderDto,
+      }),
+    }),
     getApiProductFilterByCurrencyCode: build.query<
       GetApiProductFilterByCurrencyCodeApiResponse,
       GetApiProductFilterByCurrencyCodeApiArg
@@ -187,6 +197,10 @@ export type GetApiExchangeRateByCurrencyCodeApiResponse =
 export type GetApiExchangeRateByCurrencyCodeApiArg = {
   currencyCode: string;
 };
+export type PostApiOrderCreateApiResponse = /** status 200 OK */ OrderDto;
+export type PostApiOrderCreateApiArg = {
+  orderDto: OrderDto;
+};
 export type GetApiProductFilterByCurrencyCodeApiResponse =
   /** status 200 OK */ PagedResultOfProductDto;
 export type GetApiProductFilterByCurrencyCodeApiArg = {
@@ -239,6 +253,22 @@ export type ExchangeRateDto = {
   rate?: number;
   symbol?: string;
 };
+export type OrderStatus = number;
+export type AddressType = number;
+export type AddressDto = {
+  addressLine1?: string;
+  addressLine2?: string;
+  zipCode?: string;
+  addressType?: AddressType;
+} | null;
+export type OrderDto = {
+  userId?: string;
+  cartId?: number;
+  orderDate?: string;
+  status?: OrderStatus;
+  isPaid?: boolean;
+  shippingAddress?: AddressDto;
+};
 export type ProductDto2 = {
   id?: number;
   name?: string;
@@ -265,6 +295,8 @@ export type UserDetailsDto = {
   firstName?: string | null;
   lastName?: string | null;
   preferredCurrency?: string | null;
+  contactNumber?: string | null;
+  billingAddress?: AddressDto;
 };
 export const {
   useGetApiAboutQuery,
@@ -277,6 +309,7 @@ export const {
   useDeleteApiCartProductRemoveMutation,
   useGetApiExchangeRateAllQuery,
   useGetApiExchangeRateByCurrencyCodeQuery,
+  usePostApiOrderCreateMutation,
   useGetApiProductFilterByCurrencyCodeQuery,
   useGetApiProductCategoriesQuery,
   useGetApiUserDetailsQuery,

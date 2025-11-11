@@ -12,7 +12,10 @@ public interface IUnitOfWork : IDisposable
     ISupportedCurrenyRepository SupportedCurrencies { get; }
     IUserDetailsRepository UserDetails { get; }
     ICartRepository Cart { get; }
-    ICartProductRepository CartProduct{ get; }
+    ICartProductRepository CartProduct { get; }
+    IAddressRepository Address { get; }
+    IOrderRepository Order { get; }
+
 
     int Complete();
     Task<int> CompleteAsync();
@@ -29,6 +32,9 @@ public class UnitOfWork : IUnitOfWork
     public IUserDetailsRepository UserDetails { get; private set; }
     public ICartRepository Cart { get; private set; }
     public ICartProductRepository CartProduct { get; private set; }
+    public IAddressRepository Address { get; private set; }
+    public IOrderRepository Order { get; private set; }
+
 
     public UnitOfWork(AppDbContext context,
     IExchangeRateRepository exchangeRateRepository,
@@ -38,7 +44,10 @@ public class UnitOfWork : IUnitOfWork
     ISupportedCurrenyRepository supportedCurrenyRepository,
     IUserDetailsRepository userDetails,
     ICartRepository cart,
-    ICartProductRepository cartProduct)
+    ICartProductRepository cartProduct,
+    IAddressRepository address,
+    IOrderRepository order
+    )
     {
         _context = context;
         ExchangeRates = exchangeRateRepository;
@@ -49,6 +58,8 @@ public class UnitOfWork : IUnitOfWork
         UserDetails = userDetails;
         Cart = cart;
         CartProduct = cartProduct;
+        Address = address;
+        Order = order;
     }
 
     public int Complete()

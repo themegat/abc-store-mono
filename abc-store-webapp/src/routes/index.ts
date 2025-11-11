@@ -1,4 +1,5 @@
 import HomeIcon from '@mui/icons-material/Home';
+import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 
 import { t } from 'i18next';
@@ -19,6 +20,13 @@ const routes: Routes = [
     path: '/shopping',
     title: t('routes.shop'),
     icon: StorefrontIcon,
+    show: true,
+  },
+  {
+    component: asyncComponentLoader(() => import('@/pages/Checkout')),
+    path: '/checkout',
+    title: t('checkout.title'),
+    icon: ShoppingCartCheckoutIcon,
     show: true,
   },
   {

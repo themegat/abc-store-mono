@@ -30,6 +30,7 @@ type ProductCardProps = {
   stockQuantity: number;
   sx?: SxProps;
   onClick?: () => void;
+  hasFocus?: boolean;
 };
 
 const MinStockQuantity = 10;
@@ -43,6 +44,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   currency = config.preferedCurrency,
   sx,
   onClick,
+  hasFocus = false
 }) => {
   const theme = useTheme();
   const backgroundColor = tinycolor(theme.palette.background.default).setAlpha(0.6).toRgbString();
@@ -85,6 +87,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         ...sx,
         height: 'fit-content',
         backgroundColor,
+        border: hasFocus ? 1 : 0, 
         '&:hover': {
           borderWidth: 1,
           borderRadius: 2,
@@ -104,7 +107,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               stockQuantity === 0 ? theme.palette.error.main : theme.palette.warning.main,
           }}
         >
-          <Typography fontSize={16} fontWeight="bold">
+          <Typography variant="body1" fontWeight="bold">
             {stockQuantity === 0
               ? t('product.outOfStock')
               : t('product.limitedStock', { count: stockQuantity })}

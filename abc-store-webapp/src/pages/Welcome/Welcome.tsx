@@ -15,6 +15,7 @@ import { selectUser } from '@/store/slice/userSlice';
 import backgroundVid from '../../assets/background/background_welcome.mp4';
 import posterImg from '../../assets/background/background_welcome.webp';
 import icon from '../../assets/icon.png';
+import { isEmpty } from '@/utils/app';
 
 function Welcome() {
   const isPortrait = useOrientation();
@@ -24,8 +25,10 @@ function Welcome() {
   const { isMobile, isDesktop } = useDevice();
 
   useEffect(() => {
-    if (user && user.accessToken && user.email) {
+    if (user && !isEmpty(user.uid)) {
       setActiveStep(1);
+    }else{
+      setActiveStep(0);
     }
   }, [user]);
   const setPlaybackSpeed = () => {

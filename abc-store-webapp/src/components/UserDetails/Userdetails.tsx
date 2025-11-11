@@ -117,7 +117,7 @@ const UserDetails = ({ sx }: Props) => {
           <Typography fontWeight={600} variant="h6">
             {t('userDetails.title')}
           </Typography>
-          <Typography fontSize={14}>{t('userDetails.subTitle')}</Typography>
+          <Typography variant="body2">{t('userDetails.subTitle')}</Typography>
         </Stack>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack gap={2}>
@@ -190,7 +190,7 @@ const UserDetails = ({ sx }: Props) => {
                       })}
                     </Select>
                     {fieldState.error && (
-                      <Typography marginTop={1} fontSize={12} color="error">
+                      <Typography marginTop={1} marginLeft={2} variant="caption" color="error">
                         {t('validation.required', {
                           fieldName: t('userDetails.preferredCurrency'),
                         })}

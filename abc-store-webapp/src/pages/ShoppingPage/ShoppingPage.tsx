@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 
 import { t } from 'i18next';
+import tinycolor from 'tinycolor2';
 
 import Loading from '@/components/Loading';
 import ProductCard from '@/components/Shopping/ProductCard';
@@ -29,6 +30,7 @@ import { ProductDto } from '@/store/api/abcApi';
 import { selectUser } from '@/store/slice/userSlice';
 
 import backgroundShopImg from '../../assets/background/background_shop.webp';
+import NotFound from '../NotFound';
 
 const pageSize = 10;
 const drawerWidth = 600;
@@ -49,8 +51,8 @@ const ShoppingPage = () => {
     setProducts,
     productCategories,
   } = useShopping(MaxPrice, pageSize);
-  const observerRef = useRef<IntersectionObserver | null>(null);
 
+  const observerRef = useRef<IntersectionObserver | null>(null);
   useEffect(() => {
     observerRef.current?.disconnect();
     observerRef.current = new IntersectionObserver(
@@ -87,18 +89,21 @@ const ShoppingPage = () => {
     [resetLazyLoading],
   );
 
-  const onFilterChanged = async (changes: ProductFilterChanges) => {
-    setProducts([]);
-    setProductFilter({
-      categoryId: changes.categoryId,
-      inStock: changes.inStock,
-      minPrice: changes.minPrice,
-      maxPrice: changes.maxPrice,
-      pageNumber: 1,
-      pageSize: pageSize,
-      currencyCode: user?.preferredCurrency || config.preferedCurrency,
-    });
-  };
+  const onFilterChanged = useCallback(
+    async (changes: ProductFilterChanges) => {
+      setProducts([]);
+      setProductFilter({
+        categoryId: changes.categoryId,
+        inStock: changes.inStock,
+        minPrice: changes.minPrice,
+        maxPrice: changes.maxPrice,
+        pageNumber: 1,
+        pageSize: pageSize,
+        currencyCode: user?.preferredCurrency || config.preferedCurrency,
+      });
+    },
+    [setProducts, setProductFilter, user?.preferredCurrency],
+  );
 
   useEffect(() => {
     resetLazyLoading();
@@ -117,35 +122,39 @@ const ShoppingPage = () => {
     setScrollObserver(pageSize);
   };
 
-  const FilterTitle = () => {
+  const FilterTitle = useCallback(() => {
     return (
       <Typography variant="h6" marginBottom={2}>
         {t('productFilter.title')}
       </Typography>
     );
-  };
+  }, []);
 
-  const Filter = () => {
+  const Filter = useCallback(() => {
     return (
       <ProductFilter
         onFilterChange={onFilterChanged}
         categories={productCategories}
       ></ProductFilter>
     );
-  };
+  }, [onFilterChanged, productCategories]);
 
-  const DeskTopFilter = () => {
+  const DeskTopFilter = useCallback(() => {
     return (
       <Stack position="sticky" top={75}>
         <FilterTitle />
         <Filter />
       </Stack>
     );
-  };
+  }, [Filter, FilterTitle]);
 
-  const MobileFilter = () => {
+  const MobileFilter = useCallback(() => {
     return (
-      <Accordion>
+      <Accordion
+        sx={{
+          backgroundColor: tinycolor(theme.palette.background.default).setAlpha(0.8).toRgbString(),
+        }}
+      >
         <AccordionSummary
           aria-controls="product-filter"
           id="product-filter"
@@ -158,7 +167,7 @@ const ShoppingPage = () => {
         </AccordionDetails>
       </Accordion>
     );
-  };
+  }, [Filter, FilterTitle, theme.palette.background.default]);
 
   return (
     <>
@@ -186,20 +195,25 @@ const ShoppingPage = () => {
             {isDesktop ? <DeskTopFilter /> : <MobileFilter />}
           </Grid>
           <Grid size={{ xs: 12, sm: 12, md: 9 }}>
-            <Stack justifyContent="center" gap={5} direction="row" flexWrap="wrap">
-              {products.map((item, index) => (
-                <ProductCard
-                  key={`product-${index}`}
-                  id={item?.id ?? 0}
-                  sx={{ width: 250 }}
-                  image={item?.thumbnailUrl ? item.thumbnailUrl : ''}
-                  title={item?.name ?? ''}
-                  price={item?.price ?? 0}
-                  stockQuantity={item?.stockQuantity ?? 0}
-                  currency={user?.preferredCurrency || config.preferedCurrency}
-                  onClick={() => openProductDetails(item)}
-                ></ProductCard>
-              ))}
+            <Stack justifyContent="center" gap={isMobile ? 1.5 : 5} direction="row" flexWrap="wrap">
+              {products.length === 0 && !fetchingProducts ? (
+                <NotFound sx={{ marginTop: 10 }} title={t('product.notItemsFound')} />
+              ) : (
+                products.map((item, index) => (
+                  <ProductCard
+                    key={`product-${index}`}
+                    id={item?.id ?? 0}
+                    sx={{ width: isMobile ? 165 : 250 }}
+                    image={item?.thumbnailUrl ? item.thumbnailUrl : ''}
+                    title={item?.name ?? ''}
+                    price={item?.price ?? 0}
+                    stockQuantity={item?.stockQuantity ?? 0}
+                    currency={user?.preferredCurrency || config.preferedCurrency}
+                    onClick={() => openProductDetails(item)}
+                    hasFocus={selectedProduct?.id === item?.id}
+                  ></ProductCard>
+                ))
+              )}
               {fetchingProducts && <Loading></Loading>}
             </Stack>
           </Grid>

@@ -17,6 +17,9 @@ public class AppDbContext : DbContext
     public DbSet<UserDetails> UserDetails { get; set; }
     public DbSet<Cart> Cart { get; set; }
     public DbSet<CartProduct> CartProduct { get; set; }
+    public DbSet<Order> Order { get; set; }
+    public DbSet<Address> Address { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -55,5 +58,37 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Cart>()
             .Property(c => c.Status)
             .HasConversion<string>();
+
+        modelBuilder.Entity<Order>()
+            .Property(o => o.Status)
+            .HasConversion<string>();
+
+        modelBuilder.Entity<Address>()
+        .Property(a => a.AddressType)
+        .HasConversion<string>();
+
+        modelBuilder.Entity<Order>()
+            .HasOne(o => o.ShippingAddress)
+            .WithMany()
+            .HasForeignKey(o => o.AddressId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Order>()
+        .HasOne(o => o.UserDetails)
+        .WithMany()
+        .HasForeignKey(o => o.UserId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Order>()
+        .HasOne(o => o.Cart)
+        .WithMany()
+        .HasForeignKey(o => o.CartId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<UserDetails>()
+            .HasOne(o => o.BillingAddress)
+            .WithMany()
+            .HasForeignKey(o => o.AddressId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
