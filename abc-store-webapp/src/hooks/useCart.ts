@@ -10,10 +10,12 @@ import {
   useDeleteApiCartRemoveMutation,
   usePostApiCartCreateMutation,
   usePostApiCartProductAddMutation,
+  usePutApiCartCompleteMutation,
   usePutApiCartProductUpdateMutation,
 } from '@/store/api/abcApi';
 import {
   addUpdateCartProduct,
+  completeCart,
   selectCart,
   selectCartProduct,
   setCart,
@@ -49,6 +51,7 @@ const useCart = () => {
   const [updateCartProductRequest] = usePutApiCartProductUpdateMutation();
   const [removeCartProductRequest] = useDeleteApiCartProductRemoveMutation();
   const [removeCartRequest] = useDeleteApiCartRemoveMutation();
+  const [completeCartRequest, { isLoading: cartCompleting }] = usePutApiCartCompleteMutation();
 
   const toasterContext = useToasterContext();
 
@@ -180,7 +183,25 @@ const useCart = () => {
     }
   };
 
-  return { useObserveCartProduct, updateProduct, observeCart };
+  const completeCartCheckout = async (cart: CartDto) => {
+    try {
+      await completeCartRequest({
+        cartDto: cart,
+      }).unwrap();
+      dispatch(completeCart());
+    } catch (err) {
+      const error = err as AbcExceptionResponse;
+      showError(error.data.Message);
+    }
+  };
+
+  return {
+    useObserveCartProduct,
+    updateProduct,
+    observeCart,
+    completeCartCheckout,
+    cartCompleting,
+  };
 };
 
 export default useCart;

@@ -14,10 +14,15 @@ import {
 
 import { t } from 'i18next';
 
+import useCart from '@/hooks/useCart';
+import useCheckout from '@/hooks/useCheckout';
+import useUserDetails from '@/hooks/useUserDetails';
+import { OrderDto, UserDetailsDto } from '@/store/api/abcApi';
 import { selectUser } from '@/store/slice/userSlice';
 
 import AddressDetails, { AddressDetailsFormInputs } from '../UserDetails/AddressDetails';
 import BasicDetails, { BasicDetailsFormInputs } from '../UserDetails/BasicDetails';
+import { useNavigate } from 'react-router';
 
 export type StepProps = {
   label: string | JSX.Element;
@@ -28,6 +33,11 @@ const CheckoutSteps = () => {
   const user = useSelector(selectUser);
   const [activeStep, setActiveStep] = useState(0);
   const [shippingAddressSameAsBilling, setShippingAddressSameAsBilling] = useState(false);
+  const { createUpdateUser, userUpdating } = useUserDetails();
+  const { completeCartCheckout, cartCompleting, observeCart } = useCart();
+  const { createOrder, creatingOrder } = useCheckout();
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const [basicDetailValues, setBasicDetailValues] = useState<BasicDetailsFormInputs | undefined>({
     firstName: user?.firstName ?? '',
@@ -84,8 +94,49 @@ const CheckoutSteps = () => {
     [steps],
   );
 
-  const completeCheckout = () => {
-    console.log('completeCheckout', steps);
+  useEffect(() => {
+    setIsLoading(userUpdating || cartCompleting || creatingOrder);
+  }, [userUpdating, cartCompleting, creatingOrder]);
+
+  const handleCreateOrder = async () => {
+    if (shippingAddressValues) {
+      const orderDto: OrderDto = {
+        userId: user?.uid ?? '',
+        isPaid: false,
+        cartId: observeCart.id,
+        shippingAddress: {
+          addressLine1: shippingAddressValues.streetNumber,
+          addressLine2: shippingAddressValues.suburb,
+          zipCode: shippingAddressValues.areaCode,
+        },
+      };
+      return await createOrder(orderDto);
+    }
+  };
+
+  const createUpdateUserDetails = async () => {
+    if (basicDetailValues && billingAddressValues) {
+      const userDto: UserDetailsDto = {
+        userId: user?.uid ?? '',
+        firstName: basicDetailValues.firstName,
+        lastName: basicDetailValues.lastName,
+        contactNumber: basicDetailValues.contactNumber,
+        preferredCurrency: user?.preferredCurrency ?? '',
+        billingAddress: {
+          addressLine1: billingAddressValues.streetNumber,
+          addressLine2: billingAddressValues.suburb,
+          zipCode: billingAddressValues.areaCode,
+        },
+      };
+      return await createUpdateUser(userDto);
+    }
+  };
+
+  const completeCheckout = async () => {
+    await createUpdateUserDetails();
+    await handleCreateOrder();
+    await completeCartCheckout(observeCart);
+    navigate('/shopping');
   };
 
   const stepElements: JSX.Element[] = useMemo(
@@ -171,6 +222,9 @@ const CheckoutSteps = () => {
                 )}
                 {activeStep === steps.length - 1 && (
                   <Button
+                    disabled={isLoading}
+                    loading={isLoading}
+                    loadingPosition="start"
                     variant="contained"
                     size="large"
                     color="primary"
@@ -180,7 +234,13 @@ const CheckoutSteps = () => {
                   </Button>
                 )}
                 {activeStep > 0 && (
-                  <Button variant="contained" size="large" color="inherit" onClick={previousStep}>
+                  <Button
+                    disabled={isLoading}
+                    variant="contained"
+                    size="large"
+                    color="inherit"
+                    onClick={previousStep}
+                  >
                     {t('checkout.previous')}
                   </Button>
                 )}

@@ -17,6 +17,7 @@ const cartSlice = createSlice({
         return initialState;
       }
     },
+    completeCart: () => initialState,
     addUpdateCartProduct: (state, action: { payload: CartProductDto }) => {
       const existingProductIndex =
         state?.cartProducts?.findIndex(
@@ -39,7 +40,7 @@ const cartSlice = createSlice({
   },
 });
 
-export const { setCart, addUpdateCartProduct } = cartSlice.actions;
+export const { setCart, addUpdateCartProduct, completeCart } = cartSlice.actions;
 
 export const selectCart = (state: { cart: CartDto }) => state.cart;
 export const selectCartProduct = (state: { cart: CartDto }, id: number) =>
