@@ -72,7 +72,7 @@ public class CartService
             var cart = cartQuery.First();
             cart.Status = CartStatus.COMPLETE;
             cart.UpdatedBy = SYS_USER;
-            cart.UpdatedAt = DateTime.Now;
+            cart.UpdatedAt = DateTime.UtcNow;
             await _uow.CompleteAsync();
             return CartDto.toDto(cart);
         }

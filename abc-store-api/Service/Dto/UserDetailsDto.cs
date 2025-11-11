@@ -9,12 +9,16 @@ public class UserDetailsDto : IDto<UserDetailsDto, UserDetails>
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public string? PreferredCurrency { get; set; }
+    public string? ContactNumber { get; set; }
+    public AddressDto? BillingAddress { get; set; }
 
     public static UserDetailsDto toDto(UserDetails entity) => new UserDetailsDto
     {
         UserId = entity.UserId,
         FirstName = entity.FirstName,
         LastName = entity.LastName,
-        PreferredCurrency = entity.PreferredCurrency
+        PreferredCurrency = entity.PreferredCurrency,
+        ContactNumber = entity.ContactNumber,
+        BillingAddress = entity.BillingAddress != null ? AddressDto.toDto(entity.BillingAddress) : null
     };
 }
