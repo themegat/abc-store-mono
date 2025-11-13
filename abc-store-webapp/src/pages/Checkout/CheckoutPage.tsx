@@ -57,6 +57,7 @@ const CheckoutPage = () => {
               .toRgbString(),
             borderRadius: 2,
             padding: 5,
+            border: `1px solid ${theme.palette.text.primary}`,
           }}
         >
           <Grid size={5} spacing={10}>

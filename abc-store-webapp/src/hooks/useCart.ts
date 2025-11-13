@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { AbcExceptionResponse } from '@/error-handling/AbcExceptionResponse';
 import { useToasterContext } from '@/sections/Toaster/ToasterContext';
 import {
   CartDto,
@@ -22,15 +23,6 @@ import {
 } from '@/store/slice/cartSlice';
 import { selectUser } from '@/store/slice/userSlice';
 import { AppDispatch, RootState } from '@/store/store';
-
-type AbcExceptionResponse = {
-  status: number;
-  data: {
-    StatusCode: number;
-    Message: string;
-    Details?: string;
-  };
-};
 
 const useObserveCartProduct = (productId: number) => {
   return useSelector((state: RootState) => selectCartProduct(state, productId));
@@ -185,10 +177,11 @@ const useCart = () => {
 
   const completeCartCheckout = async (cart: CartDto) => {
     try {
-      await completeCartRequest({
+      const result = await completeCartRequest({
         cartDto: cart,
       }).unwrap();
       dispatch(completeCart());
+      return result;
     } catch (err) {
       const error = err as AbcExceptionResponse;
       showError(error.data.Message);

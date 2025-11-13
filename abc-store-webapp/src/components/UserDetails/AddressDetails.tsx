@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
-import { FormState, useForm } from 'react-hook-form';
+import { Control, UseFormSetValue, UseFormTrigger } from 'react-hook-form';
 
 import { Stack } from '@mui/material';
 
@@ -15,48 +14,13 @@ export interface AddressDetailsFormInputs {
 
 type Props = {
   id: string;
-  stepIndex: number;
-  setStepData: (index: number, valid: boolean, values: AddressDetailsFormInputs) => void;
-  values?: AddressDetailsFormInputs;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  control: Control<AddressDetailsFormInputs, any, AddressDetailsFormInputs>;
+  trigger: UseFormTrigger<AddressDetailsFormInputs>;
+  setValue: UseFormSetValue<AddressDetailsFormInputs>;
 };
 
-const AddressDetails = ({ id, stepIndex, setStepData, values }: Props) => {
-  const { control, setValue, trigger, formState, getValues } = useForm<AddressDetailsFormInputs>({
-    defaultValues: {
-      streetNumber: values?.streetNumber || '',
-      suburb: values?.suburb || '',
-      areaCode: values?.areaCode || '',
-    },
-  });
-
-  const valuesChanged = useCallback(
-    (name: 'streetNumber' | 'suburb' | 'areaCode') => {
-      trigger(name);
-      setStepData(stepIndex, formState.isValid, getValues());
-    },
-    [stepIndex, formState, setStepData, getValues, trigger],
-  );
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [currentState, setCurrentState] = useState<FormState<any> | undefined>(undefined);
-
-  const update = useCallback(() => {
-    setStepData(stepIndex, formState.isValid, getValues());
-  }, [stepIndex, formState.isValid, getValues, setStepData]);
-
-  useEffect(() => {
-    setValue('streetNumber', values?.streetNumber ?? '');
-    setValue('suburb', values?.suburb ?? '');
-    setValue('areaCode', values?.areaCode ?? '');
-  }, [values, setValue]);
-
-  useEffect(() => {
-    if (currentState?.defaultValues !== formState?.defaultValues) {
-      update();
-      setCurrentState(formState);
-    }
-  }, [id, update, currentState, formState]);
-
+const AddressDetails = ({ id, control, setValue, trigger }: Props) => {
   return (
     <Stack id={id} gap={4} width="100%">
       <Stack width="100%" gap={4} direction="row">
@@ -68,7 +32,7 @@ const AddressDetails = ({ id, stepIndex, setStepData, values }: Props) => {
           setValue={setValue}
           trigger={trigger}
           rules={{ required: true }}
-          onChange={() => valuesChanged('streetNumber')}
+          onChange={() => trigger('streetNumber')}
         />
         <TextFieldControl
           id="suburb"
@@ -78,7 +42,7 @@ const AddressDetails = ({ id, stepIndex, setStepData, values }: Props) => {
           setValue={setValue}
           trigger={trigger}
           rules={{ required: true }}
-          onChange={() => valuesChanged('suburb')}
+          onChange={() => trigger('suburb')}
         />
       </Stack>
       <TextFieldControl
@@ -91,7 +55,7 @@ const AddressDetails = ({ id, stepIndex, setStepData, values }: Props) => {
         fullWidth={false}
         sx={{ width: '48%' }}
         rules={{ required: true }}
-        onChange={() => valuesChanged('areaCode')}
+        onChange={() => trigger('areaCode')}
       />
     </Stack>
   );

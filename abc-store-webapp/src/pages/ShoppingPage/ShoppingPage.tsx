@@ -99,10 +99,10 @@ const ShoppingPage = () => {
         maxPrice: changes.maxPrice,
         pageNumber: 1,
         pageSize: pageSize,
-        currencyCode: user?.preferredCurrency || config.preferedCurrency,
+        currencyCode: user?.userDetails?.preferredCurrency || config.preferedCurrency,
       });
     },
-    [setProducts, setProductFilter, user?.preferredCurrency],
+    [setProducts, setProductFilter, user?.userDetails?.preferredCurrency],
   );
 
   useEffect(() => {
@@ -208,7 +208,7 @@ const ShoppingPage = () => {
                     title={item?.name ?? ''}
                     price={item?.price ?? 0}
                     stockQuantity={item?.stockQuantity ?? 0}
-                    currency={user?.preferredCurrency || config.preferedCurrency}
+                    currency={user?.userDetails?.preferredCurrency || config.preferedCurrency}
                     onClick={() => openProductDetails(item)}
                     hasFocus={selectedProduct?.id === item?.id}
                   ></ProductCard>
@@ -255,7 +255,7 @@ const ShoppingPage = () => {
                   images={selectedProduct.productImages ?? []}
                   title={selectedProduct.name ?? ''}
                   price={selectedProduct.price ?? 0}
-                  currency={user?.preferredCurrency || config.preferedCurrency}
+                  currency={user?.userDetails?.preferredCurrency || config.preferedCurrency}
                   stockQuantity={selectedProduct.stockQuantity ?? 0}
                   description={selectedProduct.description ?? ''}
                 />

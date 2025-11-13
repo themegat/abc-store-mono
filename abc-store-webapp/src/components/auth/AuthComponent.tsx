@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Stack, SxProps, useTheme } from '@mui/material';
 
 import { SignInAuthScreen, SignUpAuthScreen } from '@firebase-ui/react';
+import tinycolor from 'tinycolor2';
 
 type Props = {
   sx?: SxProps;
@@ -20,7 +21,9 @@ function AuthComponent({ sx }: Props) {
           ...sx,
           '.fui-card': {
             borderColor: theme.palette.text.primary,
-            backgroundColor: theme.palette.background.default,
+            backgroundColor: tinycolor(theme.palette.background.default)
+              .setAlpha(0.6)
+              .toRgbString(),
             '.fui-card__title': {
               color: theme.palette.text.primary,
             },

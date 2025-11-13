@@ -1,5 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+import { UserDetailsDto } from '../api/abcApi';
+
 export enum UserState {
   PENDING,
   COMPLETE,
@@ -11,9 +13,7 @@ export type User = {
   uid: string;
   email: string;
   state: UserState | undefined;
-  firstName: string | undefined;
-  lastName: string | undefined;
-  preferredCurrency: string | undefined;
+  userDetails?: UserDetailsDto,
 };
 
 const initialState: User = {
@@ -21,9 +21,7 @@ const initialState: User = {
   uid: '',
   email: '',
   state: undefined,
-  firstName: undefined,
-  lastName: undefined,
-  preferredCurrency: undefined,
+  userDetails: undefined,
 };
 
 const userslice = createSlice({

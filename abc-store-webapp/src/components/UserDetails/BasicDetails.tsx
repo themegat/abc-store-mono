@@ -1,51 +1,43 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useCallback, useEffect, useState } from 'react';
-import { FormState, useForm } from 'react-hook-form';
+import { Control, UseFormSetValue, UseFormTrigger } from 'react-hook-form';
 
 import { Stack } from '@mui/material';
 
 import { t } from 'i18next';
 
+import SelectControl from '../SelectControl';
 import TextFieldControl from '../TextFieldControl';
+
+export enum BasicDetailsFormType {
+  ON_BOARDING,
+  CHECKOUT,
+}
 
 export interface BasicDetailsFormInputs {
   firstName: string;
   lastName: string;
   emailAddress: string;
   contactNumber?: string;
+  preferredCurrency?: string;
 }
 
 type Props = {
   id: string;
-  stepIndex: number;
-  setStepData: (index: number, valid: boolean, values: BasicDetailsFormInputs) => void;
-  values?: BasicDetailsFormInputs;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  control: Control<BasicDetailsFormInputs, any, BasicDetailsFormInputs>;
+  trigger: UseFormTrigger<BasicDetailsFormInputs>;
+  setValue: UseFormSetValue<BasicDetailsFormInputs>;
+  formType: BasicDetailsFormType;
+  currencyOptions?: { id: string; value: string }[];
 };
 
-const BasicDetails = ({ id, stepIndex, setStepData, values }: Props) => {
-  const { control, setValue, formState, trigger, getValues } = useForm<any>({
-    context: id,
-    defaultValues: {
-      firstName: values?.firstName || '',
-      lastName: values?.lastName || '',
-      emailAddress: values?.emailAddress || '',
-      contactNumber: values?.contactNumber || '',
-    },
-  });
-
-  const [currentState, setCurrentState] = useState<FormState<any> | undefined>(undefined);
-
-  const update = useCallback(() => {
-    setStepData(stepIndex, formState.isValid, getValues());
-  }, [stepIndex, formState.isValid, getValues, setStepData]);
-
-  useEffect(() => {
-    if (currentState?.defaultValues !== formState?.defaultValues) {
-      update();
-      setCurrentState(formState);
-    }
-  }, [id, update, formState, currentState]);
-
+const BasicDetails = ({
+  id,
+ control,
+ trigger,
+ setValue,
+ formType,
+ currencyOptions
+}: Props) => {
   return (
     <Stack id={id} gap={4} width="100%">
       <Stack width="100%" gap={4} direction="row">
@@ -69,15 +61,33 @@ const BasicDetails = ({ id, stepIndex, setStepData, values }: Props) => {
         />
       </Stack>
       <Stack width="100%" gap={4} direction="row">
-        <TextFieldControl
-          id="email-address"
-          label={t('userDetails.emailAddress')}
-          name="emailAddress"
-          control={control}
-          setValue={setValue}
-          trigger={trigger}
-          rules={{ required: true }}
-        />
+        {formType === BasicDetailsFormType.CHECKOUT && (
+          <TextFieldControl
+            id="email-address"
+            label={t('userDetails.emailAddress')}
+            name="emailAddress"
+            control={control}
+            setValue={setValue}
+            trigger={trigger}
+            rules={{ required: true }}
+            fullWidth={true}
+          />
+        )}
+        {formType === BasicDetailsFormType.ON_BOARDING && (
+          <Stack sx={{ width: '46%' }}>
+            <SelectControl
+              name="preferredCurrency"
+              id="preferred-currency"
+              label={t('userDetails.preferredCurrency')}
+              options={currencyOptions || []}
+              control={control}
+              setValue={setValue}
+              trigger={trigger}
+              rules={{ required: true }}
+              fullWidth={true}
+            />
+          </Stack>
+        )}
         <TextFieldControl
           id="contact-number"
           label={t('userDetails.contactNumber')}
@@ -85,6 +95,7 @@ const BasicDetails = ({ id, stepIndex, setStepData, values }: Props) => {
           control={control}
           setValue={setValue}
           trigger={trigger}
+          sx={{ width: formType === BasicDetailsFormType.CHECKOUT ? '100%' : '46%' }}
         />
       </Stack>
     </Stack>

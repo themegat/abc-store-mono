@@ -4,10 +4,10 @@ import { useDispatch } from 'react-redux';
 
 import { User as FirebaseUser, getAuth, onAuthStateChanged } from 'firebase/auth';
 
-import { abcApi } from '@/store/api/abcApi';
+import useUserDetails from '@/hooks/useUserDetails';
+import { setCart } from '@/store/slice/cartSlice';
 import { User, UserState, setUser } from '@/store/slice/userSlice';
 import { AppDispatch } from '@/store/store';
-import { setCart } from '@/store/slice/cartSlice';
 
 interface AuthContextType {
   firebaseUser: FirebaseUser | null;
@@ -24,8 +24,8 @@ export const AuthContext = createContext<AuthContextType>({
 export const useAuthStatus = () => {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [loading, setLoading] = useState(true);
-  const [getUserDetails] = abcApi.endpoints.getApiUserDetails.useLazyQuery();
   const dispatch = useDispatch<AppDispatch>();
+  const { getUserDetails } = useUserDetails();
 
   useEffect(() => {
     const authInstance = getAuth();
@@ -34,15 +34,15 @@ export const useAuthStatus = () => {
       if (currentUser) {
         setFirebaseUser(currentUser);
         const token = await authInstance.currentUser?.getIdToken();
-        const UserDetails = await getUserDetails({ userId: currentUser.uid });
+        const userDetails = await getUserDetails({ userId: currentUser.uid });
         const newUser: User = {
           accessToken: token ?? '',
           uid: currentUser.uid,
           email: currentUser.email ?? '',
-          firstName: UserDetails.data?.firstName ?? undefined,
-          lastName: UserDetails.data?.lastName ?? undefined,
-          preferredCurrency: UserDetails.data?.preferredCurrency ?? undefined,
-          state: UserDetails.data ? UserState.COMPLETE : UserState.PENDING,
+          userDetails: {
+            ...userDetails.data,
+          },
+          state: userDetails.data ? UserState.COMPLETE : UserState.PENDING,
         };
 
         dispatch(setUser(newUser));

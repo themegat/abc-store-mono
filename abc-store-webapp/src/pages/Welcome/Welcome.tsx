@@ -96,7 +96,7 @@ function Welcome() {
               </StepContent>
             </Step>
             <Step key={2}>
-              <StepContent sx={{ marginTop: 7, padding: 7, minWidth: 400 }}>
+              <StepContent sx={{ marginTop: 0, padding: 2, minWidth: 400 }}>
                 <UserDetails sx={{ marginBottom: isDesktop ? 10 : 0 , marginTop: isDesktop ? 9 : 0}}></UserDetails>
               </StepContent>
             </Step>

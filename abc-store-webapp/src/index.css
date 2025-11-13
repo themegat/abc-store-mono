@@ -18,3 +18,19 @@
   width: 90%;
   display: grid;
 }
+
+.MuiStep-root.MuiStep-vertical {
+  width: 100%;
+  .MuiStepConnector-root.MuiStepConnector-vertical {
+    display: none;
+  }
+  .MuiStepLabel-root.MuiStepLabel-vertical {
+    display: flex;
+    flex-direction: row !important;
+    gap: 20px;
+    .MuiStepLabel-alternativeLabel {
+      text-align: start;
+      margin-top: 0;
+    }
+  }
+}

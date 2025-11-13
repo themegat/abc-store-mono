@@ -20,7 +20,7 @@ import { t } from 'i18next';
 import { AuthContext } from '@/components/auth/AuthContext';
 import useCart from '@/hooks/useCart';
 import routes from '@/routes';
-import { selectUser } from '@/store/slice/userSlice';
+import { selectUser, UserState } from '@/store/slice/userSlice';
 
 import { useSidebar } from './hooks';
 
@@ -36,9 +36,9 @@ function Sidebar({ enabled = true }: Props) {
   const { observeCart } = useCart();
 
   let username = '';
-  if (user) {
-    if (user.firstName && user.lastName) {
-      username = `${user.firstName} ${user.lastName}`;
+  if (user && user.userDetails) {
+    if (user.userDetails.firstName && user.userDetails.lastName) {
+      username = `${user.userDetails.firstName} ${user.userDetails.lastName}`;
     } else if (user.email) {
       username = user.email;
     }
@@ -57,6 +57,13 @@ function Sidebar({ enabled = true }: Props) {
     return true;
   };
 
+  const showShopping = (title: string) => {
+    if (title === t('routes.shop')) {
+      return user && user.state === UserState.COMPLETE;
+    }
+    return true;
+  };
+
   return (
     <>
       {enabled && (
@@ -71,7 +78,13 @@ function Sidebar({ enabled = true }: Props) {
         >
           <List sx={{ width: 250, pt: (theme) => `${theme.mixins.toolbar.minHeight}px` }}>
             {routes
-              .filter((route) => route.title && route.show && showCheckout(route.title))
+              .filter(
+                (route) =>
+                  route.title &&
+                  route.show &&
+                  showCheckout(route.title) &&
+                  showShopping(route.title),
+              )
               .map(({ path, title, icon: Icon }) => (
                 <ListItem sx={{ p: 0 }} key={path} onClick={close}>
                   <ListItemButton component={Link} to={path as string}>
