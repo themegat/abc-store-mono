@@ -23,7 +23,7 @@ const CartItems = ({ products }: Props) => {
           title={item?.product?.name ?? ''}
           price={item?.product?.price ?? 0}
           stockQuantity={item?.product?.stockQuantity ?? 0}
-          currency={user?.preferredCurrency || config.preferedCurrency}
+          currency={user?.userDetails?.preferredCurrency || config.preferedCurrency}
           sx={{ marginY: 2 }}
         />
       ))}

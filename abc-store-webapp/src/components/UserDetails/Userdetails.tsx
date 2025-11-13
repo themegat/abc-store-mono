@@ -1,100 +1,197 @@
-import { useState } from 'react';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { JSX, useEffect, useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
   Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
   Stack,
+  Step,
+  StepContent,
+  StepLabel,
+  Stepper,
   SxProps,
-  TextField,
   Typography,
   useTheme,
 } from '@mui/material';
 
 import { t } from 'i18next';
+import tinycolor from 'tinycolor2';
 
-import { config } from '@/config';
 import useOrientation from '@/hooks/useOrientation';
-import {
-  useGetApiExchangeRateAllQuery,
-  usePostApiUserDetailsUpdateCreateMutation,
-} from '@/store/api/abcApi';
+import useUserDetails from '@/hooks/useUserDetails';
+import { UserDetailsDto, useGetApiExchangeRateAllQuery } from '@/store/api/abcApi';
 import { AppDispatch } from '@/store/store';
 
 import { User, UserState, selectUser, setUser } from '../../store/slice/userSlice';
-
-interface IFormInputs {
-  firstName: string;
-  lastName: string;
-  preferredCurrency: string;
-}
+import AddressDetails, { AddressDetailsFormInputs } from './AddressDetails';
+import BasicDetails, { BasicDetailsFormInputs, BasicDetailsFormType } from './BasicDetails';
 
 type Props = {
   sx?: SxProps;
 };
 
+type Step = {
+  title: string;
+  component: JSX.Element;
+};
+
 const UserDetails = ({ sx }: Props) => {
   const theme = useTheme();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | undefined>();
+  const [activeStep, setActiveStep] = useState(0);
+
   const { data: currencyResponse } = useGetApiExchangeRateAllQuery();
-  const [postApiUserDetailsUpdateCreate] = usePostApiUserDetailsUpdateCreateMutation();
+  const { createUpdateUser, userUpdating } = useUserDetails();
+
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector(selectUser);
   const isPortrait = useOrientation();
 
-  const { control, handleSubmit } = useForm<IFormInputs>({
+  const {
+    control: basicDetailsControl,
+    setValue: setBasicDetailsValues,
+    formState: basicDetailsFormState,
+    trigger: triggerBasicDetails,
+    getValues: basicDetailsValues,
+  } = useForm<BasicDetailsFormInputs>({
     defaultValues: {
       firstName: '',
       lastName: '',
+      emailAddress: '',
+      contactNumber: '',
       preferredCurrency: '',
     },
   });
 
-  const onSubmit: SubmitHandler<IFormInputs> = (data) => {
-    setIsLoading(true);
+  const {
+    control: addressDetailsControl,
+    setValue: setAddressDetailsValue,
+    trigger: triggerAddressDetails,
+    formState: addressDetailsFormState,
+    getValues: addressDetailsValues,
+  } = useForm<AddressDetailsFormInputs>({
+    defaultValues: {
+      streetNumber: '',
+      suburb: '',
+      areaCode: '',
+    },
+  });
 
-    if (!user) {
-      setError('User not found');
-      setIsLoading(false);
-      return;
+  useEffect(() => {
+    setIsLoading(userUpdating);
+  }, [userUpdating]);
+
+  const [currencyOptions, setCurrencyOptions] = useState<{ id: string; value: string }[]>([]);
+
+  useEffect(() => {
+    const options = currencyResponse?.map((currency, index) => {
+      return { id: index.toString(), value: currency.code ?? '' };
+    });
+    setCurrencyOptions(options ?? []);
+  }, [currencyResponse]);
+
+  const handleUpdateBasicDetails = async () => {
+    if (user) {
+      const basicDetails = basicDetailsValues();
+      const userDetailsDto: UserDetailsDto = {
+        userId: user?.uid ?? '',
+        firstName: basicDetails.firstName,
+        lastName: basicDetails.lastName,
+        contactNumber: basicDetails.contactNumber,
+        preferredCurrency: basicDetails.preferredCurrency,
+      };
+      const result = await createUpdateUser(userDetailsDto);
+      dispatch(
+        setUser({
+          ...user,
+          userDetails: userDetailsDto,
+        }),
+      );
+      return result;
     }
+    return undefined;
+  };
 
-    const updateUser: User = {
-      ...user,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      preferredCurrency: data.preferredCurrency,
-    };
-    postApiUserDetailsUpdateCreate({
-      userDetailsDto: {
-        firstName: updateUser.firstName,
-        lastName: updateUser.lastName,
-        preferredCurrency: updateUser.preferredCurrency,
-        userId: updateUser.uid,
-      },
-    })
-      .unwrap()
-      .then(() => {
-        updateUser.state = UserState.COMPLETE;
-        dispatch(setUser(updateUser));
-      })
-      .catch((err) => {
-        setError(err.message);
-      })
-      .finally(() => setIsLoading(false));
+  const handleUpdateAddressDetails = async () => {
+    if (user) {
+      const addressDetails = addressDetailsValues();
+      const userDetailsDto: UserDetailsDto = {
+        ...user?.userDetails,
+        billingAddress: {
+          addressLine1: addressDetails.streetNumber,
+          addressLine2: addressDetails.suburb,
+          zipCode: addressDetails.areaCode,
+        },
+      };
+      const result = await createUpdateUser(userDetailsDto);
+      dispatch(
+        setUser({
+          ...user,
+          userDetails: userDetailsDto,
+          state: UserState.COMPLETE,
+        }),
+      );
+      return result;
+    }
+    return undefined;
+  };
+
+  const steps = [
+    {
+      title: t('userDetails.basicDetails'),
+      component: useMemo(
+        () => (
+          <BasicDetails
+            id="basicDetails"
+            control={basicDetailsControl}
+            setValue={setBasicDetailsValues}
+            trigger={triggerBasicDetails}
+            currencyOptions={currencyOptions}
+            formType={BasicDetailsFormType.ON_BOARDING}
+          />
+        ),
+        [currencyOptions, basicDetailsControl, setBasicDetailsValues, triggerBasicDetails],
+      ),
+    },
+    {
+      title: t('userDetails.addressDetails'),
+      component: (
+        <AddressDetails
+          id="addressDetails"
+          control={addressDetailsControl}
+          setValue={setAddressDetailsValue}
+          trigger={triggerAddressDetails}
+        />
+      ),
+    },
+  ];
+
+  const nextStep = async () => {
+    if (activeStep === 0) {
+      triggerBasicDetails();
+      if (basicDetailsFormState.isValid == true) {
+        const result = await handleUpdateBasicDetails();
+        if (result) {
+          setActiveStep(1);
+        }
+      }
+    } else if (activeStep === 1) {
+      triggerAddressDetails();
+      if (addressDetailsFormState.isValid === true) {
+        await handleUpdateAddressDetails();
+      }
+    }
+  };
+
+  const previousStep = () => {
+    setActiveStep((prevStep) => (prevStep > 0 ? prevStep - 1 : prevStep));
   };
 
   const handleOnSkip = () => {
     if (user) {
       const updateUser: User = {
         ...user,
-        state: UserState.SKIPPED,
-        preferredCurrency: config.preferedCurrency,
+        state: UserState.COMPLETE,
       };
       dispatch(setUser(updateUser));
     }
@@ -107,7 +204,7 @@ const UserDetails = ({ sx }: Props) => {
           ...sx,
           borderWidth: 1,
           borderColor: theme.palette.text.primary,
-          backgroundColor: theme.palette.background.paper,
+          backgroundColor: tinycolor(theme.palette.background.default).setAlpha(0.6).toRgbString(),
           paddingX: 5,
           paddingY: 5,
           borderRadius: 2,
@@ -119,101 +216,47 @@ const UserDetails = ({ sx }: Props) => {
           </Typography>
           <Typography variant="body2">{t('userDetails.subTitle')}</Typography>
         </Stack>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form>
           <Stack gap={2}>
-            <Controller
-              name="firstName"
-              control={control}
-              rules={{ required: true }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  size="small"
-                  label={t('userDetails.firstName')}
-                  variant="outlined"
-                  id="first-name"
-                  type="text"
-                  error={fieldState.error ? true : false}
-                  helperText={
-                    fieldState.error
-                      ? t('validation.required', { fieldName: t('userDetails.firstName') })
-                      : ''
-                  }
-                />
-              )}
-            />
-            <Controller
-              name="lastName"
-              control={control}
-              rules={{ required: true }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  size="small"
-                  label={t('userDetails.lastName')}
-                  variant="outlined"
-                  id="last-name"
-                  type="text"
-                  error={fieldState.error ? true : false}
-                  helperText={
-                    fieldState.error
-                      ? t('validation.required', { fieldName: t('userDetails.lastName') })
-                      : ''
-                  }
-                />
-              )}
-            />
-            <Controller
-              name="preferredCurrency"
-              control={control}
-              rules={{ required: true }}
-              render={({ field, fieldState }) => (
-                <>
-                  <FormControl>
-                    <InputLabel id="preferred-currency-label">
-                      {t('userDetails.preferredCurrency')}
-                    </InputLabel>
-                    <Select
-                      {...field}
-                      size="small"
-                      id="preferred-currency"
-                      label={t('userDetails.preferredCurrency')}
-                      labelId="preferred-currency-label"
-                      error={fieldState.error ? true : false}
+            <Stepper orientation="vertical" activeStep={activeStep} alternativeLabel>
+              {steps.map((step, index) => (
+                <Step key={index}>
+                  <StepLabel>
+                    <Typography variant="body1">{step.title}</Typography>
+                  </StepLabel>
+                  <StepContent>
+                    {step.component}
+                    <br />
+                    <Stack
+                      gap={2}
+                      direction={isPortrait ? 'column' : 'row'}
+                      width="100%"
+                      justifyContent="start"
+                      marginBottom={2}
                     >
-                      {currencyResponse?.map((currency) => {
-                        return (
-                          <MenuItem key={currency.code} value={currency.code}>
-                            {currency.code}
-                          </MenuItem>
-                        );
-                      })}
-                    </Select>
-                    {fieldState.error && (
-                      <Typography marginTop={1} marginLeft={2} variant="caption" color="error">
-                        {t('validation.required', {
-                          fieldName: t('userDetails.preferredCurrency'),
-                        })}
-                      </Typography>
-                    )}
-                  </FormControl>
-                </>
-              )}
-            />
-            <Stack
-              gap={2}
-              direction={isPortrait ? 'column' : 'row'}
-              width="100%"
-              justifyContent="space-between"
-            >
-              <Button disabled={isLoading} onClick={handleOnSkip} variant="contained" color="info">
-                {t('userDetails.skipButton')}
-              </Button>
-              <Button type="submit" variant="contained" loading={isLoading}>
-                {t('userDetails.okButton')}
-              </Button>
-            </Stack>
-            {error && <Typography color="error">{error}</Typography>}
+                      <Button variant="contained" loading={isLoading} onClick={nextStep}>
+                        {t('userDetails.okButton')}
+                      </Button>
+                      {activeStep > 0 && (
+                        <Button
+                          disabled={isLoading}
+                          onClick={handleOnSkip}
+                          variant="contained"
+                          color="info"
+                        >
+                          {t('userDetails.skipButton')}
+                        </Button>
+                      )}
+                      {activeStep > 0 && (
+                        <Button disabled={isLoading} onClick={previousStep}>
+                          Back
+                        </Button>
+                      )}
+                    </Stack>
+                  </StepContent>
+                </Step>
+              ))}
+            </Stepper>
           </Stack>
         </form>
       </Stack>

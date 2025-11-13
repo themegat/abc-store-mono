@@ -1,5 +1,6 @@
 using ABCStoreAPI.Database;
 using ABCStoreAPI.Database.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace ABCStoreAPI.Repository;
 
@@ -13,6 +14,8 @@ public class UserDetailsRepository : GenericRepository<UserDetails>, IUserDetail
 
     public UserDetails? GetByUserId(string userId)
     {
-        return _dbSet.FirstOrDefault(x => x.UserId == userId);
+        return _dbSet.Where(x => x.UserId == userId)
+        .Include(u => u.BillingAddress)
+        .FirstOrDefault();
     }
 }

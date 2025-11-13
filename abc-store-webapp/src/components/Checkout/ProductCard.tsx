@@ -2,7 +2,6 @@ import { useState } from 'react';
 
 import { Card, CardContent, CardMedia, Stack, SxProps, Typography, useTheme } from '@mui/material';
 
-import { config } from '@/config';
 import { formatCurrency } from '@/utils/shopping';
 
 import placeholderImg from '../../assets/placeholder.webp';
@@ -24,7 +23,7 @@ const ProductCard = ({
   title,
   price,
   stockQuantity,
-  currency = config.preferedCurrency,
+  currency,
   sx,
 }: Props) => {
   const theme = useTheme();

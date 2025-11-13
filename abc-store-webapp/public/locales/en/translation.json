@@ -22,7 +22,9 @@
     "skipButton": "Skip for now",
     "okButton": "Continue",
     "emailAddress": "Email Address",
-    "contactNumber": "Contact Number"
+    "contactNumber": "Contact Number",
+    "basicDetails": "Basic Details",
+    "addressDetails": "Address Details"
   },
   "address": {
     "shippingAddress": "Shipping Address",

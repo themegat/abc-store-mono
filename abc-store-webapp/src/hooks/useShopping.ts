@@ -17,7 +17,7 @@ const useShopping = (maxPrice: number, pageSize: number) => {
     maxPrice: maxPrice,
     pageNumber: 1,
     pageSize: pageSize,
-    currencyCode: user?.preferredCurrency || config.preferedCurrency,
+    currencyCode: user?.userDetails?.preferredCurrency || config.preferedCurrency,
   });
 
   const { data: productsResponse, isLoading: fetchingProducts } =

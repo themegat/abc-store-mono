@@ -1,5 +1,7 @@
-import { JSX, useCallback, useEffect, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { JSX, useEffect, useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router';
 
 import {
   Button,
@@ -18,15 +20,17 @@ import useCart from '@/hooks/useCart';
 import useCheckout from '@/hooks/useCheckout';
 import useUserDetails from '@/hooks/useUserDetails';
 import { OrderDto, UserDetailsDto } from '@/store/api/abcApi';
-import { selectUser } from '@/store/slice/userSlice';
+import { selectUser, setUser } from '@/store/slice/userSlice';
 
 import AddressDetails, { AddressDetailsFormInputs } from '../UserDetails/AddressDetails';
-import BasicDetails, { BasicDetailsFormInputs } from '../UserDetails/BasicDetails';
-import { useNavigate } from 'react-router';
+import BasicDetails, {
+  BasicDetailsFormInputs,
+  BasicDetailsFormType,
+} from '../UserDetails/BasicDetails';
 
 export type StepProps = {
   label: string | JSX.Element;
-  valid: boolean;
+  element: JSX.Element;
 };
 
 const CheckoutSteps = () => {
@@ -38,29 +42,76 @@ const CheckoutSteps = () => {
   const { createOrder, creatingOrder } = useCheckout();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const [basicDetailValues, setBasicDetailValues] = useState<BasicDetailsFormInputs | undefined>({
-    firstName: user?.firstName ?? '',
-    lastName: user?.lastName ?? '',
-    emailAddress: user?.email ?? '',
-    contactNumber: '',
+  const {
+    control: basicDetailsControl,
+    setValue: setBasicDetailsValues,
+    formState: basicDetailsFormState,
+    trigger: triggerBasicDetails,
+    getValues: basicDetailsValues,
+  } = useForm<BasicDetailsFormInputs>({
+    defaultValues: {
+      firstName: user?.userDetails?.firstName || '',
+      lastName: user?.userDetails?.lastName || '',
+      emailAddress: user?.email || '',
+      contactNumber: user?.userDetails?.contactNumber || '',
+      preferredCurrency: user?.userDetails?.preferredCurrency || '',
+    },
   });
-  const [billingAddressValues, setBillingAddressValues] = useState<
-    AddressDetailsFormInputs | undefined
-  >(undefined);
-  const [shippingAddressValues, setShippingAddressValues] = useState<
-    AddressDetailsFormInputs | undefined
-  >(undefined);
+
+  const {
+    control: billingAddressDetailsControl,
+    setValue: setBillingAddressDetailsValue,
+    trigger: triggerBillingAddressDetails,
+    formState: billingAddressDetailsFormState,
+    getValues: billingAddressDetailsValues,
+  } = useForm<AddressDetailsFormInputs>({
+    defaultValues: {
+      streetNumber: user?.userDetails?.billingAddress?.addressLine1 || '',
+      suburb: user?.userDetails?.billingAddress?.addressLine2 || '',
+      areaCode: user?.userDetails?.billingAddress?.zipCode || '',
+    },
+  });
+
+  const {
+    control: shippingAddressDetailsControl,
+    setValue: setShippingAddressDetailsValue,
+    trigger: triggerShippingAddressDetails,
+    formState: shippingAddressDetailsFormState,
+    getValues: shippingAddressDetailsValues,
+  } = useForm<AddressDetailsFormInputs>({
+    defaultValues: {
+      streetNumber: '',
+      suburb: '',
+      areaCode: '',
+    },
+  });
 
   const steps: StepProps[] = useMemo(
     () => [
       {
         label: t('checkout.customerDetails'),
-        valid: false,
+        element: (
+          <BasicDetails
+            id="customer-details"
+            formType={BasicDetailsFormType.CHECKOUT}
+            control={basicDetailsControl}
+            setValue={setBasicDetailsValues}
+            trigger={triggerBasicDetails}
+          />
+        ),
       },
       {
         label: t('address.billingAddress'),
-        valid: false,
+        element: (
+          <AddressDetails
+            id="billing-address"
+            control={billingAddressDetailsControl}
+            setValue={setBillingAddressDetailsValue}
+            trigger={triggerBillingAddressDetails}
+          />
+        ),
       },
       {
         label: (
@@ -74,24 +125,28 @@ const CheckoutSteps = () => {
             )}
           </Stack>
         ),
-        valid: false,
+        element: (
+          <AddressDetails
+            id="shipping-address"
+            control={shippingAddressDetailsControl}
+            setValue={setShippingAddressDetailsValue}
+            trigger={triggerShippingAddressDetails}
+          />
+        ),
       },
     ],
-    [activeStep],
-  );
-
-  const setStepData = useCallback(
-    (index: number, valid: boolean, values?: BasicDetailsFormInputs | AddressDetailsFormInputs) => {
-      steps[index].valid = valid;
-      if (index === 0) {
-        setBasicDetailValues(values as BasicDetailsFormInputs);
-      } else if (index === 1) {
-        setBillingAddressValues(values as AddressDetailsFormInputs);
-      } else if (index === 2) {
-        setShippingAddressValues(values as AddressDetailsFormInputs);
-      }
-    },
-    [steps],
+    [
+      activeStep,
+      basicDetailsControl,
+      billingAddressDetailsControl,
+      setBasicDetailsValues,
+      setBillingAddressDetailsValue,
+      setShippingAddressDetailsValue,
+      shippingAddressDetailsControl,
+      triggerBasicDetails,
+      triggerBillingAddressDetails,
+      triggerShippingAddressDetails,
+    ],
   );
 
   useEffect(() => {
@@ -99,81 +154,89 @@ const CheckoutSteps = () => {
   }, [userUpdating, cartCompleting, creatingOrder]);
 
   const handleCreateOrder = async () => {
-    if (shippingAddressValues) {
+    if (shippingAddressDetailsValues()) {
       const orderDto: OrderDto = {
         userId: user?.uid ?? '',
         isPaid: false,
         cartId: observeCart.id,
         shippingAddress: {
-          addressLine1: shippingAddressValues.streetNumber,
-          addressLine2: shippingAddressValues.suburb,
-          zipCode: shippingAddressValues.areaCode,
+          addressLine1: shippingAddressDetailsValues().streetNumber,
+          addressLine2: shippingAddressDetailsValues().suburb,
+          zipCode: shippingAddressDetailsValues().areaCode,
         },
       };
       return await createOrder(orderDto);
     }
+    return undefined;
   };
 
-  const createUpdateUserDetails = async () => {
-    if (basicDetailValues && billingAddressValues) {
+  const handleCreateUpdateUserDetails = async () => {
+    if (basicDetailsValues() && billingAddressDetailsValues() && user) {
       const userDto: UserDetailsDto = {
         userId: user?.uid ?? '',
-        firstName: basicDetailValues.firstName,
-        lastName: basicDetailValues.lastName,
-        contactNumber: basicDetailValues.contactNumber,
-        preferredCurrency: user?.preferredCurrency ?? '',
+        firstName: basicDetailsValues().firstName,
+        lastName: basicDetailsValues().lastName,
+        contactNumber: basicDetailsValues().contactNumber,
+        preferredCurrency: user?.userDetails?.preferredCurrency ?? '',
         billingAddress: {
-          addressLine1: billingAddressValues.streetNumber,
-          addressLine2: billingAddressValues.suburb,
-          zipCode: billingAddressValues.areaCode,
+          addressLine1: billingAddressDetailsValues().streetNumber,
+          addressLine2: billingAddressDetailsValues().suburb,
+          zipCode: billingAddressDetailsValues().areaCode,
         },
       };
-      return await createUpdateUser(userDto);
+      const result = await createUpdateUser(userDto);
+      dispatch(
+        setUser({
+          ...user,
+          userDetails: userDto,
+        }),
+      );
+      return result;
+    }
+    return undefined;
+  };
+
+  const handleCompleteCheckout = async () => {
+    const userResult = await handleCreateUpdateUserDetails();
+    if (userResult) {
+      const orderResult = await handleCreateOrder();
+      if (orderResult) {
+        const cartResult = await completeCartCheckout(observeCart);
+        if (cartResult) {
+          navigate('/shopping');
+        }
+      }
     }
   };
-
-  const completeCheckout = async () => {
-    await createUpdateUserDetails();
-    await handleCreateOrder();
-    await completeCartCheckout(observeCart);
-    navigate('/shopping');
-  };
-
-  const stepElements: JSX.Element[] = useMemo(
-    () => [
-      <BasicDetails
-        values={basicDetailValues}
-        stepIndex={0}
-        setStepData={setStepData}
-        id="customer-details"
-      />,
-      <AddressDetails
-        values={billingAddressValues}
-        stepIndex={1}
-        setStepData={setStepData}
-        id="billing-address"
-      />,
-      <AddressDetails
-        values={shippingAddressValues}
-        stepIndex={2}
-        setStepData={setStepData}
-        id="shipping-address"
-      />,
-    ],
-    [setStepData, basicDetailValues, billingAddressValues, shippingAddressValues],
-  );
 
   useEffect(() => {
     if (shippingAddressSameAsBilling) {
-      setShippingAddressValues(billingAddressValues);
+      setShippingAddressDetailsValue('streetNumber', billingAddressDetailsValues().streetNumber);
+      setShippingAddressDetailsValue('suburb', billingAddressDetailsValues().suburb);
+      setShippingAddressDetailsValue('areaCode', billingAddressDetailsValues().areaCode);
     } else {
-      setShippingAddressValues(undefined);
+      setShippingAddressDetailsValue('streetNumber', '');
+      setShippingAddressDetailsValue('suburb', '');
+      setShippingAddressDetailsValue('areaCode', '');
     }
-  }, [shippingAddressSameAsBilling, billingAddressValues]);
+  }, [shippingAddressSameAsBilling, setShippingAddressDetailsValue, billingAddressDetailsValues]);
 
-  const nextStep = () => {
-    if (steps[activeStep].valid) {
-      setActiveStep((prevStep) => (prevStep < steps.length - 1 ? prevStep + 1 : prevStep));
+  const nextStep = async () => {
+    if (activeStep === 0) {
+      triggerBasicDetails();
+      if (basicDetailsFormState.isValid === true) {
+        setActiveStep(1);
+      }
+    } else if (activeStep === 1) {
+      triggerBillingAddressDetails();
+      if (billingAddressDetailsFormState.isValid === true) {
+        setActiveStep(2);
+      }
+    } else if (activeStep === 2) {
+      triggerShippingAddressDetails();
+      if (shippingAddressDetailsFormState.isValid === true) {
+        handleCompleteCheckout();
+      }
     }
   };
 
@@ -185,26 +248,8 @@ const CheckoutSteps = () => {
     <>
       <Stepper orientation="vertical" activeStep={activeStep} alternativeLabel>
         {steps.map((step, index) => (
-          <Step
-            key={index}
-            sx={{
-              width: '100%',
-              '.MuiStepConnector-root.MuiStepConnector-vertical': {
-                display: 'none',
-              },
-            }}
-          >
-            <StepLabel
-              sx={{
-                display: 'flex',
-                flexDirection: 'row !important',
-                gap: 2,
-                '.MuiStepLabel-alternativeLabel': {
-                  textAlign: 'start',
-                  marginTop: 0,
-                },
-              }}
-            >
+          <Step key={index}>
+            <StepLabel>
               <Typography variant="h5">{step.label}</Typography>
             </StepLabel>
             <StepContent
@@ -212,7 +257,7 @@ const CheckoutSteps = () => {
                 marginY: 2,
               }}
             >
-              {stepElements[index]}
+              {step.element}
               <br></br>
               <Stack gap={2} direction="row">
                 {activeStep < steps.length - 1 && (
@@ -228,7 +273,7 @@ const CheckoutSteps = () => {
                     variant="contained"
                     size="large"
                     color="primary"
-                    onClick={completeCheckout}
+                    onClick={nextStep}
                   >
                     {t('checkout.complete')}
                   </Button>
