@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using ABCStoreAPI.Database.Model;
 using ABCStoreAPI.Repository;
@@ -12,6 +13,7 @@ using Soenneker.Utils.AutoBogus;
 
 namespace ABCStoreAPI.Service.Tests;
 
+[ExcludeFromCodeCoverage]
 public class CartServiceTest
 {
     private Mock<ICartRepository> _cartRepositoryMock = null!;
@@ -271,7 +273,7 @@ public class CartServiceTest
         var dto = new CartProductDto
         {
             ProductId = 2,
-            Quantity = 5 
+            Quantity = 5
         };
 
         Assert.ThrowsAsync<AbcExecptionException>(

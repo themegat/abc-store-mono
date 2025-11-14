@@ -1,18 +1,16 @@
+using System.Diagnostics.CodeAnalysis;
 using ABCStoreAPI.Database.Model;
 using ABCStoreAPI.Repository;
-using ABCStoreAPI.Service;
 using ABCStoreAPI.Service.Dto;
 using ABCStoreAPI.Service.Page;
 using ABCStoreAPI.Service.Tests.Base;
 using Moq;
 using NUnit.Framework;
 using Soenneker.Utils.AutoBogus;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ABCStoreAPI.Service.Tests
 {
+    [ExcludeFromCodeCoverage]
     public class ProductServiceTest
     {
         private Mock<IUnitOfWork> _uowMock = null!;
@@ -206,7 +204,7 @@ namespace ABCStoreAPI.Service.Tests
         {
             var page = new PagedRequest
             {
-                PageNumber = 0, 
+                PageNumber = 0,
                 PageSize = 5
             };
 

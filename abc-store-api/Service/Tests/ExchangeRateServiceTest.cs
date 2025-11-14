@@ -5,9 +5,11 @@ using NUnit.Framework;
 using Soenneker.Utils.AutoBogus;
 
 using ABCStoreAPI.Service.Tests.Base;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ABCStoreAPI.Service.Tests
 {
+    [ExcludeFromCodeCoverage]
     public class ExchangeRateServiceTest
     {
         private Mock<IUnitOfWork> _uowMock = null!;

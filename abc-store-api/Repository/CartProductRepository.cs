@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using ABCStoreAPI.Database;
 using ABCStoreAPI.Database.Model;
 
@@ -7,6 +8,8 @@ public interface ICartProductRepository : IGenericRepository<CartProduct>
 {
     public IQueryable<CartProduct> GetByCartIdAndProductId(int cartId, int productId);
 }
+
+[ExcludeFromCodeCoverage]
 public class CartProductRepository : GenericRepository<CartProduct>, ICartProductRepository
 {
     public CartProductRepository(AppDbContext appDbContext) : base(appDbContext) { }

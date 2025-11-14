@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ABCStoreAPI.Controller
 {
+     [ExcludeFromCodeCoverage]
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]

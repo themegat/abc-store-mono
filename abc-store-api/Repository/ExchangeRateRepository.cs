@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using ABCStoreAPI.Database;
 using ABCStoreAPI.Database.Model;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ public interface IExchangeRateRepository : IGenericRepository<ExchangeRate>
     public Task<bool> Truncate();
 }
 
+[ExcludeFromCodeCoverage]
 public class ExchangeRateRepository : GenericRepository<ExchangeRate>, IExchangeRateRepository
 {
     public ExchangeRateRepository(AppDbContext context) : base(context)

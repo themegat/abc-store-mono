@@ -1,13 +1,13 @@
-using System;
+using System.Diagnostics.CodeAnalysis;
 using ABCStoreAPI.Database.Model;
 using ABCStoreAPI.Repository;
-using ABCStoreAPI.Service;
 using ABCStoreAPI.Service.Dto;
 using Moq;
 using NUnit.Framework;
 
 namespace ABCStoreAPI.Service.Tests
 {
+    [ExcludeFromCodeCoverage]
     [TestFixture]
     public class UserDetailsServiceTest
     {
@@ -241,7 +241,7 @@ namespace ABCStoreAPI.Service.Tests
             Assert.That(existing.BillingAddress!.AddressLine1, Is.EqualTo("NewLine1"));
             Assert.That(existing.BillingAddress.AddressLine2, Is.EqualTo("NewLine2"));
             Assert.That(existing.BillingAddress.ZipCode, Is.EqualTo("9999"));
-        
+
             Assert.That(existing.BillingAddress.AddressType, Is.EqualTo(AddressType.SHIPPING));
             Assert.That(existing.BillingAddress.UpdatedAt, Is.Not.EqualTo(default(DateTime)));
             Assert.That(existing.BillingAddress.UpdatedBy, Is.EqualTo("System"));

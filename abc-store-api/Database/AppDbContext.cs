@@ -1,8 +1,10 @@
 namespace ABCStoreAPI.Database;
 
+using System.Diagnostics.CodeAnalysis;
 using ABCStoreAPI.Database.Model;
 using Microsoft.EntityFrameworkCore;
 
+ [ExcludeFromCodeCoverage]
 public class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)

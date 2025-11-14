@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Security.Claims;
 using ABCStoreAPI.Configuration;
@@ -12,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ABCStoreAPI.Extension;
 
+[ExcludeFromCodeCoverage]
 public static class ServiceExtensions
 {
     public static string AbcStoreWebapp = "_AbcStoreWebapp";

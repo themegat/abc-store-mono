@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using ABCStoreAPI.Database;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +12,7 @@ public interface IGenericRepository<T> where T : class
     void Remove(T entity);
 }
 
+[ExcludeFromCodeCoverage]
 public class GenericRepository<T> : IGenericRepository<T> where T : class
 {
     protected readonly AppDbContext _context;

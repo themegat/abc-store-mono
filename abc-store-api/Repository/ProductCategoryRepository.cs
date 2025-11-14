@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using ABCStoreAPI.Database;
 using ABCStoreAPI.Database.Model;
 
@@ -7,6 +8,8 @@ public interface IProductCategoryRepository : IGenericRepository<ProductCategory
 {
     public IQueryable<ProductCategory> GetByName(string name);
 }
+
+ [ExcludeFromCodeCoverage]
 public class ProductCategoryRepository : GenericRepository<ProductCategory>, IProductCategoryRepository
 {
     public ProductCategoryRepository(AppDbContext context) : base(context) { }

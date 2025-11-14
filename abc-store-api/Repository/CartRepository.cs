@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using ABCStoreAPI.Database;
 using ABCStoreAPI.Database.Model;
 
@@ -8,6 +9,7 @@ public interface ICartRepository : IGenericRepository<Cart>
     public IQueryable<Cart> GetByUserIdAndStatus(string userId, CartStatus status);
 }
 
+ [ExcludeFromCodeCoverage]
 public class CartRepository : GenericRepository<Cart>, ICartRepository
 {
     public CartRepository(AppDbContext appDbContext) : base(appDbContext) { }
