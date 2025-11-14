@@ -1,7 +1,7 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MyApp.Namespace
+namespace ABCStoreAPI.Controller
 {
     [Route("api/[controller]")]
     [ApiController]
