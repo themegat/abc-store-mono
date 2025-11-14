@@ -1,11 +1,9 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text.Json;
 using ABCStoreAPI.Service.Base;
 
 namespace ABCStoreAPI.Extension.Base;
 
-[ExcludeFromCodeCoverage]
 public class ExceptionMiddleware
 {
     private readonly RequestDelegate _next;

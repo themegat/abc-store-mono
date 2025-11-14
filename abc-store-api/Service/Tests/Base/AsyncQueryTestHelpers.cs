@@ -1,6 +1,5 @@
 
 using Microsoft.EntityFrameworkCore.Query;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 
 namespace ABCStoreAPI.Service.Tests.Base;
@@ -9,8 +8,6 @@ namespace ABCStoreAPI.Service.Tests.Base;
 /// Helper classes to support EF Core async LINQ (ToListAsync, FirstOrDefaultAsync)
 /// against in-memory collections.
 /// </summary>
-
-[ExcludeFromCodeCoverage]
 internal class TestAsyncEnumerable<T> : EnumerableQuery<T>, IAsyncEnumerable<T>, IQueryable<T>
 {
     public TestAsyncEnumerable(IEnumerable<T> enumerable)
@@ -29,7 +26,6 @@ internal class TestAsyncEnumerable<T> : EnumerableQuery<T>, IAsyncEnumerable<T>,
     IQueryProvider IQueryable.Provider => new TestAsyncQueryProvider<T>(this);
 }
 
-[ExcludeFromCodeCoverage]
 internal class TestAsyncEnumerator<T> : IAsyncEnumerator<T>
 {
     private readonly IEnumerator<T> _inner;
@@ -51,7 +47,6 @@ internal class TestAsyncEnumerator<T> : IAsyncEnumerator<T>
     }
 }
 
-[ExcludeFromCodeCoverage]
 internal class TestAsyncQueryProvider<TEntity> : IAsyncQueryProvider
 {
     private readonly IQueryProvider _inner;

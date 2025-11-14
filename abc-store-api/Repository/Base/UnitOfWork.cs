@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using ABCStoreAPI.Database;
 using ABCStoreAPI.Repository.Base;
 
@@ -21,8 +20,6 @@ public interface IUnitOfWork : IDisposable
     int Complete();
     Task<int> CompleteAsync();
 }
-
-[ExcludeFromCodeCoverage]
 public class UnitOfWork : IUnitOfWork
 {
     private readonly AppDbContext _context;

@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using ABCStoreAPI.Database;
 using ABCStoreAPI.Database.Model;
 
@@ -12,7 +11,6 @@ public interface IProductRepository : IGenericRepository<Product>
 
 }
 
- [ExcludeFromCodeCoverage]
 public class ProductRepository : GenericRepository<Product>, IProductRepository
 {
     public ProductRepository(AppDbContext context) : base(context)

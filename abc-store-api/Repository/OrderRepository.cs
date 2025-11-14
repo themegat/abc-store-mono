@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using ABCStoreAPI.Database;
 using ABCStoreAPI.Database.Model;
 
@@ -8,8 +7,6 @@ public interface IOrderRepository : IGenericRepository<Order>
 {
 
 }
-
-[ExcludeFromCodeCoverage]
 public class OrderRepository : GenericRepository<Order>, IOrderRepository
 {
     public OrderRepository(AppDbContext context) : base(context) { }

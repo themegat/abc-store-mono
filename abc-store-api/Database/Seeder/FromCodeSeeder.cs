@@ -1,10 +1,8 @@
-using System.Diagnostics.CodeAnalysis;
 using ABCStoreAPI.Database.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace ABCStoreAPI.Database.Seeder;
 
- [ExcludeFromCodeCoverage]
 public class FromCodeSeeder : DataSeeder
 {
     public FromCodeSeeder(AppDbContext context, ILogger<DataSeeder> logger) : base(context, logger)

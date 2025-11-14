@@ -1,8 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace ABCStoreAPI.Database;
 
- [ExcludeFromCodeCoverage]
 public abstract class DataSeeder
 {
     protected readonly AppDbContext _context;

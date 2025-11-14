@@ -1,10 +1,8 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MyApp.Namespace
 {
-    [ExcludeFromCodeCoverage]
     [Route("api/[controller]")]
     [ApiController]
     public class AboutController : ControllerBase

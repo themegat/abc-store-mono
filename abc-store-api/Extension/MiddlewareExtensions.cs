@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using ABCStoreAPI.Database;
 using ABCStoreAPI.Extension.Base;
 using ABCStoreAPI.Service.Consumer.Base;
@@ -6,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ABCStoreAPI.Extension;
 
-[ExcludeFromCodeCoverage]
 public static class MiddlewareExtensions
 {
     public static WebApplication ConfigurePipeline(this WebApplication app)

@@ -1,15 +1,11 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace ABCStoreAPI.Configuration;
 
-[ExcludeFromCodeCoverage]
 public class ExchangeRateConfig
 {
     public string BaseCurrency { get; set; } = "";
     public string Url { get; set; } = "";
 }
 
- [ExcludeFromCodeCoverage]
 public class ApiConfig
 {
     public string DummyjsonBaseUrl { get; set; } = "";

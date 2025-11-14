@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using ABCStoreAPI.Database.Model;
 using ABCStoreAPI.Repository;
@@ -9,7 +8,6 @@ using NUnit.Framework;
 
 namespace ABCStoreAPI.Service.Tests
 {
-    [ExcludeFromCodeCoverage]
     [TestFixture]
     public class OrderServiceTest
     {
