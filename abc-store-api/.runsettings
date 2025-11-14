@@ -20,7 +20,6 @@
                                 <Function>^ABCStoreAPI.Migrations\..*</Function>
                                 <Function>^ABCStoreAPI.Repository\..*</Function>
                                 <Function>^ABCStoreAPI.Service.Tests\..*</Function>
-                                <Function>^Program.cs</Function>
                             </Exclude>
                         </Functions>
                     </CodeCoverage>
