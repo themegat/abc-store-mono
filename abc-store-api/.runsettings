@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+    <RunConfiguration>
+        <ResultsDirectory>.\Coverage</ResultsDirectory>
+    </RunConfiguration>
+    <DataCollectionRunSettings>
+        <DataCollectors>
+            <DataCollector friendlyName="Code Coverage">
+                <Configuration>
+                    <Format>coverage,cobertura,json,lcov</Format>
+                    <CodeCoverage>
+                        <Functions>
+                            <Exclude>
+                                <Function>^ABCStoreAPI.Configuration\..*</Function>
+                                <Function>^ABCStoreAPI.Controller\..*</Function>
+                                <Function>^ABCStoreAPI.Database.DataSeeder</Function>
+                                <Function>^ABCStoreAPI.Database.Seeder</Function>
+                                <Function>^ABCStoreAPI.Database.AppDbContext</Function>
+                                <Function>^ABCStoreAPI.Extension\..*</Function>
+                                <Function>^ABCStoreAPI.Migrations\..*</Function>
+                                <Function>^ABCStoreAPI.Repository\..*</Function>
+                                <Function>^ABCStoreAPI.Service.Tests\..*</Function>
+                            </Exclude>
+                        </Functions>
+                    </CodeCoverage>
+                </Configuration>
+            </DataCollector>
+        </DataCollectors>
+    </DataCollectionRunSettings>
+</RunSettings>

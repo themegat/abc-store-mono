@@ -61,7 +61,7 @@ public class CartService
     public async Task<CartDto> CompleteCart(CartDto cartDto)
     {
         var cartQuery = GetCart(cartDto.UserId, CartStatus.IN_PROGRESS);
-        if (cartQuery == null)
+        if (cartQuery.FirstOrDefault() == null)
         {
             var message = "A cart in progress could not be found";
             _logger.LogDebug(message);
@@ -81,7 +81,7 @@ public class CartService
     public async Task RemoveCart(CartDto cartDto)
     {
         var cartQuery = GetCart(cartDto.UserId, CartStatus.IN_PROGRESS);
-        if (cartQuery == null)
+        if (cartQuery.FirstOrDefault() == null)
         {
             var message = "A cart in progress could not be found";
             _logger.LogDebug(message);
@@ -97,7 +97,7 @@ public class CartService
     public async Task<CartDto> GetCartInProgress(string userId)
     {
         var cartQuery = GetCart(userId, CartStatus.IN_PROGRESS);
-        if (cartQuery == null)
+        if (cartQuery.FirstOrDefault() == null)
         {
             var message = "A cart in progress could not be found";
             _logger.LogDebug(message);

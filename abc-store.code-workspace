@@ -35,6 +35,8 @@
 		},
 		"peacock.color": "#204F57",
 		"npm.packageManager": "npm",
-		"npm.scriptRunner": "npm"
+		"npm.scriptRunner": "npm",
+		"dotnet.unitTests.runSettingsPath": ".runsettings",
+		"dotnet.testWindow.useTestingPlatformProtocol": false,
 	}
 }
