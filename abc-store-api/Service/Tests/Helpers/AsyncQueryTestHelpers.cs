@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 
-namespace ABCStoreAPI.Service.Tests.Base;
+namespace ABCStoreAPI.Service.Tests.Helpers;
 
 /// <summary>
 /// Helper classes to support EF Core async LINQ (ToListAsync, FirstOrDefaultAsync)

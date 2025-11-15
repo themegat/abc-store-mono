@@ -1,7 +1,5 @@
-using System;
 using ABCStoreAPI.Database.Model;
 using ABCStoreAPI.Repository;
-using ABCStoreAPI.Service;
 using ABCStoreAPI.Service.Dto;
 using Moq;
 using NUnit.Framework;
@@ -241,7 +239,7 @@ namespace ABCStoreAPI.Service.Tests
             Assert.That(existing.BillingAddress!.AddressLine1, Is.EqualTo("NewLine1"));
             Assert.That(existing.BillingAddress.AddressLine2, Is.EqualTo("NewLine2"));
             Assert.That(existing.BillingAddress.ZipCode, Is.EqualTo("9999"));
-        
+
             Assert.That(existing.BillingAddress.AddressType, Is.EqualTo(AddressType.SHIPPING));
             Assert.That(existing.BillingAddress.UpdatedAt, Is.Not.EqualTo(default(DateTime)));
             Assert.That(existing.BillingAddress.UpdatedBy, Is.EqualTo("System"));
@@ -303,7 +301,13 @@ namespace ABCStoreAPI.Service.Tests
                 FirstName = "John",
                 LastName = "Doe",
                 PreferredCurrency = "USD",
-                ContactNumber = "123"
+                ContactNumber = "123",
+                BillingAddress = new Address()
+                {
+                    AddressLine1 = "Line1",
+                    AddressLine2 = "Line2",
+                    ZipCode = "1234"
+                }
             };
 
             _userDetailsRepositoryMock
@@ -318,6 +322,10 @@ namespace ABCStoreAPI.Service.Tests
             Assert.That(dto.LastName, Is.EqualTo("Doe"));
             Assert.That(dto.PreferredCurrency, Is.EqualTo("USD"));
             Assert.That(dto.ContactNumber, Is.EqualTo("123"));
+            Assert.That(dto.BillingAddress?.AddressLine1, Is.EqualTo("Line1"));
+            Assert.That(dto.BillingAddress?.AddressLine2, Is.EqualTo("Line2"));
+            Assert.That(dto.BillingAddress?.ZipCode, Is.EqualTo("1234"));
+
         }
 
         #endregion

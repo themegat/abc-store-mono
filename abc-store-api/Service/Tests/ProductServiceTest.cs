@@ -1,15 +1,11 @@
 using ABCStoreAPI.Database.Model;
 using ABCStoreAPI.Repository;
-using ABCStoreAPI.Service;
 using ABCStoreAPI.Service.Dto;
 using ABCStoreAPI.Service.Page;
-using ABCStoreAPI.Service.Tests.Base;
+using ABCStoreAPI.Service.Tests.Helpers;
 using Moq;
 using NUnit.Framework;
 using Soenneker.Utils.AutoBogus;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ABCStoreAPI.Service.Tests
 {

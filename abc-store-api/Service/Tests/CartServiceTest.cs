@@ -1,11 +1,8 @@
-using System.Linq;
 using ABCStoreAPI.Database.Model;
 using ABCStoreAPI.Repository;
 using ABCStoreAPI.Repository.Base;
-using ABCStoreAPI.Service;
 using ABCStoreAPI.Service.Base;
 using ABCStoreAPI.Service.Dto;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Soenneker.Utils.AutoBogus;

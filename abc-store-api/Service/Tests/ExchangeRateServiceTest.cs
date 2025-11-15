@@ -4,7 +4,7 @@ using Moq;
 using NUnit.Framework;
 using Soenneker.Utils.AutoBogus;
 
-using ABCStoreAPI.Service.Tests.Base;
+using ABCStoreAPI.Service.Tests.Helpers;
 
 namespace ABCStoreAPI.Service.Tests
 {

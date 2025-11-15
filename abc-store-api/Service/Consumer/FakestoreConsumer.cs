@@ -8,23 +8,6 @@ using Newtonsoft.Json;
 
 namespace ABCStoreAPI.Service.Consumer;
 
-class GenerateImageData
-{
-    public int Id { get; set; }
-    public string Url { get; set; } = string.Empty;
-}
-
-class FirebaseGenerateThumbnailRequest
-{
-    public int Size { get; set; }
-    public List<GenerateImageData> Images { get; set; } = new List<GenerateImageData>();
-}
-
-class FirebaseGenerateThumbnailResponse
-{
-    public List<GenerateImageData> Data { get; set; } = new List<GenerateImageData>();
-}
-
 class FakestoreProductConsumable : ProductConsumable
 {
     public string Image { get; set; }
