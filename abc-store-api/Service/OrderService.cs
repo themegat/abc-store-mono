@@ -47,7 +47,7 @@ public class OrderService
             ShippingAddress = address
         };
 
-        var cart = _uow.Cart.GetById(orderDto.CartId);
+        var cart = _uow.Cart.FindById(orderDto.CartId);
         if (cart == null)
         {
             var message = "Cart not found";

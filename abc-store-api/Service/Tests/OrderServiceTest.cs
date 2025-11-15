@@ -85,7 +85,7 @@ namespace ABCStoreAPI.Service.Tests
             Assert.That(ex!.ErrorCode, Is.EqualTo(HttpStatusCode.BadRequest));
             Assert.That(ex.Message, Is.EqualTo("User not found"));
 
-            _cartRepositoryMock.Verify(r => r.GetById(It.IsAny<int>()), Times.Never);
+            _cartRepositoryMock.Verify(r => r.FindById(It.IsAny<int>()), Times.Never);
             _orderRepositoryMock.Verify(r => r.Add(It.IsAny<Order>()), Times.Never);
             _uowMock.Verify(u => u.CompleteAsync(), Times.Never);
         }
@@ -110,7 +110,7 @@ namespace ABCStoreAPI.Service.Tests
                 .Returns(user);
 
             _cartRepositoryMock
-                .Setup(r => r.GetById(42))
+                .Setup(r => r.FindById(42))
                 .Returns((Cart?)null);
 
             var ex = Assert.ThrowsAsync<AbcExecptionException>(
@@ -157,7 +157,7 @@ namespace ABCStoreAPI.Service.Tests
                 .Returns(user);
 
             _cartRepositoryMock
-                .Setup(r => r.GetById(1))
+                .Setup(r => r.FindById(1))
                 .Returns(cart);
 
             _productRepositoryMock
@@ -216,7 +216,7 @@ namespace ABCStoreAPI.Service.Tests
                 .Returns(user);
 
             _cartRepositoryMock
-                .Setup(r => r.GetById(1))
+                .Setup(r => r.FindById(1))
                 .Returns(cart);
 
             _productRepositoryMock
