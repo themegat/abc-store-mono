@@ -82,7 +82,7 @@ public class UserDetailsService : IUserDetailsService
                 existingUserDetails.BillingAddress.AddressLine1 = userDetails.BillingAddress.AddressLine1;
                 existingUserDetails.BillingAddress.AddressLine2 = userDetails.BillingAddress.AddressLine2;
                 existingUserDetails.BillingAddress.ZipCode = userDetails.BillingAddress.ZipCode;
-                existingUserDetails.BillingAddress.AddressType = AddressType.SHIPPING;
+                existingUserDetails.BillingAddress.AddressType = AddressType.BILLING;
                 existingUserDetails.BillingAddress.UpdatedAt = DateTime.UtcNow;
                 existingUserDetails.BillingAddress.UpdatedBy = "System";
             }

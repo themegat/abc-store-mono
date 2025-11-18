@@ -44,6 +44,12 @@ export const useAuthStatus = () => {
             firstName: userDetails.data?.firstName ?? '',
             lastName: userDetails.data?.lastName ?? '',
             preferredCurrency: userDetails.data?.preferredCurrency ?? '',
+            billingAddress: {
+              addressLine1: userDetails.data?.billingAddress?.addressLine1 ?? '',
+              addressLine2: userDetails.data?.billingAddress?.addressLine2 ?? '',
+              zipCode: userDetails.data?.billingAddress?.zipCode ?? '',
+              addressType: userDetails.data?.billingAddress?.addressType ?? 'BILLING',
+            }
           },
           state: userDetails.data ? UserState.COMPLETE : UserState.PENDING,
         };
