@@ -1,9 +1,17 @@
+using System.ComponentModel.DataAnnotations;
 using ABCStoreAPI.Repository;
 using Microsoft.EntityFrameworkCore;
+using ABCStoreAPI.Service.Validation;
 
 namespace ABCStoreAPI.Service;
 
-public class ExchangeRateService
+public interface IExchangeRateService
+{
+    Task<List<Dto.ExchangeRateDto>> GetAllExchangeRatesAsync();
+    Task<Dto.ExchangeRateDto?> GetExchangeRateByCurrencyCodeAsync(string currencyCode);
+}
+
+public class ExchangeRateService : IExchangeRateService
 {
     private readonly IUnitOfWork _uow;
 
@@ -22,7 +30,8 @@ public class ExchangeRateService
         return exchangeRates.Select(Dto.ExchangeRateDto.toDto).ToList();
     }
 
-    public async Task<Dto.ExchangeRateDto?> GetExchangeRateByCurrencyCodeAsync(string currencyCode)
+    [Validated]
+    public async Task<Dto.ExchangeRateDto?> GetExchangeRateByCurrencyCodeAsync([Required][MinLength(3)] string currencyCode)
     {
         var exchangeRate = await _uow.ExchangeRates
         .GetByCurrency(currencyCode)

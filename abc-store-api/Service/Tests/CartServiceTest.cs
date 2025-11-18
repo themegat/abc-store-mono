@@ -3,6 +3,8 @@ using ABCStoreAPI.Repository;
 using ABCStoreAPI.Repository.Base;
 using ABCStoreAPI.Service.Base;
 using ABCStoreAPI.Service.Dto;
+using ABCStoreAPI.Service.Tests.Helpers;
+using Castle.DynamicProxy;
 using Moq;
 using NUnit.Framework;
 using Soenneker.Utils.AutoBogus;
@@ -17,7 +19,7 @@ public class CartServiceTest
 
     private Mock<IUnitOfWork> _uowMock = null!;
     private Mock<ILogger<CartService>> _loggerMock = null!;
-    private CartService _cartService = null!;
+    private ICartService _cartService = null!;
 
     private List<Cart> _cart = null!;
 
@@ -49,10 +51,28 @@ public class CartServiceTest
 
         _uowMock.Setup(uow => uow.CompleteAsync()).ReturnsAsync(1);
 
-        _cartService = new CartService(_uowMock.Object, _loggerMock.Object);
+        var cartService = new CartService(_uowMock.Object, _loggerMock.Object);
+
+        _cartService = ValidationTestHelpers.RegisterServiceValidation<ICartService, CartService>(cartService);
     }
 
     #region CreateCart
+
+    [Test]
+    public async Task TestCreateCart_InvalidRequest_ThrowsException()
+    {
+        var cartDto = new CartDto
+        {
+            CartProducts = new List<CartProductDto>()
+        };
+
+        var ex = Assert.ThrowsAsync<AbcExecption>(
+            async () => await _cartService.CreateCart(cartDto)
+        );
+        Assert.That(ex.Message, Contains.Substring("The UserId field is required"));
+        Assert.That(ex.Message, Contains.Substring("At least one cart product is required"));
+    }
+
 
     [Test]
     public async Task TestCreateCartDuplicate_ThrowsException()
@@ -70,7 +90,7 @@ public class CartServiceTest
             }
         };
 
-        Assert.ThrowsAsync<AbcExecptionException>(
+        Assert.ThrowsAsync<AbcExecption>(
             async () => await _cartService.CreateCart(cartDto));
     }
 
@@ -102,6 +122,14 @@ public class CartServiceTest
     #region CompleteCart
 
     [Test]
+    public void CompleteCart_InvalidRequest_ThrowsException()
+    {
+        var ex = Assert.ThrowsAsync<AbcExecption>(
+            async () => await _cartService.CompleteCart(""));
+        Assert.That(ex.Message, Contains.Substring("The userId field is required"));
+    }
+
+    [Test]
     public async Task CompleteCart_WhenCartInProgress_UpdatesStatusAndSaves()
     {
         var cart = new Cart
@@ -115,9 +143,7 @@ public class CartServiceTest
             .Setup(cr => cr.GetByUserIdAndStatus("user-complete", CartStatus.IN_PROGRESS))
             .Returns(new List<Cart> { cart }.AsQueryable());
 
-        var dto = new CartDto { UserId = "user-complete" };
-
-        var result = await _cartService.CompleteCart(dto);
+        var result = await _cartService.CompleteCart("user-complete");
 
         Assert.That(cart.Status, Is.EqualTo(CartStatus.COMPLETE));
         Assert.That(cart.UpdatedBy, Is.EqualTo("system"));
@@ -128,10 +154,8 @@ public class CartServiceTest
     [Test]
     public void CompleteCart_WhenNoCartInProgress_ThrowsException()
     {
-        var dto = new CartDto { UserId = "no-cart-user" };
-
-        Assert.ThrowsAsync<AbcExecptionException>(
-            async () => await _cartService.CompleteCart(dto));
+        Assert.ThrowsAsync<AbcExecption>(
+            async () => await _cartService.CompleteCart("no-cart-user"));
     }
 
     #endregion
@@ -152,9 +176,7 @@ public class CartServiceTest
             .Setup(cr => cr.GetByUserIdAndStatus("user-remove", CartStatus.IN_PROGRESS))
             .Returns(new List<Cart> { cart }.AsQueryable());
 
-        var dto = new CartDto { UserId = "user-remove" };
-
-        await _cartService.RemoveCart(dto);
+        await _cartService.RemoveCart("user-remove");
 
         _cartRepositoryMock.Verify(cr => cr.Remove(cart), Times.Once);
         _uowMock.Verify(uow => uow.CompleteAsync(), Times.Once);
@@ -163,10 +185,16 @@ public class CartServiceTest
     [Test]
     public void RemoveCart_WhenCartDoesNotExist_ThrowsException()
     {
-        var dto = new CartDto { UserId = "no-cart-to-remove" };
+        Assert.ThrowsAsync<AbcExecption>(
+            async () => await _cartService.RemoveCart("no-cart-to-remove"));
+    }
 
-        Assert.ThrowsAsync<AbcExecptionException>(
-            async () => await _cartService.RemoveCart(dto));
+    [Test]
+    public void RemoveCart_InvalidRequest_ThrowsException()
+    {
+        var ex = Assert.ThrowsAsync<AbcExecption>(
+            async () => await _cartService.RemoveCart(""));
+        Assert.That(ex.Message, Contains.Substring("The userId field is required"));
     }
 
     #endregion
@@ -196,8 +224,16 @@ public class CartServiceTest
     [Test]
     public void GetCartInProgress_WhenCartDoesNotExist_ThrowsException()
     {
-        Assert.ThrowsAsync<AbcExecptionException>(
+        Assert.ThrowsAsync<AbcExecption>(
             async () => await _cartService.GetCartInProgress("no-cart-user"));
+    }
+
+    [Test]
+    public void GetCartInProgress_InvalidRequest_ThrowsException()
+    {
+        var ex = Assert.ThrowsAsync<AbcExecption>(
+            async () => await _cartService.GetCartInProgress(""));
+        Assert.That(ex.Message, Contains.Substring("The userId field is required"));
     }
 
     #endregion
@@ -248,7 +284,7 @@ public class CartServiceTest
             Quantity = 1
         };
 
-        Assert.ThrowsAsync<AbcExecptionException>(
+        Assert.ThrowsAsync<AbcExecption>(
             async () => await _cartService.AddProductToCart(1, dto));
     }
 
@@ -268,10 +304,10 @@ public class CartServiceTest
         var dto = new CartProductDto
         {
             ProductId = 2,
-            Quantity = 5 
+            Quantity = 5
         };
 
-        Assert.ThrowsAsync<AbcExecptionException>(
+        Assert.ThrowsAsync<AbcExecption>(
             async () => await _cartService.AddProductToCart(1, dto));
     }
 
@@ -305,7 +341,7 @@ public class CartServiceTest
             Quantity = 2
         };
 
-        Assert.ThrowsAsync<AbcExecptionException>(
+        Assert.ThrowsAsync<AbcExecption>(
             async () => await _cartService.AddProductToCart(1, dto));
     }
 
@@ -410,7 +446,7 @@ public class CartServiceTest
             Quantity = 1
         };
 
-        Assert.ThrowsAsync<AbcExecptionException>(
+        Assert.ThrowsAsync<AbcExecption>(
             async () => await _cartService.UpdateCartProduct(1, dto));
     }
 
@@ -457,7 +493,7 @@ public class CartServiceTest
             Quantity = 1
         };
 
-        Assert.ThrowsAsync<AbcExecptionException>(
+        Assert.ThrowsAsync<AbcExecption>(
             async () => await _cartService.RemoveCartProduct(1, dto));
     }
 

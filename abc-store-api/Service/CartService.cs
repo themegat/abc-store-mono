@@ -1,13 +1,26 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using ABCStoreAPI.Database.Model;
 using ABCStoreAPI.Repository;
 using ABCStoreAPI.Service.Base;
 using ABCStoreAPI.Service.Dto;
+using ABCStoreAPI.Service.Validation;
 using Microsoft.EntityFrameworkCore;
 
 namespace ABCStoreAPI.Service;
 
-public class CartService
+public interface ICartService
+{
+    public Task<CartDto> CreateCart(CartDto cartDto);
+    public Task<CartDto> CompleteCart(string userId);
+    public Task<CartDto> RemoveCart(string userId);
+    public Task<CartDto> GetCartInProgress(string userId);
+    public Task<CartProductDto> AddProductToCart(int cartId, CartProductDto cartProductDto);
+    public Task<CartProductDto> UpdateCartProduct(int cartId, CartProductDto cartProductDto);
+    public Task RemoveCartProduct(int cartId, CartProductDto cartProductDto);
+}
+
+public class CartService : ICartService
 {
     private const string SYS_USER = "system";
     private readonly IUnitOfWork _uow;
@@ -25,6 +38,7 @@ public class CartService
             .ThenInclude(cp => cp.Product);
     }
 
+    [Validated]
     public async Task<CartDto> CreateCart(CartDto cartDto)
     {
         var cartQuery = GetCart(cartDto.UserId, CartStatus.IN_PROGRESS);
@@ -54,18 +68,19 @@ public class CartService
         {
             var message = "A cart in progress already exists";
             _logger.LogDebug(message);
-            throw new AbcExecptionException(HttpStatusCode.BadRequest, message);
+            throw new AbcExecption(HttpStatusCode.BadRequest, message);
         }
     }
 
-    public async Task<CartDto> CompleteCart(CartDto cartDto)
+    [Validated]
+    public async Task<CartDto> CompleteCart([Required][MinLength(1)] string userId)
     {
-        var cartQuery = GetCart(cartDto.UserId, CartStatus.IN_PROGRESS);
+        var cartQuery = GetCart(userId, CartStatus.IN_PROGRESS);
         if (cartQuery.FirstOrDefault() == null)
         {
             var message = "A cart in progress could not be found";
             _logger.LogDebug(message);
-            throw new AbcExecptionException(HttpStatusCode.BadRequest, message);
+            throw new AbcExecption(HttpStatusCode.BadRequest, message);
         }
         else
         {
@@ -78,30 +93,33 @@ public class CartService
         }
     }
 
-    public async Task RemoveCart(CartDto cartDto)
-    {
-        var cartQuery = GetCart(cartDto.UserId, CartStatus.IN_PROGRESS);
-        if (cartQuery.FirstOrDefault() == null)
-        {
-            var message = "A cart in progress could not be found";
-            _logger.LogDebug(message);
-            throw new AbcExecptionException(HttpStatusCode.NotFound, message);
-        }
-        else
-        {
-            _uow.Cart.Remove(cartQuery.First());
-            await _uow.CompleteAsync();
-        }
-    }
-
-    public async Task<CartDto> GetCartInProgress(string userId)
+    [Validated]
+    public async Task<CartDto> RemoveCart([Required][MinLength(1)] string userId)
     {
         var cartQuery = GetCart(userId, CartStatus.IN_PROGRESS);
         if (cartQuery.FirstOrDefault() == null)
         {
             var message = "A cart in progress could not be found";
             _logger.LogDebug(message);
-            throw new AbcExecptionException(HttpStatusCode.NotFound, message);
+            throw new AbcExecption(HttpStatusCode.NotFound, message);
+        }
+        else
+        {
+            _uow.Cart.Remove(cartQuery.First());
+            await _uow.CompleteAsync();
+            return CartDto.toDto(cartQuery.First());
+        }
+    }
+
+    [Validated]
+    public async Task<CartDto> GetCartInProgress([Required][MinLength(1)] string userId)
+    {
+        var cartQuery = GetCart(userId, CartStatus.IN_PROGRESS);
+        if (cartQuery.FirstOrDefault() == null)
+        {
+            var message = "A cart in progress could not be found";
+            _logger.LogDebug(message);
+            throw new AbcExecption(HttpStatusCode.NotFound, message);
         }
         else
         {
@@ -128,7 +146,7 @@ public class CartService
         {
             message = "Product does not exist";
             _logger.LogDebug(message);
-            throw new AbcExecptionException(HttpStatusCode.NotFound, message);
+            throw new AbcExecption(HttpStatusCode.NotFound, message);
         }
         else
         {
@@ -136,12 +154,13 @@ public class CartService
             {
                 message = "Product does not have enough stock";
                 _logger.LogDebug(message);
-                throw new AbcExecptionException(HttpStatusCode.BadRequest, message);
+                throw new AbcExecption(HttpStatusCode.BadRequest, message);
             }
         }
     }
 
-    public async Task<CartProductDto> AddProductToCart(int cartId, CartProductDto cartProductDto)
+    [Validated]
+    public async Task<CartProductDto> AddProductToCart([Required] int cartId, CartProductDto cartProductDto)
     {
         CheckProductStockAgainstQuantity(cartProductDto.ProductId, cartProductDto.Quantity);
         var cartProductQuery = GetCartProduct(cartId, cartProductDto.ProductId);
@@ -164,11 +183,12 @@ public class CartService
         {
             var message = "Cart already contains the product";
             _logger.LogDebug(message);
-            throw new AbcExecptionException(HttpStatusCode.BadRequest, message);
+            throw new AbcExecption(HttpStatusCode.BadRequest, message);
         }
     }
 
-    public async Task<CartProductDto> UpdateCartProduct(int cartId, CartProductDto cartProductDto)
+    [Validated]
+    public async Task<CartProductDto> UpdateCartProduct([Required] int cartId, CartProductDto cartProductDto)
     {
         CheckProductStockAgainstQuantity(cartProductDto.ProductId, cartProductDto.Quantity);
         var cartProductQuery = GetCartProduct(cartId, cartProductDto.ProductId);
@@ -176,7 +196,7 @@ public class CartService
         {
             var message = "Product does not exist on cart";
             _logger.LogDebug(message);
-            throw new AbcExecptionException(HttpStatusCode.NotFound, message);
+            throw new AbcExecption(HttpStatusCode.NotFound, message);
         }
         else
         {
@@ -196,14 +216,15 @@ public class CartService
         }
     }
 
-    public async Task RemoveCartProduct(int cartId, CartProductDto cartProductDto)
+    [Validated]
+    public async Task RemoveCartProduct([Required] int cartId, CartProductDto cartProductDto)
     {
         var cartProductQuery = GetCartProduct(cartId, cartProductDto.ProductId);
         if (cartProductQuery.FirstOrDefault() == null)
         {
             var message = "Product does not exist on cart";
             _logger.LogDebug(message);
-            throw new AbcExecptionException(HttpStatusCode.NotFound, message);
+            throw new AbcExecption(HttpStatusCode.NotFound, message);
         }
         else
         {

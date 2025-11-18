@@ -3,6 +3,7 @@ using ABCStoreAPI.Database.Model;
 using ABCStoreAPI.Repository;
 using ABCStoreAPI.Service.Base;
 using ABCStoreAPI.Service.Dto;
+using ABCStoreAPI.Service.Tests.Helpers;
 using Moq;
 using NUnit.Framework;
 
@@ -18,7 +19,7 @@ namespace ABCStoreAPI.Service.Tests
         private Mock<IProductRepository> _productRepositoryMock = null!;
         private Mock<ILogger<OrderService>> _loggerMock = null!;
 
-        private OrderService _orderService = null!;
+        private IOrderService _orderService = null!;
 
         [SetUp]
         public void SetUp()
@@ -37,7 +38,9 @@ namespace ABCStoreAPI.Service.Tests
 
             _uowMock.Setup(u => u.CompleteAsync()).ReturnsAsync(1);
 
-            _orderService = new OrderService(_uowMock.Object, _loggerMock.Object);
+            var orderService = new OrderService(_uowMock.Object, _loggerMock.Object);
+
+            _orderService = ValidationTestHelpers.RegisterServiceValidation<IOrderService, OrderService>(orderService);
         }
 
         #region Helper builders
@@ -52,7 +55,8 @@ namespace ABCStoreAPI.Service.Tests
                 {
                     AddressLine1 = "Line 1",
                     AddressLine2 = "Line 2",
-                    ZipCode = "12345"
+                    ZipCode = "12345",
+                    AddressType = AddressType.SHIPPING
                 }
             };
         }
@@ -71,7 +75,7 @@ namespace ABCStoreAPI.Service.Tests
         #region CreateOrder - User not found
 
         [Test]
-        public void CreateOrder_WhenUserNotFound_ThrowsAbcExecptionException()
+        public void CreateOrder_WhenUserNotFound_ThrowsAbcExecption()
         {
             var orderDto = BuildOrderDto(userId: "missing-user", cartId: 1);
 
@@ -79,7 +83,7 @@ namespace ABCStoreAPI.Service.Tests
                 .Setup(r => r.GetByUserId("missing-user"))
                 .Returns((UserDetails?)null);
 
-            var ex = Assert.ThrowsAsync<AbcExecptionException>(
+            var ex = Assert.ThrowsAsync<AbcExecption>(
                 async () => await _orderService.CreateOrder(orderDto));
 
             Assert.That(ex!.ErrorCode, Is.EqualTo(HttpStatusCode.BadRequest));
@@ -95,7 +99,7 @@ namespace ABCStoreAPI.Service.Tests
         #region CreateOrder - Cart not found
 
         [Test]
-        public void CreateOrder_WhenCartNotFound_ThrowsAbcExecptionException()
+        public void CreateOrder_WhenCartNotFound_ThrowsAbcExecption()
         {
             var orderDto = BuildOrderDto(userId: "user-1", cartId: 42);
 
@@ -113,7 +117,7 @@ namespace ABCStoreAPI.Service.Tests
                 .Setup(r => r.FindById(42))
                 .Returns((Cart?)null);
 
-            var ex = Assert.ThrowsAsync<AbcExecptionException>(
+            var ex = Assert.ThrowsAsync<AbcExecption>(
                 async () => await _orderService.CreateOrder(orderDto));
 
             Assert.That(ex!.ErrorCode, Is.EqualTo(HttpStatusCode.BadRequest));
@@ -164,7 +168,7 @@ namespace ABCStoreAPI.Service.Tests
                 .Setup(r => r.GetById(10))
                 .Returns(product);
 
-            var ex = Assert.ThrowsAsync<AbcExecptionException>(
+            var ex = Assert.ThrowsAsync<AbcExecption>(
                 async () => await _orderService.CreateOrder(orderDto));
 
             Assert.That(ex!.ErrorCode, Is.EqualTo(HttpStatusCode.BadRequest));
@@ -253,6 +257,31 @@ namespace ABCStoreAPI.Service.Tests
             _orderRepositoryMock.Verify(r => r.Add(It.IsAny<Order>()), Times.Once);
 
             _uowMock.Verify(u => u.CompleteAsync(), Times.Exactly(2));
+        }
+
+        #endregion
+
+        #region CreateOrder - Invalid request 
+
+        [Test]
+        public void CreateOrder_InvalidRequest_ThrowsExecption()
+        {
+            var ex = Assert.ThrowsAsync<AbcExecption>(async () => await _orderService.CreateOrder(new OrderDto()
+            {
+                UserId = string.Empty,
+                ShippingAddress = new AddressDto()
+                {
+                    AddressLine1 = string.Empty,
+                    AddressLine2 = string.Empty,
+                    ZipCode = string.Empty,
+                    AddressType = AddressType.SHIPPING
+                }
+            }));
+            Assert.That(ex!.ErrorCode, Is.EqualTo(HttpStatusCode.BadRequest));
+            Assert.That(ex.Message, Does.Contain("The UserId field is required"));
+            Assert.That(ex.Message, Does.Contain("The StreetAddress field is required"));
+            Assert.That(ex.Message, Does.Contain("The Suburb field is required"));
+            Assert.That(ex.Message, Does.Contain("The AreaCode field is required"));
         }
 
         #endregion

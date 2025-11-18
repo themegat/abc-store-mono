@@ -2,11 +2,20 @@ using ABCStoreAPI.Database.Model;
 using ABCStoreAPI.Repository;
 using ABCStoreAPI.Service.Dto;
 using ABCStoreAPI.Service.Page;
+using ABCStoreAPI.Service.Validation;
 using Microsoft.EntityFrameworkCore;
 
 namespace ABCStoreAPI.Service;
 
-public class ProductService
+public interface IProductService
+{
+    Task<List<ProductCategoryDto>> GetAllProductCategoriesAsync();
+    Task<PagedResult<ProductDto>> GetFilteredProductsAsync(PagedRequest page,
+        string searchTerm = "", int categoryId = 0, decimal minPrice = 0,
+        decimal maxPrice = decimal.MaxValue, bool inStock = true, string currencyCode = "USD");
+}
+
+public class ProductService : IProductService
 {
     private readonly IUnitOfWork _uow;
 
@@ -21,11 +30,12 @@ public class ProductService
         return categories.Select(Dto.ProductCategoryDto.toDto).ToList();
     }
 
+    [Validated]
     public async Task<PagedResult<ProductDto>> GetFilteredProductsAsync(PagedRequest page,
-        string searchTerm = "", int categoryId = 0, decimal minPrice = 0,
-        decimal maxPrice = decimal.MaxValue, bool inStock = true, string currencyCode = "USD")
+            string searchTerm = "", int categoryId = 0, decimal minPrice = 0,
+            decimal maxPrice = decimal.MaxValue, bool inStock = true, string currencyCode = "USD")
     {
-        var exchangeRate = await GetExchangeRateAsync(currencyCode);
+        var exchangeRate = GetExchangeRateAsync(currencyCode);
         page.PageNumber = Math.Max(1, page.PageNumber);
         int skip = (page.PageNumber - 1) * page.PageSize;
 
@@ -44,13 +54,12 @@ public class ProductService
         return PagedResult<ProductDto>.Build(page, items);
     }
 
-    private async Task<ExchangeRate> GetExchangeRateAsync(string targetCurrencyCode)
+    private ExchangeRate GetExchangeRateAsync(string targetCurrencyCode)
     {
-        var exchangeRate = await _uow.ExchangeRates
-       .GetByCurrency(targetCurrencyCode)
-       .FirstOrDefaultAsync();
+        var exchangeRate = _uow.ExchangeRates
+       .GetByCurrency(targetCurrencyCode);
 
-        return exchangeRate == null ? new ExchangeRate() : exchangeRate;
+        return exchangeRate.Any() ? exchangeRate.First() : new ExchangeRate();
     }
 
     private async Task<decimal> ConvertPriceAsync(decimal price, string targetCurrencyCode,
@@ -59,11 +68,6 @@ public class ProductService
         if (targetCurrencyCode == "USD")
         {
             return price;
-        }
-
-        if (exchangeRate == null)
-        {
-            throw new Exception($"Exchange rate for currency code '{targetCurrencyCode}' not found.");
         }
 
         return price * exchangeRate.Rate;

@@ -1,10 +1,18 @@
+using System.ComponentModel.DataAnnotations;
 using ABCStoreAPI.Database.Model;
 using ABCStoreAPI.Repository;
 using ABCStoreAPI.Service.Dto;
+using ABCStoreAPI.Service.Validation;
 
 namespace ABCStoreAPI.Service;
 
-public class UserDetailsService
+public interface IUserDetailsService
+{
+    void UpdateCreateUserDetails([Required] UserDetailsDto userDetails);
+    UserDetailsDto GetUserDetails(string userId);
+}
+
+public class UserDetailsService : IUserDetailsService
 {
     private readonly IUnitOfWork _uow;
 
@@ -15,14 +23,6 @@ public class UserDetailsService
 
     private void CreateUserDetails(UserDetailsDto userDetails)
     {
-        if (userDetails == null || string.IsNullOrEmpty(userDetails.UserId)
-            || string.IsNullOrEmpty(userDetails.FirstName)
-            || string.IsNullOrEmpty(userDetails.LastName)
-            || string.IsNullOrEmpty(userDetails.PreferredCurrency))
-        {
-            throw new Exception("Invalid user details.");
-        }
-
         UserDetails newUserDetails = new UserDetails()
         {
             UserId = userDetails.UserId,
@@ -55,14 +55,6 @@ public class UserDetailsService
 
     private void UpdateUserDetails(UserDetailsDto userDetails, UserDetails existingUserDetails)
     {
-        if (userDetails == null || string.IsNullOrEmpty(userDetails.UserId)
-            || string.IsNullOrEmpty(userDetails.FirstName)
-            || string.IsNullOrEmpty(userDetails.LastName)
-            || string.IsNullOrEmpty(userDetails.PreferredCurrency))
-        {
-            throw new Exception("Invalid user details.");
-        }
-
         existingUserDetails.FirstName = userDetails.FirstName;
         existingUserDetails.LastName = userDetails.LastName;
         existingUserDetails.PreferredCurrency = userDetails.PreferredCurrency;
@@ -99,13 +91,9 @@ public class UserDetailsService
         _uow.Complete();
     }
 
+    [Validated]
     public void UpdateCreateUserDetails(UserDetailsDto userDetails)
     {
-        if (userDetails == null || string.IsNullOrEmpty(userDetails.UserId))
-        {
-            throw new Exception("Invalid user details.");
-        }
-
         var user = _uow.UserDetails.GetByUserId(userDetails.UserId);
         if (user == null)
         {
@@ -117,7 +105,8 @@ public class UserDetailsService
         }
     }
 
-    public UserDetailsDto GetUserDetails(string userId)
+    [Validated]
+    public UserDetailsDto GetUserDetails([Required][StringLength(20, MinimumLength = 3)] string userId)
     {
         var user = _uow.UserDetails.GetByUserId(userId);
         if (user == null)

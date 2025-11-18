@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using ABCStoreAPI.Database.Model;
 using ABCStoreAPI.Service.Dto.Base;
 
@@ -5,7 +6,10 @@ namespace ABCStoreAPI.Service.Dto;
 
 public class CartProductDto : IDto<CartProductDto, CartProduct>
 {
+    [Required]
     public int Quantity { get; set; }
+
+    [Required]
     public int ProductId { get; set; }
     public ProductDto? Product { get; set; }
 

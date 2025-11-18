@@ -31,7 +31,7 @@ public class ExceptionMiddleware
     private static Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         context.Response.ContentType = "application/json";
-        context.Response.StatusCode = exception is AbcExecptionException
+        context.Response.StatusCode = exception is AbcExecption
             ? (int)HttpStatusCode.BadRequest
             : (int)HttpStatusCode.InternalServerError;
 

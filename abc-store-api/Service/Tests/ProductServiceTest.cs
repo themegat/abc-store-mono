@@ -15,7 +15,7 @@ namespace ABCStoreAPI.Service.Tests
         private Mock<IProductRepository> _productRepositoryMock = null!;
         private Mock<IProductCategoryRepository> _productCategoryRepositoryMock = null!;
         private Mock<IExchangeRateRepository> _exchangeRateRepositoryMock = null!;
-        private ProductService _productService = null!;
+        private IProductService _productService = null!;
 
         private List<ProductCategory> _categories = null!;
         private List<Product> _products = null!;
@@ -78,7 +78,8 @@ namespace ABCStoreAPI.Service.Tests
                 .Setup(u => u.ExchangeRates)
                 .Returns(_exchangeRateRepositoryMock.Object);
 
-            _productService = new ProductService(_uowMock.Object);
+            var productService = new ProductService(_uowMock.Object);
+            _productService = ValidationTestHelpers.RegisterServiceValidation<IProductService, ProductService>(productService);
         }
 
         #region GetAllProductCategoriesAsync
@@ -202,7 +203,7 @@ namespace ABCStoreAPI.Service.Tests
         {
             var page = new PagedRequest
             {
-                PageNumber = 0, 
+                PageNumber = 0,
                 PageSize = 5
             };
 
@@ -220,7 +221,7 @@ namespace ABCStoreAPI.Service.Tests
             int pageNumber = dynResult.PageNumber;
             Assert.That(pageNumber, Is.EqualTo(1));
         }
-
+        
         #endregion
     }
 }

@@ -7,6 +7,7 @@ using ABCStoreAPI.Repository.Base;
 using ABCStoreAPI.Service;
 using ABCStoreAPI.Service.Consumer;
 using ABCStoreAPI.Service.Consumer.Base;
+using Castle.DynamicProxy;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 
@@ -47,11 +48,11 @@ public static class ServiceExtensions
         builder.Services.AddScoped<IAddressRepository, AddressRepository>();
         builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
-        builder.Services.AddScoped<ExchangeRateService>();
-        builder.Services.AddScoped<ProductService>();
-        builder.Services.AddScoped<UserDetailsService>();
-        builder.Services.AddScoped<CartService>();
-        builder.Services.AddScoped<OrderService>();
+        builder.Services.AddValidatedService<IExchangeRateService, ExchangeRateService>();
+        builder.Services.AddValidatedService<IProductService, ProductService>();
+        builder.Services.AddValidatedService<IUserDetailsService, UserDetailsService>();
+        builder.Services.AddValidatedService<ICartService, CartService>();
+        builder.Services.AddValidatedService<IOrderService, OrderService>();
 
         return builder;
     }
@@ -156,5 +157,22 @@ public static class ServiceExtensions
             });
 
         return builder;
+    }
+
+    public static IServiceCollection AddValidatedService<TInterface, TImpl>(this IServiceCollection services)
+       where TInterface : class
+       where TImpl : class, TInterface
+    {
+        services.AddScoped<TImpl>();
+
+        services.AddScoped(provider =>
+        {
+            var proxyGen = new ProxyGenerator();
+            var real = provider.GetRequiredService<TImpl>();
+            var interceptor = new ValidationInterceptor();
+            return proxyGen.CreateInterfaceProxyWithTarget<TInterface>(real, interceptor);
+        });
+
+        return services;
     }
 }

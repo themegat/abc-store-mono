@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using ABCStoreAPI.Database.Model;
 using ABCStoreAPI.Service.Dto.Base;
 
@@ -5,10 +6,18 @@ namespace ABCStoreAPI.Service.Dto;
 
 public class UserDetailsDto : IDto<UserDetailsDto, UserDetails>
 {
-    public string? UserId { get; set; }
-    public string? FirstName { get; set; }
-    public string? LastName { get; set; }
-    public string? PreferredCurrency { get; set; }
+    [Required]
+    [StringLength(20, MinimumLength = 3)]
+    public required string UserId { get; set; }
+    [Required]
+    [StringLength(30, MinimumLength = 3)]
+    public required string FirstName { get; set; }
+    [Required]
+    [StringLength(30, MinimumLength = 3)]
+    public required string LastName { get; set; }
+    [Required]
+    [StringLength(10, MinimumLength = 2)]
+    public required string PreferredCurrency { get; set; }
     public string? ContactNumber { get; set; }
     public AddressDto? BillingAddress { get; set; }
 
