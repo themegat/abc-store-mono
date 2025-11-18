@@ -6,6 +6,7 @@ import tinycolor from 'tinycolor2';
 import CartItems from '@/components/Checkout/CartItems';
 import CheckoutSteps from '@/components/Checkout/CheckoutSteps';
 import useCart from '@/hooks/useCart';
+import useDevice from '@/hooks/useDevice';
 
 import backgroundImg from '../../assets/background/background_checkout.webp';
 
@@ -29,6 +30,7 @@ const DividerElement = ({ orientation }: DividerElementProps) => {
 };
 
 const CheckoutPage = () => {
+  const { isMobile, isTablet, isDesktop } = useDevice();
   const { observeCart } = useCart();
   const theme = useTheme();
   return (
@@ -36,7 +38,7 @@ const CheckoutPage = () => {
       <meta name="title" content={t('checkout.title')} />
       <Stack
         paddingY={5}
-        paddingX={10}
+        paddingX={isMobile ? 2 : isTablet ? 5 : 10}
         sx={{
           backgroundImage: `url(${backgroundImg})`,
           backgroundAttachment: 'fixed',
@@ -56,19 +58,19 @@ const CheckoutPage = () => {
               .setAlpha(0.6)
               .toRgbString(),
             borderRadius: 2,
-            padding: 5,
+            padding: isDesktop ? 5 : 2,
             border: `1px solid ${theme.palette.text.primary}`,
           }}
         >
-          <Grid size={5} spacing={10}>
+          <Grid size={{ xs: 12, md: 12, lg: 6 }} spacing={10}>
             <Typography variant="h5">{t('cart.title')}</Typography>
             <CartItems products={observeCart?.cartProducts ?? []} />
           </Grid>
-          <Grid size={1} sx={{ display: 'flex', justifyContent: 'center' }}>
-            <DividerElement orientation="vertical" />
+          <Grid size={{ xs: 12, md: 12, lg: 1 }} sx={{ display: 'flex', justifyContent: 'center' }}>
+            <DividerElement orientation={isDesktop ? 'vertical' : 'horizontal'} />
           </Grid>
 
-          <Grid size={6}>
+          <Grid size={{ xs: 12, md: 12, lg: 5 }}>
             <CheckoutSteps />
           </Grid>
         </Grid>

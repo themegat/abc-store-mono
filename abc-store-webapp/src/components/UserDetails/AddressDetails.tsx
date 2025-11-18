@@ -4,6 +4,8 @@ import { Stack } from '@mui/material';
 
 import { t } from 'i18next';
 
+import useDevice from '@/hooks/useDevice';
+
 import TextFieldControl from '../TextFieldControl';
 
 export interface AddressDetailsFormInputs {
@@ -21,9 +23,11 @@ type Props = {
 };
 
 const AddressDetails = ({ id, control, setValue, trigger }: Props) => {
+  const { isMobile } = useDevice();
+
   return (
     <Stack id={id} gap={4} width="100%">
-      <Stack width="100%" gap={4} direction="row">
+      <Stack width="100%" gap={4} direction={isMobile ? 'column' : 'row'}>
         <TextFieldControl
           id="street-number"
           label={t('address.line1')}
