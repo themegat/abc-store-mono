@@ -1,14 +1,15 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RemoveIcon from '@mui/icons-material/Remove';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { Button, IconButton, Input, Stack, SxProps, debounce } from '@mui/material';
+import { Button, IconButton, Input, Stack, SxProps } from '@mui/material';
 
 import { t } from 'i18next';
 
 import useCart from '@/hooks/useCart';
+import { useDebounceCallback } from '@/hooks/useDebounceCallback';
 import useDevice from '@/hooks/useDevice';
 
 type Props = {
@@ -24,7 +25,7 @@ const DebounceDelay = 1000;
 
 const AddToCart = ({ productId, maxQty }: Props) => {
   const { isDesktop, isMobile } = useDevice();
-  
+
   const { useObserveCartProduct, updateProduct } = useCart();
   const cartProduct = useObserveCartProduct(productId);
   const [qty, setQty] = useState<number>(cartProduct?.quantity || 0);
@@ -34,24 +35,21 @@ const AddToCart = ({ productId, maxQty }: Props) => {
     setQty(cartProduct?.quantity || 0);
   }, [cartProduct]);
 
-  const updateProductQtyDebounced = useCallback(
-    debounce(async (quantity: number) => {
-      setLoading(true);
-      if (cartProduct) {
-        await updateProduct(cartProduct.productId!, quantity);
-        setLoading(false);
-      } else {
-        await updateProduct(productId, quantity);
-        setLoading(false);
-      }
-    }, DebounceDelay),
-    [],
-  );
+  const updateProductQty = useDebounceCallback(async (quantity: number) => {
+    setLoading(true);
+    if (cartProduct) {
+      await updateProduct(cartProduct.productId!, quantity);
+      setLoading(false);
+    } else {
+      await updateProduct(productId, quantity);
+      setLoading(false);
+    }
+  }, DebounceDelay);
 
   const increaseQty = async () => {
     if (qty <= maxQty) {
       const newQty = qty + 1;
-      await updateProductQtyDebounced(newQty);
+      await updateProductQty(newQty);
       setQty(newQty);
     }
   };
@@ -59,14 +57,14 @@ const AddToCart = ({ productId, maxQty }: Props) => {
   const decreaseQty = async () => {
     if (qty > 0) {
       const newQty = qty - 1;
-      await updateProductQtyDebounced(newQty);
+      await updateProductQty(newQty);
       setQty(newQty);
     }
   };
 
   const remove = async () => {
     setLoading(true);
-    await updateProductQtyDebounced(0);
+    await updateProductQty(0);
     setQty(0);
   };
 

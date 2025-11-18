@@ -4,6 +4,8 @@ import { Stack } from '@mui/material';
 
 import { t } from 'i18next';
 
+import useDevice from '@/hooks/useDevice';
+
 import SelectControl from '../SelectControl';
 import TextFieldControl from '../TextFieldControl';
 
@@ -30,17 +32,11 @@ type Props = {
   currencyOptions?: { id: string; value: string }[];
 };
 
-const BasicDetails = ({
-  id,
- control,
- trigger,
- setValue,
- formType,
- currencyOptions
-}: Props) => {
+const BasicDetails = ({ id, control, trigger, setValue, formType, currencyOptions }: Props) => {
+  const { isMobile } = useDevice();
   return (
     <Stack id={id} gap={4} width="100%">
-      <Stack width="100%" gap={4} direction="row">
+      <Stack width="100%" gap={4} direction={isMobile ? 'column' : 'row'}>
         <TextFieldControl
           id="first-name"
           label={t('userDetails.firstName')}
@@ -60,7 +56,7 @@ const BasicDetails = ({
           rules={{ required: true }}
         />
       </Stack>
-      <Stack width="100%" gap={4} direction="row">
+      <Stack width="100%" gap={4} direction={isMobile ? 'column' : 'row'}>
         {formType === BasicDetailsFormType.CHECKOUT && (
           <TextFieldControl
             id="email-address"
@@ -74,7 +70,7 @@ const BasicDetails = ({
           />
         )}
         {formType === BasicDetailsFormType.ON_BOARDING && (
-          <Stack sx={{ width: '46%' }}>
+          <Stack sx={{ width: isMobile ? '100%' : '46%' }}>
             <SelectControl
               name="preferredCurrency"
               id="preferred-currency"
@@ -95,7 +91,7 @@ const BasicDetails = ({
           control={control}
           setValue={setValue}
           trigger={trigger}
-          sx={{ width: formType === BasicDetailsFormType.CHECKOUT ? '100%' : '46%' }}
+          sx={{ width: formType === BasicDetailsFormType.CHECKOUT || isMobile ? '100%' : '46%' }}
         />
       </Stack>
     </Stack>

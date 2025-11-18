@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { Card, CardContent, CardMedia, Stack, SxProps, Typography, useTheme } from '@mui/material';
 
+import useDevice from '@/hooks/useDevice';
 import { formatCurrency } from '@/utils/shopping';
 
 import placeholderImg from '../../assets/placeholder.webp';
@@ -17,17 +18,10 @@ type Props = {
   sx?: SxProps;
 };
 
-const ProductCard = ({
-  id,
-  image,
-  title,
-  price,
-  stockQuantity,
-  currency,
-  sx,
-}: Props) => {
+const ProductCard = ({ id, image, title, price, stockQuantity, currency, sx }: Props) => {
   const theme = useTheme();
   const [imageLoaded, setImageLoaded] = useState(false);
+  const { isMobile } = useDevice();
 
   return (
     <Card
@@ -43,13 +37,13 @@ const ProductCard = ({
       <CardMedia
         onLoad={() => setImageLoaded(true)}
         component="img"
-        sx={{ width: 151, display: imageLoaded ? 'block' : 'none' }}
+        sx={{ width: isMobile ? 141 : 151, display: imageLoaded ? 'block' : 'none' }}
         image={image}
         alt={title}
       />
       <CardMedia
         component="img"
-        sx={{ width: 151, display: imageLoaded ? 'none' : 'block' }}
+        sx={{ width: isMobile ? 141 : 151, display: imageLoaded ? 'none' : 'block' }}
         image={placeholderImg}
         alt={title}
       />
@@ -58,9 +52,10 @@ const ProductCard = ({
         <Stack sx={{ height: '100%' }}>
           <Typography variant="h6">{title}</Typography>
           <Stack
-            direction="row"
+            direction={isMobile ? 'column' : 'row'}
             justifyContent="space-between"
-            sx={{ height: '100%', alignItems: 'end' }}
+            gap={isMobile ? 1 : 0}
+            sx={{ height: '100%', alignItems: isMobile ? 'start' : 'end' }}
           >
             <AddToCart productId={id} maxQty={stockQuantity} />
             <Typography variant="h6" color="text.secondary">
