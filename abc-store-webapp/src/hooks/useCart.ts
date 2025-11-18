@@ -24,15 +24,18 @@ import {
 import { selectUser } from '@/store/slice/userSlice';
 import { AppDispatch, RootState } from '@/store/store';
 
-const useObserveCartProduct = (productId: number) => {
-  return useSelector((state: RootState) => selectCartProduct(state, productId));
-};
-
 const useObserveCart = () => {
   return useSelector(selectCart);
 };
 
 const useCart = () => {
+  const useObserveCartProduct = (productId: number) => {
+    return useSelector((state: RootState) => {
+      return selectCartProduct(state, productId);
+    });
+  };
+
+
   const dispatch = useDispatch<AppDispatch>();
   const observeCart = useObserveCart();
   const user = useSelector(selectUser);
@@ -153,7 +156,7 @@ const useCart = () => {
       quantity: quantity,
     };
 
-    if (!observeCart.userId && !observeCart.id) {
+    if (!observeCart.id) {
       await createNewCart(newCartProduct);
     } else {
       const existingCartProduct = observeCart.cartProducts?.find(

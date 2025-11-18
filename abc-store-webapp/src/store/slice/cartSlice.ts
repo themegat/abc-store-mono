@@ -25,7 +25,9 @@ const cartSlice = createSlice({
           (product) => product.productId === action.payload.productId,
         ) ?? -1;
       if (action.payload.quantity === 0 && existingProductIndex > -1) {
-        return { ...state, cartProducts: state.cartProducts?.splice(existingProductIndex, 1) };
+        const cartProducts = [...state.cartProducts];
+        cartProducts?.splice(existingProductIndex, 1);
+        return { ...state, cartProducts };
       } else if (action?.payload?.quantity && action?.payload?.quantity > 0) {
         if (existingProductIndex > -1) {
           const cartProducts = [...state.cartProducts!];
