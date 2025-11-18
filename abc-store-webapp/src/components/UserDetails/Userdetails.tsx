@@ -98,7 +98,7 @@ const UserDetails = ({ sx }: Props) => {
         firstName: basicDetails.firstName,
         lastName: basicDetails.lastName,
         contactNumber: basicDetails.contactNumber,
-        preferredCurrency: basicDetails.preferredCurrency,
+        preferredCurrency: basicDetails.preferredCurrency ?? '',
       };
       const result = await createUpdateUser(userDetailsDto);
       dispatch(
@@ -116,11 +116,15 @@ const UserDetails = ({ sx }: Props) => {
     if (user) {
       const addressDetails = addressDetailsValues();
       const userDetailsDto: UserDetailsDto = {
-        ...user?.userDetails,
+        userId: user?.userDetails?.userId ?? '',
+        firstName: user?.userDetails?.firstName ?? '',
+        lastName: user?.userDetails?.lastName ?? '',
+        preferredCurrency: user?.userDetails?.preferredCurrency ?? '',
         billingAddress: {
           addressLine1: addressDetails.streetNumber,
           addressLine2: addressDetails.suburb,
           zipCode: addressDetails.areaCode,
+          addressType: 'BILLING',
         },
       };
       const result = await createUpdateUser(userDetailsDto);

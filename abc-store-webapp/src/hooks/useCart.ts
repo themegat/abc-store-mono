@@ -70,7 +70,7 @@ const useCart = () => {
   const createNewCart = async (cartProduct: CartProductDto) => {
     try {
       const cart: CartDto = {
-        userId: user?.uid,
+        userId: user?.uid ?? '',
         cartProducts: [cartProduct],
         status: 1,
       };
@@ -117,10 +117,11 @@ const useCart = () => {
   const removeCart = async (cartDto: CartDto) => {
     try {
       await removeCartRequest({
-        cartDto,
+        userId: cartDto.userId ?? '',
       });
       dispatch(
         setCart({
+          userId: cartDto.userId,
           cartProducts: [],
         }),
       );
@@ -178,7 +179,7 @@ const useCart = () => {
   const completeCartCheckout = async (cart: CartDto) => {
     try {
       const result = await completeCartRequest({
-        cartDto: cart,
+        userId: cart.userId ?? '',
       }).unwrap();
       dispatch(completeCart());
       return result;

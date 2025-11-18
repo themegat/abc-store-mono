@@ -29,7 +29,9 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/api/Cart/complete`,
         method: "PUT",
-        body: queryArg.cartDto,
+        params: {
+          userId: queryArg.userId,
+        },
       }),
     }),
     deleteApiCartRemove: build.mutation<
@@ -39,7 +41,9 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/api/Cart/remove`,
         method: "DELETE",
-        body: queryArg.cartDto,
+        params: {
+          userId: queryArg.userId,
+        },
       }),
     }),
     postApiCartProductAdd: build.mutation<
@@ -165,11 +169,11 @@ export type PostApiCartCreateApiArg = {
 };
 export type PutApiCartCompleteApiResponse = /** status 200 OK */ CartDto;
 export type PutApiCartCompleteApiArg = {
-  cartDto: CartDto;
+  userId?: string;
 };
 export type DeleteApiCartRemoveApiResponse = /** status 200 OK */ CartDto;
 export type DeleteApiCartRemoveApiArg = {
-  cartDto: CartDto;
+  userId?: string;
 };
 export type PostApiCartProductAddApiResponse =
   /** status 200 OK */ CartProductDto;
@@ -237,15 +241,15 @@ export type ProductDto = {
   productImages?: string[] | null;
 } | null;
 export type CartProductDto = {
-  quantity?: number;
-  productId?: number;
+  quantity: number;
+  productId: number;
   product?: ProductDto;
 };
 export type CartDto = {
   id?: number;
-  userId?: string | null;
+  userId: string | null;
   status?: CartStatus;
-  cartProducts?: CartProductDto[];
+  cartProducts: CartProductDto[];
 };
 export type ExchangeRateDto = {
   code?: string;
@@ -254,20 +258,20 @@ export type ExchangeRateDto = {
   symbol?: string;
 };
 export type OrderStatus = number;
-export type AddressType = number;
+export type AddressType = "SHIPPING" | "BILLING";
 export type AddressDto = {
-  addressLine1?: string;
-  addressLine2?: string;
-  zipCode?: string;
-  addressType?: AddressType;
-} | null;
+  addressLine1: string;
+  addressLine2: string;
+  zipCode: string;
+  addressType: AddressType;
+};
 export type OrderDto = {
-  userId?: string;
-  cartId?: number;
+  userId: string;
+  cartId: number;
   orderDate?: string;
   status?: OrderStatus;
   isPaid?: boolean;
-  shippingAddress?: AddressDto;
+  shippingAddress: AddressDto;
 };
 export type ProductDto2 = {
   id?: number;
@@ -290,13 +294,19 @@ export type ProductCategoryDto = {
   id?: number;
   name?: string;
 };
+export type AddressDto2 = {
+  addressLine1: string;
+  addressLine2: string;
+  zipCode: string;
+  addressType: AddressType;
+} | null;
 export type UserDetailsDto = {
-  userId?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  preferredCurrency?: string | null;
+  userId: string;
+  firstName: string;
+  lastName: string;
+  preferredCurrency: string;
   contactNumber?: string | null;
-  billingAddress?: AddressDto;
+  billingAddress?: AddressDto2;
 };
 export const {
   useGetApiAboutQuery,

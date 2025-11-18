@@ -40,7 +40,10 @@ export const useAuthStatus = () => {
           uid: currentUser.uid,
           email: currentUser.email ?? '',
           userDetails: {
-            ...userDetails.data,
+            userId: userDetails.data?.userId ?? '',
+            firstName: userDetails.data?.firstName ?? '',
+            lastName: userDetails.data?.lastName ?? '',
+            preferredCurrency: userDetails.data?.preferredCurrency ?? '',
           },
           state: userDetails.data ? UserState.COMPLETE : UserState.PENDING,
         };
