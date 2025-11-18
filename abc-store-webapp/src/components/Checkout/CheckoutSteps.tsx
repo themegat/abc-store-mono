@@ -158,11 +158,12 @@ const CheckoutSteps = () => {
       const orderDto: OrderDto = {
         userId: user?.uid ?? '',
         isPaid: false,
-        cartId: observeCart.id,
+        cartId: observeCart.id ?? 0,
         shippingAddress: {
           addressLine1: shippingAddressDetailsValues().streetNumber,
           addressLine2: shippingAddressDetailsValues().suburb,
           zipCode: shippingAddressDetailsValues().areaCode,
+          addressType: 'BILLING',
         },
       };
       return await createOrder(orderDto);
@@ -182,6 +183,7 @@ const CheckoutSteps = () => {
           addressLine1: billingAddressDetailsValues().streetNumber,
           addressLine2: billingAddressDetailsValues().suburb,
           zipCode: billingAddressDetailsValues().areaCode,
+          addressType: 'BILLING',
         },
       };
       const result = await createUpdateUser(userDto);

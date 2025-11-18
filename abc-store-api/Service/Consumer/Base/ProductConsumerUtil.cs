@@ -5,6 +5,23 @@ using Newtonsoft.Json;
 
 namespace ABCStoreAPI.Service.Consumer.Base;
 
+class GenerateImageData
+{
+    public int Id { get; set; }
+    public string Url { get; set; } = string.Empty;
+}
+
+class FirebaseGenerateThumbnailRequest
+{
+    public int Size { get; set; }
+    public List<GenerateImageData> Images { get; set; } = new List<GenerateImageData>();
+}
+
+class FirebaseGenerateThumbnailResponse
+{
+    public List<GenerateImageData> Data { get; set; } = new List<GenerateImageData>();
+}
+
 public class ProductConsumerUtil
 {
     private readonly IUnitOfWork _uow;
@@ -50,32 +67,6 @@ public class ProductConsumerUtil
 
         await _uow.CompleteAsync();
         _logger.LogInformation("Added {Count} product categories. Skipped {Skipped} duplicate categories.", newCount, duplicateCount);
-    }
-
-    public async Task PersistProductImages(int productId, List<string> imageUrls, string user)
-    {
-        var product = _uow.Products.GetById(productId);
-
-        if (product != null)
-        {
-            foreach (var imageUrl in imageUrls)
-            {
-
-                var productImage = new ProductImage()
-                {
-                    Url = imageUrl,
-                    ProductId = product.Id
-                };
-                productImage.CreatedAt = DateTime.UtcNow;
-                productImage.UpdatedAt = DateTime.UtcNow;
-                productImage.CreatedBy = user;
-                productImage.UpdatedBy = user;
-
-                _uow.ProductImages.Add(productImage);
-            }
-
-            await _uow.CompleteAsync();
-        }
     }
 
     public async Task GenerateThumbnailsAsync(HttpClient httpClient, List<Tuple<int, string>> thumbnailsToGenerate)

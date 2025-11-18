@@ -1,8 +1,9 @@
-using System;
+using System.Net;
 using ABCStoreAPI.Database.Model;
 using ABCStoreAPI.Repository;
-using ABCStoreAPI.Service;
+using ABCStoreAPI.Service.Base;
 using ABCStoreAPI.Service.Dto;
+using ABCStoreAPI.Service.Tests.Helpers;
 using Moq;
 using NUnit.Framework;
 
@@ -13,7 +14,7 @@ namespace ABCStoreAPI.Service.Tests
     {
         private Mock<IUnitOfWork> _uowMock = null!;
         private Mock<IUserDetailsRepository> _userDetailsRepositoryMock = null!;
-        private UserDetailsService _service = null!;
+        private IUserDetailsService _service = null!;
 
         [SetUp]
         public void SetUp()
@@ -23,35 +24,37 @@ namespace ABCStoreAPI.Service.Tests
 
             _uowMock.Setup(u => u.UserDetails).Returns(_userDetailsRepositoryMock.Object);
 
-            _service = new UserDetailsService(_uowMock.Object);
+            var service = new UserDetailsService(_uowMock.Object);
+            _service = ValidationTestHelpers.RegisterServiceValidation<IUserDetailsService, UserDetailsService>(service);
         }
 
-        #region UpdateCreateUserDetails - validation
+        #region validation
 
         [Test]
-        public void UpdateCreateUserDetails_WhenUserDetailsIsNull_Throws()
+        public void UpdateCreateUserDetails_InvalidRequest_ThrowsException()
         {
-            var ex = Assert.Throws<Exception>(() => _service.UpdateCreateUserDetails(null!));
-            Assert.That(ex!.Message, Is.EqualTo("Invalid user details."));
-            _userDetailsRepositoryMock.Verify(r => r.Add(It.IsAny<UserDetails>()), Times.Never);
-            _uowMock.Verify(u => u.Complete(), Times.Never);
-        }
-
-        [Test]
-        public void UpdateCreateUserDetails_WhenUserIdMissing_Throws()
-        {
-            var dto = new UserDetailsDto
+            var ex = Assert.Throws<AbcExecption>(() => _service.UpdateCreateUserDetails(new UserDetailsDto()
             {
-                UserId = "",
-                FirstName = "John",
-                LastName = "Doe",
-                PreferredCurrency = "USD"
-            };
+                UserId = string.Empty,
+                PreferredCurrency = string.Empty,
+                FirstName = string.Empty,
+                LastName = string.Empty
+            }));
 
-            var ex = Assert.Throws<Exception>(() => _service.UpdateCreateUserDetails(dto));
-            Assert.That(ex!.Message, Is.EqualTo("Invalid user details."));
-            _userDetailsRepositoryMock.Verify(r => r.Add(It.IsAny<UserDetails>()), Times.Never);
-            _uowMock.Verify(u => u.Complete(), Times.Never);
+            Assert.That(ex!.ErrorCode, Is.EqualTo(HttpStatusCode.BadRequest));
+            Assert.That(ex!.Message, Contains.Substring("The UserId field is required."));
+            Assert.That(ex!.Message, Contains.Substring("The FirstName field is required."));
+            Assert.That(ex!.Message, Contains.Substring("The LastName field is required."));
+            Assert.That(ex!.Message, Contains.Substring("The PreferredCurrency field is required."));
+        }
+
+        [Test]
+        public void GetUserDetails_InvalidRequest_ThrowsException()
+        {
+            var ex = Assert.Throws<AbcExecption>(() => _service.GetUserDetails(string.Empty));
+
+            Assert.That(ex!.ErrorCode, Is.EqualTo(HttpStatusCode.BadRequest));
+            Assert.That(ex!.Message, Contains.Substring("The userId field is required."));
         }
 
         #endregion
@@ -72,7 +75,8 @@ namespace ABCStoreAPI.Service.Tests
                 {
                     AddressLine1 = "Line1",
                     AddressLine2 = "Line2",
-                    ZipCode = "0001"
+                    ZipCode = "0001",
+                    AddressType = AddressType.BILLING
                 }
             };
 
@@ -110,28 +114,6 @@ namespace ABCStoreAPI.Service.Tests
             _uowMock.Verify(u => u.Complete(), Times.Once);
         }
 
-        [Test]
-        public void UpdateCreateUserDetails_WhenNewUserMissingRequiredFields_Throws()
-        {
-            var dto = new UserDetailsDto
-            {
-                UserId = "user-1",
-                FirstName = "",
-                LastName = "Doe",
-                PreferredCurrency = "USD"
-            };
-
-            _userDetailsRepositoryMock
-                .Setup(r => r.GetByUserId("user-1"))
-                .Returns((UserDetails?)null);
-
-            var ex = Assert.Throws<Exception>(() => _service.UpdateCreateUserDetails(dto));
-            Assert.That(ex!.Message, Is.EqualTo("Invalid user details."));
-
-            _userDetailsRepositoryMock.Verify(r => r.Add(It.IsAny<UserDetails>()), Times.Never);
-            _uowMock.Verify(u => u.Complete(), Times.Never);
-        }
-
         #endregion
 
         #region Update path (user exists)
@@ -159,7 +141,8 @@ namespace ABCStoreAPI.Service.Tests
                 {
                     AddressLine1 = "NewLine1",
                     AddressLine2 = "NewLine2",
-                    ZipCode = "9999"
+                    ZipCode = "9999",
+                    AddressType = AddressType.BILLING
                 }
             };
 
@@ -221,7 +204,8 @@ namespace ABCStoreAPI.Service.Tests
                 {
                     AddressLine1 = "NewLine1",
                     AddressLine2 = "NewLine2",
-                    ZipCode = "9999"
+                    ZipCode = "9999",
+                    AddressType = AddressType.BILLING
                 }
             };
 
@@ -241,42 +225,13 @@ namespace ABCStoreAPI.Service.Tests
             Assert.That(existing.BillingAddress!.AddressLine1, Is.EqualTo("NewLine1"));
             Assert.That(existing.BillingAddress.AddressLine2, Is.EqualTo("NewLine2"));
             Assert.That(existing.BillingAddress.ZipCode, Is.EqualTo("9999"));
-        
+
             Assert.That(existing.BillingAddress.AddressType, Is.EqualTo(AddressType.SHIPPING));
             Assert.That(existing.BillingAddress.UpdatedAt, Is.Not.EqualTo(default(DateTime)));
             Assert.That(existing.BillingAddress.UpdatedBy, Is.EqualTo("System"));
 
             _userDetailsRepositoryMock.Verify(r => r.Add(It.IsAny<UserDetails>()), Times.Never);
             _uowMock.Verify(u => u.Complete(), Times.Once);
-        }
-
-        [Test]
-        public void UpdateCreateUserDetails_WhenUserExistsAndDtoMissingRequiredFields_Throws()
-        {
-            var existing = new UserDetails
-            {
-                UserId = "user-1",
-                FirstName = "Old",
-                LastName = "Name",
-                PreferredCurrency = "ZAR"
-            };
-
-            var dto = new UserDetailsDto
-            {
-                UserId = "user-1",
-                FirstName = "",
-                LastName = "NewLast",
-                PreferredCurrency = "USD"
-            };
-
-            _userDetailsRepositoryMock
-                .Setup(r => r.GetByUserId("user-1"))
-                .Returns(existing);
-
-            var ex = Assert.Throws<Exception>(() => _service.UpdateCreateUserDetails(dto));
-            Assert.That(ex!.Message, Is.EqualTo("Invalid user details."));
-
-            _uowMock.Verify(u => u.Complete(), Times.Never);
         }
 
         #endregion
@@ -303,7 +258,13 @@ namespace ABCStoreAPI.Service.Tests
                 FirstName = "John",
                 LastName = "Doe",
                 PreferredCurrency = "USD",
-                ContactNumber = "123"
+                ContactNumber = "123",
+                BillingAddress = new Address()
+                {
+                    AddressLine1 = "Line1",
+                    AddressLine2 = "Line2",
+                    ZipCode = "1234"
+                }
             };
 
             _userDetailsRepositoryMock
@@ -318,6 +279,10 @@ namespace ABCStoreAPI.Service.Tests
             Assert.That(dto.LastName, Is.EqualTo("Doe"));
             Assert.That(dto.PreferredCurrency, Is.EqualTo("USD"));
             Assert.That(dto.ContactNumber, Is.EqualTo("123"));
+            Assert.That(dto.BillingAddress?.AddressLine1, Is.EqualTo("Line1"));
+            Assert.That(dto.BillingAddress?.AddressLine2, Is.EqualTo("Line2"));
+            Assert.That(dto.BillingAddress?.ZipCode, Is.EqualTo("1234"));
+
         }
 
         #endregion

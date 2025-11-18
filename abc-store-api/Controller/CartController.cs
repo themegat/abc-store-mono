@@ -28,24 +28,24 @@ namespace ABCStoreAPI.Controller
         [Route("create")]
         public async Task<ActionResult<CartDto>> CreateCart([FromBody] CartDto cartDto)
         {
-            var cart =await _cartService.CreateCart(cartDto);
+            var cart = await _cartService.CreateCart(cartDto);
             return new ActionResult<CartDto>(cart);
         }
 
         [HttpPut]
         [Route("complete")]
-        public async Task<ActionResult<CartDto>> CompleteCart([FromBody] CartDto cartDto)
+        public async Task<ActionResult<CartDto>> CompleteCart([FromQuery] string userId)
         {
-            var cart = await _cartService.CompleteCart(cartDto);
+            var cart = await _cartService.CompleteCart(userId);
             return new ActionResult<CartDto>(cart);
         }
 
         [HttpDelete]
         [Route("remove")]
-        public async Task<ActionResult<CartDto>> RemoveCart([FromBody] CartDto cartDto)
+        public async Task<ActionResult<CartDto>> RemoveCart([FromQuery] string userId)
         {
-            await _cartService.RemoveCart(cartDto);
-            return new ActionResult<CartDto>(cartDto);
+            var restul = await _cartService.RemoveCart(userId);
+            return new ActionResult<CartDto>(restul);
         }
 
         [HttpPost]

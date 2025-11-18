@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { CartDto, CartProductDto } from '../api/abcApi';
 
 const initialState: CartDto = {
+  userId: '',
   cartProducts: [],
 };
 

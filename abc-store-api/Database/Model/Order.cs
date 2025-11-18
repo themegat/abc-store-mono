@@ -20,5 +20,5 @@ public class Order : BaseEntity
 
     public virtual UserDetails? UserDetails { get; set; }
     public virtual Cart? Cart { get; set; }
-    public virtual Address? ShippingAddress { get; set; }
+    public virtual required Address ShippingAddress { get; set; }
 }

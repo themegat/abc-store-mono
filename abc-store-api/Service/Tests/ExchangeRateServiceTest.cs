@@ -4,7 +4,8 @@ using Moq;
 using NUnit.Framework;
 using Soenneker.Utils.AutoBogus;
 
-using ABCStoreAPI.Service.Tests.Base;
+using ABCStoreAPI.Service.Tests.Helpers;
+using ABCStoreAPI.Service.Base;
 
 namespace ABCStoreAPI.Service.Tests
 {
@@ -12,7 +13,7 @@ namespace ABCStoreAPI.Service.Tests
     {
         private Mock<IUnitOfWork> _uowMock = null!;
         private Mock<IExchangeRateRepository> _exchangeRateRepositoryMock = null!;
-        private ExchangeRateService _exchangeRateService = null!;
+        private IExchangeRateService _exchangeRateService = null!;
 
         private List<ExchangeRate> _exchangeRates = null!;
 
@@ -47,7 +48,9 @@ namespace ABCStoreAPI.Service.Tests
 
             _uowMock.Setup(u => u.ExchangeRates).Returns(_exchangeRateRepositoryMock.Object);
 
-            _exchangeRateService = new ExchangeRateService(_uowMock.Object);
+            var exchangeRateService = new ExchangeRateService(_uowMock.Object);
+
+            _exchangeRateService = ValidationTestHelpers.RegisterServiceValidation<IExchangeRateService, ExchangeRateService>(exchangeRateService);
         }
 
         #region GetAllExchangeRatesAsync
@@ -102,6 +105,13 @@ namespace ABCStoreAPI.Service.Tests
             var result = await _exchangeRateService.GetExchangeRateByCurrencyCodeAsync("ZZZ");
 
             Assert.That(result, Is.Null);
+        }
+
+        [Test]
+        public async Task GetExchangeRateByCurrencyCodeAsync_InvalidRequest_ThrowsException()
+        {
+            var ex = Assert.ThrowsAsync<AbcExecption>(async () => await _exchangeRateService.GetExchangeRateByCurrencyCodeAsync(""));
+            Assert.That(ex.Message, Contains.Substring("The currencyCode field is required"));
         }
 
         #endregion

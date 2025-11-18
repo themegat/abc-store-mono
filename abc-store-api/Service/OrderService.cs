@@ -3,10 +3,16 @@ using ABCStoreAPI.Database.Model;
 using ABCStoreAPI.Repository;
 using ABCStoreAPI.Service.Base;
 using ABCStoreAPI.Service.Dto;
+using ABCStoreAPI.Service.Validation;
 
 namespace ABCStoreAPI.Service;
 
-public class OrderService
+public interface IOrderService
+{
+    Task<OrderDto> CreateOrder(OrderDto orderDto);
+}
+
+public class OrderService : IOrderService
 {
     private readonly IUnitOfWork _uow;
     private readonly ILogger<OrderService> _logger;
@@ -17,6 +23,7 @@ public class OrderService
         _logger = logger;
     }
 
+    [Validated]
     public async Task<OrderDto> CreateOrder(OrderDto orderDto)
     {
         var user = _uow.UserDetails.GetByUserId(orderDto.UserId);
@@ -24,7 +31,7 @@ public class OrderService
         {
             var message = "User not found";
             _logger.LogDebug(message);
-            throw new AbcExecptionException(HttpStatusCode.BadRequest, message);
+            throw new AbcExecption(HttpStatusCode.BadRequest, message);
         }
         var address = new Address()
         {
@@ -47,12 +54,12 @@ public class OrderService
             ShippingAddress = address
         };
 
-        var cart = _uow.Cart.GetById(orderDto.CartId);
+        var cart = _uow.Cart.FindById(orderDto.CartId);
         if (cart == null)
         {
             var message = "Cart not found";
             _logger.LogDebug(message);
-            throw new AbcExecptionException(HttpStatusCode.BadRequest, message);
+            throw new AbcExecption(HttpStatusCode.BadRequest, message);
         }
         await UpdateStockAvailable(cart.CartProducts);
 
@@ -76,7 +83,7 @@ public class OrderService
                 {
                     var message = $"Product {product.Name} is out of stock";
                     _logger.LogDebug(message);
-                    throw new AbcExecptionException(HttpStatusCode.BadRequest, message);
+                    throw new AbcExecption(HttpStatusCode.BadRequest, message);
                 }
             }
         }

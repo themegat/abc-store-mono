@@ -1,16 +1,25 @@
+using System.ComponentModel.DataAnnotations;
 using ABCStoreAPI.Database.Model;
 using ABCStoreAPI.Service.Dto.Base;
+using Microsoft.Extensions.Options;
 
 namespace ABCStoreAPI.Service.Dto;
 
 public class OrderDto : IDto<OrderDto, Order>
 {
-    public string UserId { get; set; }
+    [Required]
+    [MinLength(1)]
+    public required string UserId { get; set; }
+
+    [Required]
     public int CartId { get; set; }
     public DateTime OrderDate { get; set; }
     public OrderStatus Status { get; set; }
     public bool IsPaid { get; set; }
-    public AddressDto? ShippingAddress { get; set; }
+
+    [Required]
+    [ValidateObjectMembers]
+    public required AddressDto ShippingAddress { get; set; }
 
     public static OrderDto toDto(Order entity) => new OrderDto
     {
@@ -19,7 +28,7 @@ public class OrderDto : IDto<OrderDto, Order>
         OrderDate = entity.OrderDate,
         Status = entity.Status,
         IsPaid = entity.IsPaid,
-        ShippingAddress = entity.ShippingAddress != null ? AddressDto.toDto(entity.ShippingAddress) : null
+        ShippingAddress = AddressDto.toDto(entity.ShippingAddress)
     };
 
 }
