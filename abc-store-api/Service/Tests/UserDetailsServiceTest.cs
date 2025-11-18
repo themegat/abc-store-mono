@@ -226,7 +226,7 @@ namespace ABCStoreAPI.Service.Tests
             Assert.That(existing.BillingAddress.AddressLine2, Is.EqualTo("NewLine2"));
             Assert.That(existing.BillingAddress.ZipCode, Is.EqualTo("9999"));
 
-            Assert.That(existing.BillingAddress.AddressType, Is.EqualTo(AddressType.SHIPPING));
+            Assert.That(existing.BillingAddress.AddressType, Is.EqualTo(AddressType.BILLING));
             Assert.That(existing.BillingAddress.UpdatedAt, Is.Not.EqualTo(default(DateTime)));
             Assert.That(existing.BillingAddress.UpdatedBy, Is.EqualTo("System"));
 
