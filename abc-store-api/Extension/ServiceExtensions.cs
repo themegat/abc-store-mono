@@ -32,9 +32,13 @@ public static class ServiceExtensions
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(connectionString));
 
-        builder.Services.AddControllers();
-
         builder.Services.AddOpenApi();
+
+        builder.Services.AddControllers()
+         .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+            });
 
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
         builder.Services.AddScoped<IExchangeRateRepository, ExchangeRateRepository>();

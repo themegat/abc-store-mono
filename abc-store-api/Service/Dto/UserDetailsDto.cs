@@ -7,13 +7,13 @@ namespace ABCStoreAPI.Service.Dto;
 public class UserDetailsDto : IDto<UserDetailsDto, UserDetails>
 {
     [Required]
-    [StringLength(20, MinimumLength = 3)]
+    [StringLength(30, MinimumLength = 3)]
     public required string UserId { get; set; }
     [Required]
-    [StringLength(30, MinimumLength = 3)]
+    [StringLength(50, MinimumLength = 3)]
     public required string FirstName { get; set; }
     [Required]
-    [StringLength(30, MinimumLength = 3)]
+    [StringLength(50, MinimumLength = 3)]
     public required string LastName { get; set; }
     [Required]
     [StringLength(10, MinimumLength = 2)]
