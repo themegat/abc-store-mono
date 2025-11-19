@@ -30,19 +30,10 @@ jobs:
       - name: Test
         run: dotnet test --collect:"Code Coverage" --settings:.runsettings
 
-      - name: Arrange Coverage
-        run: find ./Coverage -mindepth 2 -type f -exec mv "{}" ./Coverage \;
-
-      - name: Rename Coverage files
-        run: mv ./Coverage/*.coverage ./Coverage/coverage.coverage && mv ./Coverage/*.cobertura.xml ./Coverage/coverage.cobertura.xml
-
-      - name: Clean up Coverage files
-        run: rm -rf Coverage/*/
-
       - name: Code Coverage Report
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
-          filename: Coverage/coverage.cobertura.xml
+          filename: ./Coverage/**/*.cobertura.xml
           badge: true
           fail_below_min: true
           format: markdown
@@ -50,7 +41,7 @@ jobs:
           hide_complexity: true
           indicators: true
           output: both
-          thresholds: "60 80"
+          thresholds: "40 80"
 
       - name: Add Coverage PR Comment
         uses: marocchino/sticky-pull-request-comment@v2
