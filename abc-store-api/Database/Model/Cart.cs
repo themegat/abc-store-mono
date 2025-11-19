@@ -1,5 +1,8 @@
+using System.Text.Json.Serialization;
+
 namespace ABCStoreAPI.Database.Model;
 
+[JsonConverter(typeof(JsonStringEnumConverter<CartStatus>))]
 public enum CartStatus
 {
     IN_PROGRESS,

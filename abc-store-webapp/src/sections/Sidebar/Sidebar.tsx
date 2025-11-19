@@ -19,8 +19,9 @@ import { t } from 'i18next';
 
 import { AuthContext } from '@/components/auth/AuthContext';
 import useCart from '@/hooks/useCart';
+import useOrder from '@/hooks/userOrder';
 import routes from '@/routes';
-import { selectUser, UserState } from '@/store/slice/userSlice';
+import { UserState, selectUser } from '@/store/slice/userSlice';
 
 import { useSidebar } from './hooks';
 
@@ -34,6 +35,7 @@ function Sidebar({ enabled = true }: Props) {
 
   const user = useSelector(selectUser);
   const { observeCart } = useCart();
+  const { orders } = useOrder(user?.uid ?? '', 1, 1, 'Date', true);
 
   let username = '';
   if (user && user.userDetails) {
@@ -51,7 +53,7 @@ function Sidebar({ enabled = true }: Props) {
   };
 
   const showCheckout = (title: string) => {
-    if (title === t('checkout.title')) {
+    if (title === t('routes.checkout')) {
       return observeCart?.cartProducts && observeCart.cartProducts.length > 0;
     }
     return true;
@@ -60,6 +62,13 @@ function Sidebar({ enabled = true }: Props) {
   const showShopping = (title: string) => {
     if (title === t('routes.shop')) {
       return user && user.state === UserState.COMPLETE;
+    }
+    return true;
+  };
+
+  const showOrders = (title: string) => {
+    if (title === t('routes.orders')) {
+      return orders.length > 0;
     }
     return true;
   };
@@ -83,7 +92,8 @@ function Sidebar({ enabled = true }: Props) {
                   route.title &&
                   route.show &&
                   showCheckout(route.title) &&
-                  showShopping(route.title),
+                  showShopping(route.title) &&
+                  showOrders(route.title),
               )
               .map(({ path, title, icon: Icon }) => (
                 <ListItem sx={{ p: 0 }} key={path} onClick={close}>

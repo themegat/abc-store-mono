@@ -5,6 +5,7 @@ using ABCStoreAPI.Service.Base;
 using ABCStoreAPI.Service.Dto;
 using ABCStoreAPI.Service.Tests.Helpers;
 using Castle.DynamicProxy;
+using Mapster;
 using Moq;
 using NUnit.Framework;
 using Soenneker.Utils.AutoBogus;
@@ -16,6 +17,8 @@ public class CartServiceTest
     private Mock<ICartRepository> _cartRepositoryMock = null!;
     private Mock<ICartProductRepository> _cartProductRepositoryMock = null!;
     private Mock<IProductRepository> _productyRepositoryMock = null!;
+    private Mock<IExchangeRateRepository> _exchangeRateRepositoryMock = null!;
+    private Mock<IUserDetailsRepository> _userDetailsRepositoryMock = null!;
 
     private Mock<IUnitOfWork> _uowMock = null!;
     private Mock<ILogger<CartService>> _loggerMock = null!;
@@ -23,12 +26,13 @@ public class CartServiceTest
 
     private List<Cart> _cart = null!;
 
+    private AutoFaker _autoFaker;
     [SetUp]
     public void Setup()
     {
-        var autoFaker = new AutoFaker();
+        _autoFaker = new AutoFaker();
 
-        _cart = autoFaker.Generate<Cart>(5);
+        _cart = _autoFaker.Generate<Cart>(5);
 
         _uowMock = new Mock<IUnitOfWork>();
         _loggerMock = new Mock<ILogger<CartService>>();
@@ -36,6 +40,8 @@ public class CartServiceTest
         _cartRepositoryMock = new Mock<ICartRepository>();
         _cartProductRepositoryMock = new Mock<ICartProductRepository>();
         _productyRepositoryMock = new Mock<IProductRepository>();
+        _exchangeRateRepositoryMock = new Mock<IExchangeRateRepository>();
+        _userDetailsRepositoryMock = new Mock<IUserDetailsRepository>();
 
         _cartRepositoryMock
             .Setup(cr => cr.GetByUserIdAndStatus(It.IsAny<string>(), It.IsAny<CartStatus>()))
@@ -45,9 +51,22 @@ public class CartServiceTest
             .Setup(cr => cr.GetByUserIdAndStatus("1", CartStatus.IN_PROGRESS))
             .Returns(_cart.AsQueryable());
 
+        var exchangeRates = new ExchangeRate[] { new ExchangeRate()
+            { Rate = 0.8m, SupportedCurrency = new SupportedCurrency() { Code = "EUR" } } };
+
+        _exchangeRateRepositoryMock
+            .Setup(er => er.GetByCurrency(It.IsAny<string>()))
+            .Returns(exchangeRates.AsQueryable());
+
+        _userDetailsRepositoryMock
+            .Setup(ur => ur.GetByUserId(It.IsAny<string>()))
+            .Returns(_autoFaker.Generate<UserDetails>());
+
         _uowMock.Setup(uow => uow.Cart).Returns(_cartRepositoryMock.Object);
         _uowMock.Setup(uow => uow.CartProduct).Returns(_cartProductRepositoryMock.Object);
         _uowMock.Setup(uow => uow.Products).Returns(_productyRepositoryMock.Object);
+        _uowMock.Setup(uow => uow.ExchangeRates).Returns(_exchangeRateRepositoryMock.Object);
+        _uowMock.Setup(uow => uow.UserDetails).Returns(_userDetailsRepositoryMock.Object);
 
         _uowMock.Setup(uow => uow.CompleteAsync()).ReturnsAsync(1);
 

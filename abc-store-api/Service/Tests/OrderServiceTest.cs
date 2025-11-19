@@ -1,11 +1,14 @@
 using System.Net;
+using System.Security.Cryptography;
 using ABCStoreAPI.Database.Model;
 using ABCStoreAPI.Repository;
 using ABCStoreAPI.Service.Base;
 using ABCStoreAPI.Service.Dto;
+using ABCStoreAPI.Service.Page;
 using ABCStoreAPI.Service.Tests.Helpers;
 using Moq;
 using NUnit.Framework;
+using Soenneker.Utils.AutoBogus;
 
 namespace ABCStoreAPI.Service.Tests
 {
@@ -284,6 +287,90 @@ namespace ABCStoreAPI.Service.Tests
             Assert.That(ex.Message, Does.Contain("The AreaCode field is required"));
         }
 
+        #endregion
+
+        #region GetOrder
+        [Test]
+        public async Task GetOrder_WhenUserNotFound_ThrowsExecption()
+        {
+            var userFaker = new AutoFaker<UserDetails>();
+            var users = userFaker.Generate(5);
+
+            var testUser = users[1];
+
+            var page = new PagedRequest()
+            {
+                PageNumber = 1,
+                PageSize = 10
+            };
+
+            var ex = Assert.ThrowsAsync<AbcExecption>(async () => await _orderService.GetOrders(testUser.UserId, page, OrderSortBy.Date));
+            Assert.That(ex!.ErrorCode, Is.EqualTo(HttpStatusCode.BadRequest));
+            Assert.That(ex.Message, Does.Contain("User not found"));
+        }
+
+        [Test]
+        public async Task GetOrder_WhenOrderExists_ReturnsOrder()
+        {
+            var userFaker = new AutoFaker<UserDetails>();
+            var users = userFaker.Generate(5);
+            var orderFaker = new AutoFaker<Order>();
+            orderFaker.RuleFor(o => o.UserId, (faker) =>
+            {
+                if (faker.IndexFaker < 5)
+                {
+                    return users[0].Id;
+                }
+                else if (faker.IndexFaker < 12)
+                {
+                    return users[1].Id;
+                }
+                else if (faker.IndexFaker < 16)
+                {
+                    return users[2].Id;
+                }
+                else
+                {
+                    return users[3].Id;
+                }
+            });
+            orderFaker.RuleFor(o => o.UserDetails, (faker) =>
+            {
+                if (faker.IndexFaker < 5)
+                {
+                    return users[0];
+                }
+                else if (faker.IndexFaker < 12)
+                {
+                    return users[1];
+                }
+                else if (faker.IndexFaker < 16)
+                {
+                    return users[2];
+                }
+                else
+                {
+                    return users[3];
+                }
+            });
+            var orders = orderFaker.Generate(20);
+
+            var testUser = users[1];
+            _userDetailsRepositoryMock.Setup(r => r.GetByUserId(It.IsAny<string>())).Returns(testUser);
+            _orderRepositoryMock.Setup(or => or.GetByUserId(It.IsAny<int>()))
+            .Returns(orders.FindAll(o => o.UserId == testUser.Id).AsQueryable());
+
+            var page = new PagedRequest()
+            {
+                PageNumber = 1,
+                PageSize = 10
+            };
+
+            var result = await _orderService.GetOrders(testUser.UserId, page, OrderSortBy.Date);
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Items.Count, Is.EqualTo(7));
+        }
         #endregion
     }
 }

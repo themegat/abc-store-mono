@@ -109,6 +109,21 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.orderDto,
       }),
     }),
+    getApiOrderGetOrders: build.query<
+      GetApiOrderGetOrdersApiResponse,
+      GetApiOrderGetOrdersApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Order/get-orders`,
+        params: {
+          userId: queryArg.userId,
+          sortBy: queryArg.sortBy,
+          pageNumber: queryArg.pageNumber,
+          pageSize: queryArg.pageSize,
+          desc: queryArg.desc,
+        },
+      }),
+    }),
     getApiProductFilterByCurrencyCode: build.query<
       GetApiProductFilterByCurrencyCodeApiResponse,
       GetApiProductFilterByCurrencyCodeApiArg
@@ -150,7 +165,7 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/api/UserDetails/update-create`,
         method: "POST",
-        body: queryArg.userDetailsDto,
+        body: queryArg.userDetailsDto2,
       }),
     }),
   }),
@@ -205,6 +220,15 @@ export type PostApiOrderCreateApiResponse = /** status 200 OK */ OrderDto;
 export type PostApiOrderCreateApiArg = {
   orderDto: OrderDto;
 };
+export type GetApiOrderGetOrdersApiResponse =
+  /** status 200 OK */ PagedResultOfOrderDto;
+export type GetApiOrderGetOrdersApiArg = {
+  userId?: string;
+  sortBy?: OrderSortBy;
+  pageNumber?: number;
+  pageSize?: number;
+  desc?: boolean;
+};
 export type GetApiProductFilterByCurrencyCodeApiResponse =
   /** status 200 OK */ PagedResultOfProductDto;
 export type GetApiProductFilterByCurrencyCodeApiArg = {
@@ -220,16 +244,16 @@ export type GetApiProductFilterByCurrencyCodeApiArg = {
 export type GetApiProductCategoriesApiResponse =
   /** status 200 OK */ ProductCategoryDto[];
 export type GetApiProductCategoriesApiArg = void;
-export type GetApiUserDetailsApiResponse = /** status 200 OK */ UserDetailsDto;
+export type GetApiUserDetailsApiResponse = /** status 200 OK */ UserDetailsDto2;
 export type GetApiUserDetailsApiArg = {
   userId?: string;
 };
 export type PostApiUserDetailsUpdateCreateApiResponse =
-  /** status 200 OK */ UserDetailsDto;
+  /** status 200 OK */ UserDetailsDto2;
 export type PostApiUserDetailsUpdateCreateApiArg = {
-  userDetailsDto: UserDetailsDto;
+  userDetailsDto2: UserDetailsDto2;
 };
-export type CartStatus = number;
+export type CartStatus = "IN_PROGRESS" | "COMPLETE";
 export type ProductDto = {
   id?: number;
   name?: string;
@@ -257,7 +281,12 @@ export type ExchangeRateDto = {
   rate?: number;
   symbol?: string;
 };
-export type OrderStatus = number;
+export type OrderStatus =
+  | "CREATED"
+  | "PENDING"
+  | "SHIPPED"
+  | "DELIVERED"
+  | "CANCELLED";
 export type AddressType = "SHIPPING" | "BILLING";
 export type AddressDto = {
   addressLine1: string;
@@ -265,6 +294,26 @@ export type AddressDto = {
   zipCode: string;
   addressType: AddressType;
 };
+export type CartDto2 = {
+  id?: number;
+  userId: string | null;
+  status?: CartStatus;
+  cartProducts: CartProductDto[];
+} | null;
+export type AddressDto2 = {
+  addressLine1: string;
+  addressLine2: string;
+  zipCode: string;
+  addressType: AddressType;
+} | null;
+export type UserDetailsDto = {
+  userId: string;
+  firstName: string;
+  lastName: string;
+  preferredCurrency: string;
+  contactNumber?: string | null;
+  billingAddress?: AddressDto2;
+} | null;
 export type OrderDto = {
   userId: string;
   cartId: number;
@@ -272,7 +321,17 @@ export type OrderDto = {
   status?: OrderStatus;
   isPaid?: boolean;
   shippingAddress: AddressDto;
+  cart?: CartDto2;
+  userDetails?: UserDetailsDto;
 };
+export type PagedResultOfOrderDto = {
+  pageNumber?: number;
+  pageSize?: number;
+  totalPages?: number;
+  totalCount?: number;
+  items?: OrderDto[];
+};
+export type OrderSortBy = "Date" | "Status";
 export type ProductDto2 = {
   id?: number;
   name?: string;
@@ -294,13 +353,7 @@ export type ProductCategoryDto = {
   id?: number;
   name?: string;
 };
-export type AddressDto2 = {
-  addressLine1: string;
-  addressLine2: string;
-  zipCode: string;
-  addressType: AddressType;
-} | null;
-export type UserDetailsDto = {
+export type UserDetailsDto2 = {
   userId: string;
   firstName: string;
   lastName: string;
@@ -320,6 +373,7 @@ export const {
   useGetApiExchangeRateAllQuery,
   useGetApiExchangeRateByCurrencyCodeQuery,
   usePostApiOrderCreateMutation,
+  useGetApiOrderGetOrdersQuery,
   useGetApiProductFilterByCurrencyCodeQuery,
   useGetApiProductCategoriesQuery,
   useGetApiUserDetailsQuery,

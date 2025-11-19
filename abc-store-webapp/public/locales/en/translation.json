@@ -38,7 +38,9 @@
   },
   "routes": {
     "welcome": "Welcome",
-    "shop": "Start Shopping"
+    "shop": "Start Shopping",
+    "orders": "Order History",
+    "checkout": "Checkout"
   },
   "productFilter": {
     "title": "Filter Products",

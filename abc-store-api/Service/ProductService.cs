@@ -47,8 +47,8 @@ public class ProductService : IProductService
         .Include(p => p.ProductImages)
         .ToListAsync();
 
-        var items = products.Select(Dto.ProductDto.toDto)
-        .Select(p => { p.Price = ConvertPriceAsync(p.Price, currencyCode, exchangeRate).Result; return p; })
+        var items = products.Select(ProductDto.toDto)
+        .Select(p => { p.Price = ProductDto.ConvertPriceAsync(p.Price, currencyCode, exchangeRate).Result; return p; })
         .ToList();
 
         return PagedResult<ProductDto>.Build(page, items);
@@ -60,16 +60,5 @@ public class ProductService : IProductService
        .GetByCurrency(targetCurrencyCode);
 
         return exchangeRate.Any() ? exchangeRate.First() : new ExchangeRate();
-    }
-
-    private async Task<decimal> ConvertPriceAsync(decimal price, string targetCurrencyCode,
-    ExchangeRate exchangeRate)
-    {
-        if (targetCurrencyCode == "USD")
-        {
-            return price;
-        }
-
-        return price * exchangeRate.Rate;
     }
 }

@@ -1,3 +1,4 @@
+using ABCStoreAPI.Database.Model;
 using ABCStoreAPI.Service.Dto.Base;
 
 namespace ABCStoreAPI.Service.Dto;
@@ -26,5 +27,16 @@ public class ProductDto : IDto<ProductDto, Database.Model.Product>
             ProductCategory = product.ProductCategory?.Name,
             ProductImages = product.ProductImages?.Select(img => img.Url).ToList()
         };
+    }
+
+    public static async Task<decimal> ConvertPriceAsync(decimal price, string targetCurrencyCode,
+ ExchangeRate exchangeRate)
+    {
+        if (targetCurrencyCode == "USD")
+        {
+            return price;
+        }
+
+        return price * exchangeRate.Rate;
     }
 }

@@ -1,15 +1,26 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
+using System.Text.Json.Serialization;
 using ABCStoreAPI.Database.Model;
 using ABCStoreAPI.Repository;
 using ABCStoreAPI.Service.Base;
 using ABCStoreAPI.Service.Dto;
+using ABCStoreAPI.Service.Page;
 using ABCStoreAPI.Service.Validation;
 
 namespace ABCStoreAPI.Service;
 
+[JsonConverter(typeof(JsonStringEnumConverter<OrderSortBy>))]
+public enum OrderSortBy
+{
+    Date,
+    Status
+}
+
 public interface IOrderService
 {
     Task<OrderDto> CreateOrder(OrderDto orderDto);
+    Task<PagedResult<OrderDto>> GetOrders([Required] string userId, PagedRequest pagedRequest, OrderSortBy sortBy, bool desc = false);
 }
 
 public class OrderService : IOrderService
@@ -89,5 +100,37 @@ public class OrderService : IOrderService
         }
 
         await _uow.CompleteAsync();
+    }
+
+    private List<Order> SortOrders(IEnumerable<Order> orders, OrderSortBy sortBy, bool desc)
+    {
+        IOrderedEnumerable<Order> query = sortBy switch
+        {
+            OrderSortBy.Date => desc ? orders.OrderByDescending(o => o.OrderDate) : orders.OrderBy(o => o.OrderDate),
+            OrderSortBy.Status => desc ? orders.OrderByDescending(o => o.Status) : orders.OrderBy(o => o.Status),
+            _ => orders.OrderBy(o => o.OrderDate)
+        };
+
+        return query.ToList();
+    }
+
+    [Validated]
+    public async Task<PagedResult<OrderDto>> GetOrders([Required] string userId, PagedRequest pagedRequest, OrderSortBy sortBy, bool desc = false)
+    {
+        var userDetails = _uow.UserDetails.GetByUserId(userId);
+        if (userDetails == null)
+        {
+            var message = "User not found";
+            _logger.LogDebug(message);
+            throw new AbcExecption(HttpStatusCode.BadRequest, message);
+        }
+        var orders = _uow.Order.GetByUserId(userDetails.Id);
+        var sortedOrder = SortOrders(orders, sortBy, desc);
+
+        pagedRequest.PageNumber = Math.Max(1, pagedRequest.PageNumber);
+        int skip = (pagedRequest.PageNumber - 1) * pagedRequest.PageSize;
+
+        var pagedOrders = orders.Skip(skip).Take(pagedRequest.PageSize).ToList();
+        return PagedResult<OrderDto>.Build(pagedRequest, pagedOrders.Select(OrderDto.toDto).ToList());
     }
 }

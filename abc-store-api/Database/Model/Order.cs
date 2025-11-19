@@ -1,5 +1,8 @@
+using System.Text.Json.Serialization;
+
 namespace ABCStoreAPI.Database.Model;
 
+[JsonConverter(typeof(JsonStringEnumConverter<OrderStatus>))]
 public enum OrderStatus
 {
     CREATED,

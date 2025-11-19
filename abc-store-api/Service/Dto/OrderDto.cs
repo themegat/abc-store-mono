@@ -20,6 +20,8 @@ public class OrderDto : IDto<OrderDto, Order>
     [Required]
     [ValidateObjectMembers]
     public required AddressDto ShippingAddress { get; set; }
+    public CartDto? Cart { get; set; }
+    public UserDetailsDto? UserDetails { get; set; }
 
     public static OrderDto toDto(Order entity) => new OrderDto
     {
@@ -28,7 +30,9 @@ public class OrderDto : IDto<OrderDto, Order>
         OrderDate = entity.OrderDate,
         Status = entity.Status,
         IsPaid = entity.IsPaid,
-        ShippingAddress = AddressDto.toDto(entity.ShippingAddress)
+        ShippingAddress = AddressDto.toDto(entity.ShippingAddress),
+        UserDetails = entity.UserDetails == null ? null : UserDetailsDto.toDto(entity.UserDetails),
+        Cart = entity.Cart == null ? null : CartDto.toDto(entity.Cart)
     };
 
 }
