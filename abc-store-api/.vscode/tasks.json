@@ -10,6 +10,19 @@
                 "${workspaceFolder}/ABCStoreAPI.csproj"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "test:coverage",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "test",
+                "--settings",
+                "${workspaceFolder}/.runsettings",
+                "--collect",
+                "Code Coverage",
+            ],
+            "problemMatcher": "$msCompile"
         }
     ]
 }
