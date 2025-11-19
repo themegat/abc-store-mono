@@ -1,10 +1,10 @@
-name: .Net 6 CI Build
+name: API Test Workflow
 
 on:
   pull_request:
     branches: [main]
-    # paths:
-    #   - "**/abc-store-api/**"
+    paths:
+      - "**/abc-store-api/**"
 
 jobs:
   build:
