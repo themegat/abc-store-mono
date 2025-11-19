@@ -20,6 +20,7 @@ public enum OrderSortBy
 public interface IOrderService
 {
     Task<OrderDto> CreateOrder(OrderDto orderDto);
+    Task<PagedResult<OrderDto>> GetOrders([Required] string userId, PagedRequest pagedRequest, OrderSortBy sortBy, bool desc = false);
 }
 
 public class OrderService : IOrderService
