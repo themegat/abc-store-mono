@@ -4,12 +4,17 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - "**/abc-store-api/**"
+      - "./abc-store-api/**"
 
 jobs:
   build:
     runs-on: ubuntu-latest
     name: CI Test with coverage
+
+    defaults:
+      run:
+        working-directory: ./abc-store-api
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
