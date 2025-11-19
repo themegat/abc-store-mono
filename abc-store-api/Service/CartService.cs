@@ -5,6 +5,7 @@ using ABCStoreAPI.Repository;
 using ABCStoreAPI.Service.Base;
 using ABCStoreAPI.Service.Dto;
 using ABCStoreAPI.Service.Validation;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace ABCStoreAPI.Service;
@@ -34,8 +35,28 @@ public class CartService : ICartService
 
     private IQueryable<Cart> GetCart(string userId, CartStatus status)
     {
-        return _uow.Cart.GetByUserIdAndStatus(userId, status).Include(c => c.CartProducts)
+        var result = _uow.Cart.GetByUserIdAndStatus(userId, status).Include(c => c.CartProducts)
             .ThenInclude(cp => cp.Product);
+        var userDetails = _uow.UserDetails.GetByUserId(userId);
+
+        if (result.FirstOrDefault() != null && userDetails != null
+             && userDetails.PreferredCurrency != null)
+        {
+            var exchangeRate = _uow.ExchangeRates.GetByCurrency(userDetails.PreferredCurrency).FirstOrDefault();
+            if (exchangeRate != null)
+            {
+                result.FirstOrDefault()?.CartProducts.ForEach(cp =>
+                {
+                    if (cp.Product?.Price != null)
+                    {
+                        cp.Product.Price = ProductDto.ConvertPriceAsync(cp.Product.Price, exchangeRate.SupportedCurrency.Code, exchangeRate).Result;
+                    }
+                });
+
+            }
+        }
+
+        return result;
     }
 
     [Validated]

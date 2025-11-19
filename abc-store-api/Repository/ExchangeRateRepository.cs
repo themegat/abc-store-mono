@@ -19,7 +19,8 @@ public class ExchangeRateRepository : GenericRepository<ExchangeRate>, IExchange
     public IQueryable<ExchangeRate> GetByCurrency(string currencyCode)
     {
         currencyCode = currencyCode.Trim().ToUpper();
-        return _dbSet.Where(er => er.SupportedCurrency.Code.ToUpper() == currencyCode);
+        return _dbSet.Where(er => er.SupportedCurrency.Code.ToUpper() == currencyCode)
+            .Include(er => er.SupportedCurrency);
     }
 
     public async Task<bool> Truncate()
