@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - "./abc-store-api/**"
+      - "**/abc-store-api/**"
 
 jobs:
   build:
