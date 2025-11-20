@@ -5,6 +5,9 @@ on:
     branches: [main]
     paths:
       - "**/abc-store-api/**"
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   build:
