@@ -6,6 +6,7 @@ using ABCStoreAPI.Service.Dto;
 using ABCStoreAPI.Service.Tests.Helpers;
 using Castle.DynamicProxy;
 using Mapster;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Soenneker.Utils.AutoBogus;

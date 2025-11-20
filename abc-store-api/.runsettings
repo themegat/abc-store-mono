@@ -7,7 +7,7 @@
         <DataCollectors>
             <DataCollector friendlyName="Code Coverage">
                 <Configuration>
-                    <Format>coverage,cobertura,json,lcov</Format>
+                    <Format>coverage,cobertura,opencover</Format>
                     <CodeCoverage>
                         <Functions>
                             <Exclude>
