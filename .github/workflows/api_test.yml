@@ -35,6 +35,9 @@ jobs:
       - name: Restore Dependencies
         run: dotnet restore
 
+      - name: Restore Tools
+        run: dotnet tool restore
+
       - name: SonarCloud - Begin analysis
         run: >
           dotnet sonarscanner begin \
