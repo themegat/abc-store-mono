@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using ABCStoreAPI.Database.Model;
 using ABCStoreAPI.Repository;
+using ABCStoreAPI.Service.Base;
 using ABCStoreAPI.Service.Dto;
 using ABCStoreAPI.Service.Validation;
 
@@ -16,6 +17,8 @@ public class UserDetailsService : IUserDetailsService
 {
     private readonly IUnitOfWork _uow;
 
+    private readonly string SYS_USER = "System";
+
     public UserDetailsService(IUnitOfWork uow)
     {
         _uow = uow;
@@ -30,8 +33,8 @@ public class UserDetailsService : IUserDetailsService
             LastName = userDetails.LastName,
             PreferredCurrency = userDetails.PreferredCurrency,
             ContactNumber = userDetails.ContactNumber,
-            CreatedBy = "System",
-            UpdatedBy = "System"
+            CreatedBy = SYS_USER,
+            UpdatedBy = SYS_USER
         };
 
         if (userDetails.BillingAddress != null)
@@ -44,8 +47,8 @@ public class UserDetailsService : IUserDetailsService
                 AddressType = AddressType.BILLING,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                CreatedBy = "System",
-                UpdatedBy = "System"
+                CreatedBy = SYS_USER,
+                UpdatedBy = SYS_USER
             };
         }
 
@@ -73,8 +76,8 @@ public class UserDetailsService : IUserDetailsService
                     AddressType = AddressType.BILLING,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
-                    CreatedBy = "System",
-                    UpdatedBy = "System"
+                    CreatedBy = SYS_USER,
+                    UpdatedBy = SYS_USER
                 };
             }
             else
@@ -84,7 +87,7 @@ public class UserDetailsService : IUserDetailsService
                 existingUserDetails.BillingAddress.ZipCode = userDetails.BillingAddress.ZipCode;
                 existingUserDetails.BillingAddress.AddressType = AddressType.BILLING;
                 existingUserDetails.BillingAddress.UpdatedAt = DateTime.UtcNow;
-                existingUserDetails.BillingAddress.UpdatedBy = "System";
+                existingUserDetails.BillingAddress.UpdatedBy = SYS_USER;
             }
         }
 
@@ -111,7 +114,7 @@ public class UserDetailsService : IUserDetailsService
         var user = _uow.UserDetails.GetByUserId(userId);
         if (user == null)
         {
-            throw new Exception("User details not found.");
+            throw new AbcExecption(System.Net.HttpStatusCode.NotFound, "User details not found.");
         }
         return UserDetailsDto.toDto(user);
     }
