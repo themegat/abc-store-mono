@@ -32,7 +32,7 @@ jobs:
         working-directory: ./abc-store-api/ABCStoreAPI
 
       - name: Test
-        run: dotnet test --collect:"Code Coverage" --settings:.runsettings
+        run: dotnet test --collect:"Code Coverage" --settings:../.runsettings
         working-directory: ./abc-store-api/ABCStoreAPI
 
       - name: Code Coverage Report
