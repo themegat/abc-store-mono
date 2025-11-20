@@ -18,6 +18,11 @@ jobs:
       run:
         working-directory: ./abc-store-api
 
+    env:
+      SONAR_PROJECT_KEY: abc-store-api
+      SONAR_ORG: themegat
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,8 +36,28 @@ jobs:
         run: dotnet restore
         working-directory: ./abc-store-api/ABCStoreAPI
 
+      - name: Restore Tools
+        run: dotnet tool restore
+
+      - name: SonarCloud - Begin analysis
+        run: >
+          dotnet sonarscanner begin 
+          -k:"$SONAR_PROJECT_KEY" 
+          -o:"$SONAR_ORG"
+          -d:sonar.login="$SONAR_TOKEN"
+          -d:sonar.coverageReportPaths="../Coverage/SonarQube.xml"
+          -d:sonar.qualitygate.wait=true
+        working-directory: ./abc-store-api/ABCStoreAPI
+
       - name: Test
         run: dotnet test --collect:"Code Coverage" --settings:../.runsettings
+        working-directory: ./abc-store-api/ABCStoreAPI
+
+      - name: Generate SonarQube coverage report
+        run: dotnet reportgenerator -reports:./Coverage/**/*.cobertura.xml -targetdir:./Coverage/ -reporttypes:SonarQube
+
+      - name: SonarCloud - End analysis
+        run: dotnet sonarscanner end -d:sonar.login="$SONAR_TOKEN"
         working-directory: ./abc-store-api/ABCStoreAPI
 
       - name: Code Coverage Report
