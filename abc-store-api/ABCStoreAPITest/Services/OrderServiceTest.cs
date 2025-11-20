@@ -6,6 +6,7 @@ using ABCStoreAPI.Service.Base;
 using ABCStoreAPI.Service.Dto;
 using ABCStoreAPI.Service.Page;
 using ABCStoreAPI.Service.Tests.Helpers;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Soenneker.Utils.AutoBogus;

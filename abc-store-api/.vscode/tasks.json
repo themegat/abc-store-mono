@@ -2,27 +2,83 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
+            "label": "dotnet-build",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/ABCStoreAPI.csproj"
+                "${workspaceFolder}/ABCStoreAPI/ABCStoreAPI.csproj"
             ],
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "test:coverage",
+            "label": "dotnet-test:coverage",
             "command": "dotnet",
             "type": "process",
+            "options": {
+                "cwd": "${workspaceFolder}/ABCStoreAPI"
+            },
             "args": [
                 "test",
                 "--settings",
-                "${workspaceFolder}/.runsettings",
-                "--collect",
-                "Code Coverage",
+                "${workspaceFolder}/.runsettings"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "dotnet-sonar:start",
+            "type": "shell",
+            "command": "dotnet sonarscanner begin -o:\"themegat\"  -k:\"abc-store-api\" -d:sonar.login=$SONAR_TOKEN -d:sonar.coverageReportPaths=../Coverage/SonarQube.xml",
+            "options": {
+                "cwd": "${workspaceFolder}/ABCStoreAPI",
+                "env": {
+                    "SONAR_TOKEN": "00643dc814a8e6b45609f0f2cdd8c442b2595040"
+                }
+            }
+        },
+        {
+            "label": "dotnet-sonar:end",
+            "type": "shell",
+            "command": "dotnet sonarscanner end -d:sonar.token=$SONAR_TOKEN",
+            "options": {
+                "cwd": "${workspaceFolder}/ABCStoreAPI",
+                "env": {
+                    "SONAR_TOKEN": "00643dc814a8e6b45609f0f2cdd8c442b2595040"
+                }
+            }
+        },
+        {
+            "label": "dotnet-delete:coverage",
+            "type": "shell",
+            "command": "rm -rf ./Coverage"
+        },
+        {
+            "label": "dotnet-generate:sonarqube",
+            "type": "process",
+            "command": "dotnet",
+            "args": [
+                "reportgenerator",
+                "-reports:./Coverage/**/*.cobertura.xml",
+                "-targetdir:./Coverage/",
+                "-reporttypes:SonarQube"
+            ]
+        },
+        {
+            "label": "dotnet:sonar",
+            "type": "shell",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "dotnet-delete:coverage",
+                "dotnet-sonar:start",
+                "dotnet-build",
+                "dotnet-test:coverage",
+                "dotnet-generate:sonarqube",
+                "dotnet-sonar:end"
+            ],
+            "group": {
+                "kind": "none",
+                "isDefault": false
+            }
         }
     ]
 }
