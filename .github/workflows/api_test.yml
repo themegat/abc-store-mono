@@ -51,11 +51,7 @@ jobs:
         run: dotnet test --collect:"Code Coverage" --settings:.runsettings
 
       - name: Generate SonarQube coverage report
-        run: |
-          dotnet reportgenerator \
-            -reports:./Coverage/**/*.cobertura.xml \
-            -targetdir:./Coverage/ \
-            -reporttypes:SonarQube
+        run: dotnet reportgenerator -reports:./Coverage/**/*.cobertura.xml -targetdir:./Coverage/ -reporttypes:SonarQube
 
       - name: SonarCloud - End analysis
         run: dotnet sonarscanner end -d:sonar.login="$SONAR_TOKEN"
