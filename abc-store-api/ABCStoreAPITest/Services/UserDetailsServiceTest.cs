@@ -245,8 +245,9 @@ namespace ABCStoreAPI.Service.Tests
                 .Setup(r => r.GetByUserId("missing"))
                 .Returns((UserDetails?)null);
 
-            var ex = Assert.Throws<Exception>(() => _service.GetUserDetails("missing"));
+            var ex = Assert.Throws<AbcExecption>(() => _service.GetUserDetails("missing"));
             Assert.That(ex!.Message, Is.EqualTo("User details not found."));
+            Assert.That(ex.ErrorCode, Is.EqualTo(HttpStatusCode.NotFound));
         }
 
         [Test]

@@ -62,8 +62,8 @@ public class CartService : ICartService
     [Validated]
     public async Task<CartDto> CreateCart(CartDto cartDto)
     {
-        var cartQuery = GetCart(cartDto.UserId, CartStatus.IN_PROGRESS);
-        if (cartQuery.FirstOrDefault() == null)
+        var cartQuery = GetCart(cartDto.UserId!, CartStatus.IN_PROGRESS);
+        if (await cartQuery.FirstOrDefaultAsync() == null)
         {
             var cartProducts = cartDto.CartProducts.Select(cp => new CartProduct
             {
@@ -77,7 +77,7 @@ public class CartService : ICartService
             {
                 CreatedBy = SYS_USER,
                 UpdatedBy = SYS_USER,
-                UserId = cartDto.UserId,
+                UserId = cartDto.UserId!,
                 Status = CartStatus.IN_PROGRESS,
                 CartProducts = cartProducts
             };
@@ -97,7 +97,7 @@ public class CartService : ICartService
     public async Task<CartDto> CompleteCart([Required][MinLength(1)] string userId)
     {
         var cartQuery = GetCart(userId, CartStatus.IN_PROGRESS);
-        if (cartQuery.FirstOrDefault() == null)
+        if (await cartQuery.FirstOrDefaultAsync() == null)
         {
             var message = "A cart in progress could not be found";
             _logger.LogDebug(message);
@@ -105,7 +105,7 @@ public class CartService : ICartService
         }
         else
         {
-            var cart = cartQuery.First();
+            var cart = await cartQuery.FirstAsync();
             cart.Status = CartStatus.COMPLETE;
             cart.UpdatedBy = SYS_USER;
             cart.UpdatedAt = DateTime.UtcNow;
@@ -118,7 +118,7 @@ public class CartService : ICartService
     public async Task<CartDto> RemoveCart([Required][MinLength(1)] string userId)
     {
         var cartQuery = GetCart(userId, CartStatus.IN_PROGRESS);
-        if (cartQuery.FirstOrDefault() == null)
+        if (await cartQuery.FirstOrDefaultAsync() == null)
         {
             var message = "A cart in progress could not be found";
             _logger.LogDebug(message);
@@ -126,9 +126,9 @@ public class CartService : ICartService
         }
         else
         {
-            _uow.Cart.Remove(cartQuery.First());
+            _uow.Cart.Remove(await cartQuery.FirstAsync());
             await _uow.CompleteAsync();
-            return CartDto.toDto(cartQuery.First());
+            return CartDto.toDto(await cartQuery.FirstAsync());
         }
     }
 
@@ -136,7 +136,7 @@ public class CartService : ICartService
     public async Task<CartDto> GetCartInProgress([Required][MinLength(1)] string userId)
     {
         var cartQuery = GetCart(userId, CartStatus.IN_PROGRESS);
-        if (cartQuery.FirstOrDefault() == null)
+        if (await cartQuery.FirstOrDefaultAsync() == null)
         {
             var message = "A cart in progress could not be found";
             _logger.LogDebug(message);
@@ -144,7 +144,7 @@ public class CartService : ICartService
         }
         else
         {
-            return CartDto.toDto(cartQuery.First());
+            return CartDto.toDto(await cartQuery.FirstAsync());
         }
     }
 
@@ -185,7 +185,7 @@ public class CartService : ICartService
     {
         CheckProductStockAgainstQuantity(cartProductDto.ProductId, cartProductDto.Quantity);
         var cartProductQuery = GetCartProduct(cartId, cartProductDto.ProductId);
-        if (cartProductQuery.FirstOrDefault() == null)
+        if (await cartProductQuery.FirstOrDefaultAsync() == null)
         {
 
             var cartProduct = new CartProduct
@@ -213,7 +213,7 @@ public class CartService : ICartService
     {
         CheckProductStockAgainstQuantity(cartProductDto.ProductId, cartProductDto.Quantity);
         var cartProductQuery = GetCartProduct(cartId, cartProductDto.ProductId);
-        if (cartProductQuery.FirstOrDefault() == null)
+        if (await cartProductQuery.FirstOrDefaultAsync() == null)
         {
             var message = "Product does not exist on cart";
             _logger.LogDebug(message);
@@ -228,7 +228,7 @@ public class CartService : ICartService
             }
             else
             {
-                var cartProduct = cartProductQuery.First();
+                var cartProduct = await cartProductQuery.FirstAsync();
                 cartProduct.Quantity = cartProductDto.Quantity;
                 cartProduct.UpdatedBy = SYS_USER;
                 await _uow.CompleteAsync();
@@ -241,7 +241,7 @@ public class CartService : ICartService
     public async Task RemoveCartProduct([Required] int cartId, CartProductDto cartProductDto)
     {
         var cartProductQuery = GetCartProduct(cartId, cartProductDto.ProductId);
-        if (cartProductQuery.FirstOrDefault() == null)
+        if (await cartProductQuery.FirstOrDefaultAsync() == null)
         {
             var message = "Product does not exist on cart";
             _logger.LogDebug(message);
@@ -249,7 +249,7 @@ public class CartService : ICartService
         }
         else
         {
-            _uow.CartProduct.Remove(cartProductQuery.First());
+            _uow.CartProduct.Remove(await cartProductQuery.FirstAsync());
             await _uow.CompleteAsync();
         }
     }

@@ -46,11 +46,11 @@ public class CartServiceTest
 
         _cartRepositoryMock
             .Setup(cr => cr.GetByUserIdAndStatus(It.IsAny<string>(), It.IsAny<CartStatus>()))
-            .Returns(Enumerable.Empty<Cart>().AsQueryable());
+            .Returns(new TestAsyncEnumerable<Cart>(Enumerable.Empty<Cart>().AsQueryable()));
 
         _cartRepositoryMock
             .Setup(cr => cr.GetByUserIdAndStatus("1", CartStatus.IN_PROGRESS))
-            .Returns(_cart.AsQueryable());
+            .Returns(new TestAsyncEnumerable<Cart>(_cart).AsQueryable());
 
         var exchangeRates = new ExchangeRate[] { new ExchangeRate()
             { Rate = 0.8m, SupportedCurrency = new SupportedCurrency() { Code = "EUR" } } };
@@ -161,7 +161,7 @@ public class CartServiceTest
 
         _cartRepositoryMock
             .Setup(cr => cr.GetByUserIdAndStatus("user-complete", CartStatus.IN_PROGRESS))
-            .Returns(new List<Cart> { cart }.AsQueryable());
+            .Returns(new TestAsyncEnumerable<Cart>(new List<Cart> { cart }.AsQueryable()));
 
         var result = await _cartService.CompleteCart("user-complete");
 
@@ -194,7 +194,7 @@ public class CartServiceTest
 
         _cartRepositoryMock
             .Setup(cr => cr.GetByUserIdAndStatus("user-remove", CartStatus.IN_PROGRESS))
-            .Returns(new List<Cart> { cart }.AsQueryable());
+            .Returns(new TestAsyncEnumerable<Cart>(new List<Cart> { cart }.AsQueryable()));
 
         await _cartService.RemoveCart("user-remove");
 
@@ -233,7 +233,7 @@ public class CartServiceTest
 
         _cartRepositoryMock
             .Setup(cr => cr.GetByUserIdAndStatus("user-get", CartStatus.IN_PROGRESS))
-            .Returns(new List<Cart> { cart }.AsQueryable());
+            .Returns(new TestAsyncEnumerable<Cart>(new List<Cart> { cart }.AsQueryable()));
 
         var result = await _cartService.GetCartInProgress("user-get");
 
@@ -275,7 +275,7 @@ public class CartServiceTest
 
         _cartProductRepositoryMock
             .Setup(cr => cr.GetByCartIdAndProductId(1, 1))
-            .Returns(Enumerable.Empty<CartProduct>().AsQueryable());
+            .Returns(new TestAsyncEnumerable<CartProduct>(Enumerable.Empty<CartProduct>().AsQueryable()));
 
         var dto = new CartProductDto
         {
@@ -353,7 +353,7 @@ public class CartServiceTest
 
         _cartProductRepositoryMock
             .Setup(cr => cr.GetByCartIdAndProductId(1, 3))
-            .Returns(new List<CartProduct> { existingCartProduct }.AsQueryable());
+            .Returns(new TestAsyncEnumerable<CartProduct>(new List<CartProduct> { existingCartProduct }.AsQueryable()));
 
         var dto = new CartProductDto
         {
@@ -391,7 +391,7 @@ public class CartServiceTest
 
         _cartProductRepositoryMock
             .Setup(cr => cr.GetByCartIdAndProductId(1, 4))
-            .Returns(new List<CartProduct> { existingCartProduct }.AsQueryable());
+            .Returns(new TestAsyncEnumerable<CartProduct>(new List<CartProduct> { existingCartProduct }.AsQueryable()));
 
         var dto = new CartProductDto
         {
@@ -428,7 +428,7 @@ public class CartServiceTest
 
         _cartProductRepositoryMock
             .Setup(cr => cr.GetByCartIdAndProductId(1, 5))
-            .Returns(new List<CartProduct> { existingCartProduct }.AsQueryable());
+            .Returns(new TestAsyncEnumerable<CartProduct>(new List<CartProduct> { existingCartProduct }.AsQueryable()));
 
         var dto = new CartProductDto
         {
@@ -458,7 +458,7 @@ public class CartServiceTest
 
         _cartProductRepositoryMock
             .Setup(cr => cr.GetByCartIdAndProductId(1, 6))
-            .Returns(Enumerable.Empty<CartProduct>().AsQueryable());
+            .Returns(new TestAsyncEnumerable<CartProduct>(Enumerable.Empty<CartProduct>().AsQueryable()));
 
         var dto = new CartProductDto
         {
@@ -486,7 +486,7 @@ public class CartServiceTest
 
         _cartProductRepositoryMock
             .Setup(cr => cr.GetByCartIdAndProductId(1, 7))
-            .Returns(new List<CartProduct> { existingCartProduct }.AsQueryable());
+            .Returns(new TestAsyncEnumerable<CartProduct>(new List<CartProduct> { existingCartProduct }.AsQueryable()));
 
         var dto = new CartProductDto
         {
@@ -505,7 +505,7 @@ public class CartServiceTest
     {
         _cartProductRepositoryMock
             .Setup(cr => cr.GetByCartIdAndProductId(1, 8))
-            .Returns(Enumerable.Empty<CartProduct>().AsQueryable());
+            .Returns(new TestAsyncEnumerable<CartProduct>(Enumerable.Empty<CartProduct>().AsQueryable()));
 
         var dto = new CartProductDto
         {

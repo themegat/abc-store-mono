@@ -6,11 +6,11 @@ namespace ABCStoreAPI.Service.Dto;
 
 public class CartDto : IDto<CartDto, Cart>
 {
-    public int Id { get; set; }
+    public int? Id { get; set; }
 
     [Required]
     public string? UserId { get; set; }
-    public CartStatus Status { get; set; }
+    public CartStatus? Status { get; set; }
     
     [Required]
     [MinLength(1, ErrorMessage = "At least one cart product is required")]

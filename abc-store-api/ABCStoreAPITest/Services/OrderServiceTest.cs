@@ -272,6 +272,7 @@ namespace ABCStoreAPI.Service.Tests
         {
             var ex = Assert.ThrowsAsync<AbcExecption>(async () => await _orderService.CreateOrder(new OrderDto()
             {
+                CartId = 1,
                 UserId = string.Empty,
                 ShippingAddress = new AddressDto()
                 {
