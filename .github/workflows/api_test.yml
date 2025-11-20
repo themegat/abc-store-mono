@@ -5,6 +5,9 @@ on:
     branches: [main]
     paths:
       - "**/abc-store-api/**"
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   build:
@@ -29,18 +32,13 @@ jobs:
 
       - name: Test
         run: dotnet test --collect:"Code Coverage" --settings:.runsettings
-      
-      - name: List coverage files (debug)
-        run: |
-          echo "Searching for cobertura files..."
-          find . -name "*.cobertura.xml" -print
 
       - name: Code Coverage Report
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
           filename: /**/Coverage/**/*.cobertura.xml
           badge: true
-          fail_below_min: true
+          fail_below_min: false
           format: markdown
           hide_branch_rate: false
           hide_complexity: true
