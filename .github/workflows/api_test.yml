@@ -29,6 +29,7 @@ jobs:
 
       - name: Restore Dependencies
         run: dotnet restore
+        working-directory: ./abc-store-api/ABCStoreAPI
 
       - name: Test
         run: dotnet test --collect:"Code Coverage" --settings:.runsettings
