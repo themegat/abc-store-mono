@@ -40,11 +40,11 @@ jobs:
 
       - name: SonarCloud - Begin analysis
         run: >
-          dotnet sonarscanner begin \
-          -k:"$SONAR_PROJECT_KEY" \
-          -o:"$SONAR_ORG" \
-          -d:sonar.login="$SONAR_TOKEN" \
-          -d:sonar.coverageReportPaths="Coverage/SonarQube.xml" \
+          dotnet sonarscanner begin 
+          -k:"$SONAR_PROJECT_KEY" 
+          -o:"$SONAR_ORG"
+          -d:sonar.login="$SONAR_TOKEN"
+          -d:sonar.coverageReportPaths="Coverage/SonarQube.xml"
           -d:sonar.qualitygate.wait=true
 
       - name: Test
@@ -52,9 +52,9 @@ jobs:
 
       - name: Generate SonarQube coverage report
         run: |
-          dotnet reportgenerator \
-            -reports:./Coverage/**/*.cobertura.xml \
-            -targetdir:./Coverage/ \
+          dotnet reportgenerator
+            -reports:./Coverage/**/*.cobertura.xml
+            -targetdir:./Coverage/
             -reporttypes:SonarQube
 
       - name: SonarCloud - End analysis
