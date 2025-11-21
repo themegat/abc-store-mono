@@ -370,7 +370,7 @@ namespace ABCStoreAPI.Service.Tests
 
             var result = await _orderService.GetOrders(testUser.UserId, page, OrderSortBy.Date);
 
-            Assert.That(result, Is.Null);
+            Assert.That(result, Is.Not.Null);
             Assert.That(result.Items.Count, Is.EqualTo(7));
         }
         #endregion
