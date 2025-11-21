@@ -9,4 +9,4 @@ builder.ConfigureServices()
 
 var app = builder.Build();
 
-app.ConfigurePipeline().Run();
+await app.ConfigurePipeline().RunAsync();

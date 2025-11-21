@@ -11,6 +11,9 @@
 		},
 		{
 			"path": "functions"
+		},
+		{
+			"path": ".github"
 		}
 	],
 	"settings": {

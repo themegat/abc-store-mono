@@ -12,10 +12,10 @@ public class OrderDto : IDto<OrderDto, Order>
     public required string UserId { get; set; }
 
     [Required]
-    public int CartId { get; set; }
-    public DateTime OrderDate { get; set; }
-    public OrderStatus Status { get; set; }
-    public bool IsPaid { get; set; }
+    public required int CartId { get; set; }
+    public DateTime? OrderDate { get; set; }
+    public OrderStatus? Status { get; set; }
+    public bool? IsPaid { get; set; }
 
     [Required]
     [ValidateObjectMembers]
