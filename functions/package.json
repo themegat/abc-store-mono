@@ -5,7 +5,7 @@
     "lint": "eslint -c eslint.config.ts --ext .js,.ts .",
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "serve": "npm run build && firebase emulators:start --debug --import ./functions_data --export-on-exit --only auth,functions,storage,dataconnect --inspect-functions=9229",
+    "serve": "npm run build && firebase emulators:start --import ./functions_data --export-on-exit --only auth,functions,storage,dataconnect --inspect-functions=9229",
     "shell": "npm run build && firebase functions:shell",
     "save": "firebase emulators:export ./functions_data",
     "start": "npm run shell",
