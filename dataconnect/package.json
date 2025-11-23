@@ -1,0 +1,30 @@
+{
+  "name": "dataconnect",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "example": "example"
+  },
+  "type": "module",
+  "scripts": {
+    "setup_users": "tsx ./.tools/user_setup.ts",
+    "serve": "firebase emulators:start --only dataconnect",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/themegat/abc-store-mono.git"
+  },
+  "author": "T Motsoeneng",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/themegat/abc-store-mono/issues"
+  },
+  "homepage": "https://github.com/themegat/abc-store-mono#readme",
+  "description": "",
+  "devDependencies": {
+    "@types/pg": "^8.15.6",
+    "pg": "^8.16.3",
+    "tsx": "^4.20.6"
+  }
+}

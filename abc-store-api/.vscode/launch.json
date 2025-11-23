@@ -20,7 +20,7 @@
             },
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development",
-                "CONNECTION_STRING": "Host=127.0.0.1;Port=5432;Database=abcstore;User Id=admin;Password=Test@1234;",
+                "CONNECTION_STRING": "Host=127.0.0.1;Port=5432;Database=abcstore;User ID=abc_store_api;Password=develop1234;",
                 "EXCHANGE_RATE_API_KEY": "",
                 "FIREBASE_PROJECT_ID": "",
                 "FIREBASE_FUNCTION_URL": "http://127.0.0.1:5001/abc-store-cf711/us-central1/generateAndStoreThubmnail",
