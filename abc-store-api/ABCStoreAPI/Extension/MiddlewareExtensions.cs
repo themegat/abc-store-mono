@@ -1,7 +1,6 @@
 using ABCStoreAPI.Database;
 using ABCStoreAPI.Extension.Base;
 using ABCStoreAPI.Service.Consumer.Base;
-using Microsoft.EntityFrameworkCore;
 
 namespace ABCStoreAPI.Extension;
 
@@ -17,7 +16,8 @@ public static class MiddlewareExtensions
 
         app.UseCors(ServiceExtensions.AbcStoreWebapp);
 
-        app.MigrateDatabase();
+        // Todo - Remove as database will be managed by dataconnect
+        // app.MigrateDatabase();
 
         app.SeedData();
         app.RunConsumers();
@@ -31,12 +31,13 @@ public static class MiddlewareExtensions
         return app;
     }
 
-    private static void MigrateDatabase(this IHost app)
-    {
-        using var scope = app.Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        dbContext.Database.Migrate();
-    }
+    // Todo - Remove as database will be managed by dataconnect
+    // private static void MigrateDatabase(this IHost app)
+    // {
+    //     using var scope = app.Services.CreateScope();
+    //     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    //     dbContext.Database.Migrate();
+    // }
 
     private static void RunConsumers(this IHost app)
     {

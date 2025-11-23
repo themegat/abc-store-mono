@@ -17,5 +17,9 @@
             "connectionTimeout": 30
         }
     ],
-    "makefile.configureOnOpen": false
+    "makefile.configureOnOpen": false,
+    "sonarlint.connectedMode.project": {
+        "connectionId": "themegat",
+        "projectKey": "abc-store-api"
+    }
 }
