@@ -4,6 +4,7 @@
   "description": "Mono-repo for ABC store",
   "workspaces": [
     "abc-store-webapp",
+    "dataconnect",
     "functions"
   ],
   "scripts": {
