@@ -57,11 +57,7 @@ public class FakestoreConsumer : IConsumer
 
             if (!_productUtil.IsExistingProduct(newProduct.Name))
             {
-                if (string.IsNullOrWhiteSpace(product.Thumbnail) && !string.IsNullOrWhiteSpace(product.Image))
-                {
-                    thumbnailsToGenerate.Add(new Tuple<int, string>(product.Id, product.Image));
-                }
-                else
+                if (!string.IsNullOrWhiteSpace(product.Thumbnail))
                 {
                     newProduct.ThumbnailUrl = product.Thumbnail;
                 }
@@ -77,6 +73,11 @@ public class FakestoreConsumer : IConsumer
 
                 _uow.Products.Add(newProduct);
                 await _uow.CompleteAsync();
+
+                if (string.IsNullOrWhiteSpace(newProduct.ThumbnailUrl) && !string.IsNullOrWhiteSpace(product.Image))
+                {
+                    thumbnailsToGenerate.Add(new Tuple<int, string>(newProduct.Id, product.Image));
+                }
 
                 newCount++;
             }

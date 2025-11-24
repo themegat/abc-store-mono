@@ -20,7 +20,7 @@ public class AppDbContext : DbContext
     public DbSet<Order> Order { get; set; }
     public DbSet<Address> Address { get; set; }
 
-    private void MapSchemaTables(ModelBuilder modelBuilder)
+    private static void MapSchemaTables(ModelBuilder modelBuilder)
     {
         var schema = "public";
 

@@ -1,32 +1,22 @@
 # public."Address" definition
 type Address @table(name: "Address", key: ["id"]) {
-  id: Int!@col(name: "Id", dataType: "serial")
+  id: Int! @col(name: "Id", dataType: "serial")
   addressLine1: String! @col(name: "AddressLine1")
   addressLine2: String! @col(name: "AddressLine2")
   zipCode: String! @col(name: "ZipCode")
   addressType: String! @col(name: "AddressType")
   createdAt: Timestamp! @col(name: "CreatedAt") @default(expr: "request.time")
-  updatedAt:Timestamp! @col(name: "UpdatedAt") @default(expr: "request.time")
-  createdBy: String! @col(name: "CreatedBy")
-  updatedBy: String! @col(name: "UpdatedBy")
-}
-
-# public."Cart" definition
-type Cart @table(name: "Cart", key: ["id"]) {
-  id: Int!@col(name: "Id", dataType: "serial")
-  status: String! @col(name: "Status")
-  createdAt: Timestamp! @col(name: "CreatedAt") @default(expr: "request.time")
-  updatedAt:Timestamp! @col(name: "UpdatedAt") @default(expr: "request.time")
+  updatedAt: Timestamp! @col(name: "UpdatedAt") @default(expr: "request.time")
   createdBy: String! @col(name: "CreatedBy")
   updatedBy: String! @col(name: "UpdatedBy")
 }
 
 # public."ProductCategory" definition
 type ProductCategory @table(name: "ProductCategory", key: ["id"]) {
-  id: Int!@col(name: "Id", dataType: "serial")
+  id: Int! @col(name: "Id", dataType: "serial")
   name: String! @col(name: "Name")
   createdAt: Timestamp! @col(name: "CreatedAt") @default(expr: "request.time")
-  updatedAt:Timestamp! @col(name: "UpdatedAt") @default(expr: "request.time")
+  updatedAt: Timestamp! @col(name: "UpdatedAt") @default(expr: "request.time")
   createdBy: String! @col(name: "CreatedBy")
   updatedBy: String! @col(name: "UpdatedBy")
 }
@@ -45,12 +35,12 @@ type SupportedCurrency @table(name: "SupportedCurrency", key: ["id"]) {
 
 # public."ExchangeRate" definition
 type ExchangeRate @table(name: "ExchangeRate", key: ["id"]) {
-  id: Int!@col(name: "Id", dataType: "serial")
+  id: Int! @col(name: "Id", dataType: "serial")
   timeLastUpdateUnix: Int! @col(name: "TimeLastUpdateUnix")
   timeNextUpdateUnix: Int! @col(name: "TimeNextUpdateUnix")
-  rate: Float! @col(name: "Rate")
+  rate: Float! @col(name: "Rate", dataType: "decimal")
   createdAt: Timestamp! @col(name: "CreatedAt") @default(expr: "request.time")
-  updatedAt:Timestamp! @col(name: "UpdatedAt") @default(expr: "request.time")
+  updatedAt: Timestamp! @col(name: "UpdatedAt") @default(expr: "request.time")
   createdBy: String! @col(name: "CreatedBy")
   updatedBy: String! @col(name: "UpdatedBy")
   supportedCurrencyId: Int! @col(name: "SupportedCurrencyId")
@@ -60,14 +50,14 @@ type ExchangeRate @table(name: "ExchangeRate", key: ["id"]) {
 
 # public."Product" definition
 type Product @table(name: "Product", key: ["id"]) {
-  id: Int!@col(name: "Id", dataType: "serial")
+  id: Int! @col(name: "Id", dataType: "serial")
   name: String! @col(name: "Name")
   description: String! @col(name: "Description")
-  price: Float! @col(name: "Price")
+  price: Float! @col(name: "Price", dataType: "decimal")
   stockQuantity: Int! @col(name: "StockQuantity")
   thumbnailUrl: String! @col(name: "ThumbnailUrl")
   createdAt: Timestamp! @col(name: "CreatedAt") @default(expr: "request.time")
-  updatedAt:Timestamp! @col(name: "UpdatedAt") @default(expr: "request.time")
+  updatedAt: Timestamp! @col(name: "UpdatedAt") @default(expr: "request.time")
   createdBy: String! @col(name: "CreatedBy")
   updatedBy: String! @col(name: "UpdatedBy")
   productCategoryId: Int! @col(name: "ProductCategoryId")
@@ -77,10 +67,10 @@ type Product @table(name: "Product", key: ["id"]) {
 
 # public."ProductImage" definition
 type ProductImage @table(name: "ProductImage", key: ["id"]) {
-  id: Int!@col(name: "Id", dataType: "serial")
+  id: Int! @col(name: "Id", dataType: "serial")
   url: String! @col(name: "Url")
   createdAt: Timestamp! @col(name: "CreatedAt") @default(expr: "request.time")
-  updatedAt:Timestamp! @col(name: "UpdatedAt") @default(expr: "request.time")
+  updatedAt: Timestamp! @col(name: "UpdatedAt") @default(expr: "request.time")
   createdBy: String! @col(name: "CreatedBy")
   updatedBy: String! @col(name: "UpdatedBy")
   productId: Int! @col(name: "ProductId")
@@ -89,13 +79,13 @@ type ProductImage @table(name: "ProductImage", key: ["id"]) {
 
 # public."UserDetails" definition
 type UserDetails @table(name: "UserDetails", key: ["id"]) {
-  id: Int!@col(name: "Id", dataType: "serial")
+  id: Int! @col(name: "Id", dataType: "serial")
   userId: String! @col(name: "UserId")
   firstName: String! @col(name: "FirstName")
   lastName: String! @col(name: "LastName")
   preferredCurrency: String! @col(name: "PreferredCurrency")
   createdAt: Timestamp! @col(name: "CreatedAt") @default(expr: "request.time")
-  updatedAt:Timestamp! @col(name: "UpdatedAt") @default(expr: "request.time")
+  updatedAt: Timestamp! @col(name: "UpdatedAt") @default(expr: "request.time")
   createdBy: String! @col(name: "CreatedBy")
   updatedBy: String! @col(name: "UpdatedBy")
   contactNumber: String @col(name: "ContactNumber")
@@ -103,12 +93,24 @@ type UserDetails @table(name: "UserDetails", key: ["id"]) {
   address: Address @ref(fields: "addressId", references: "id")
 }
 
+# public."Cart" definition
+type Cart @table(name: "Cart", key: ["id"]) {
+  id: Int! @col(name: "Id", dataType: "serial")
+  status: String! @col(name: "Status")
+  createdAt: Timestamp! @col(name: "CreatedAt") @default(expr: "request.time")
+  updatedAt: Timestamp! @col(name: "UpdatedAt") @default(expr: "request.time")
+  createdBy: String! @col(name: "CreatedBy")
+  updatedBy: String! @col(name: "UpdatedBy")
+  userId: String! @col(name: "UserId")
+  # user: UserDetails! @ref(fields: "userId", references: "id")
+}
+
 # public."CartProduct" definition
 type CartProduct @table(name: "CartProduct", key: ["id"]) {
-  id: Int!@col(name: "Id", dataType: "serial")
+  id: Int! @col(name: "Id", dataType: "serial")
   quantity: Int! @col(name: "Quantity")
   createdAt: Timestamp! @col(name: "CreatedAt") @default(expr: "request.time")
-  updatedAt:Timestamp! @col(name: "UpdatedAt") @default(expr: "request.time")
+  updatedAt: Timestamp! @col(name: "UpdatedAt") @default(expr: "request.time")
   createdBy: String! @col(name: "CreatedBy")
   updatedBy: String! @col(name: "UpdatedBy")
   productId: Int! @col(name: "ProductId")
@@ -119,12 +121,12 @@ type CartProduct @table(name: "CartProduct", key: ["id"]) {
 
 # public."Order" definition
 type Order @table(name: "Order", key: ["id"]) {
-  id: Int!@col(name: "Id", dataType: "serial")
+  id: Int! @col(name: "Id", dataType: "serial")
   orderDate: Timestamp! @col(name: "OrderDate")
   status: String! @col(name: "Status")
   isPaid: Boolean! @col(name: "IsPaid")
   createdAt: Timestamp! @col(name: "CreatedAt") @default(expr: "request.time")
-  updatedAt:Timestamp! @col(name: "UpdatedAt") @default(expr: "request.time")
+  updatedAt: Timestamp! @col(name: "UpdatedAt") @default(expr: "request.time")
   createdBy: String! @col(name: "CreatedBy")
   updatedBy: String! @col(name: "UpdatedBy")
   userId: Int! @col(name: "UserId")

@@ -1,6 +1,7 @@
 // @ts-check
 
 import { Client } from "pg";
+import { connect } from "./helpers/connect";
 
 type User = {
   rolname: string;
@@ -9,19 +10,6 @@ type User = {
   rolcreatedb?: boolean;
   rolcanlogin?: boolean;
   password?: string;
-};
-
-const connect = async () => {
-  const client = new Client({
-    user: "postgres",
-    password: "",
-    host: "127.0.0.1",
-    port: 5432,
-    database: "abcstore",
-  });
-
-  await client.connect();
-  return client;
 };
 
 const userExists = async (client: Client, username: string) => {
@@ -70,13 +58,12 @@ try {
     console.log(`User ${user.rolname} created`);
   }
 
-  process.exit(0);
 } catch (err) {
   console.error(err);
-  process.exit(1);
 } finally {
   if (client) {
     console.debug("Closing client");
     client.connection.end();
+    process.exit(0);
   }
 }
