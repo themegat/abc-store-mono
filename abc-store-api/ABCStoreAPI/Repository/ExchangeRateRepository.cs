@@ -33,7 +33,7 @@ public class ExchangeRateRepository : GenericRepository<ExchangeRate>, IExchange
         else
         {
             var tableName = entityType.GetTableName();
-            string sql = $"TRUNCATE TABLE \"{tableName}\"";
+            string sql = $"TRUNCATE TABLE public.\"{tableName}\" CONTINUE IDENTITY RESTRICT";
             await _context.Database.ExecuteSqlRawAsync(sql);
             return true;
         }

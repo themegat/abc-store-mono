@@ -20,10 +20,45 @@ public class AppDbContext : DbContext
     public DbSet<Order> Order { get; set; }
     public DbSet<Address> Address { get; set; }
 
+    private static void MapSchemaTables(ModelBuilder modelBuilder)
+    {
+        var schema = "public";
+
+        modelBuilder.Entity<Address>()
+        .ToTable("Address", schema: schema);
+
+        modelBuilder.Entity<Cart>()
+        .ToTable("Cart", schema: schema);
+
+        modelBuilder.Entity<CartProduct>()
+        .ToTable("CartProduct", schema: schema);
+
+        modelBuilder.Entity<ExchangeRate>()
+       .ToTable("ExchangeRate", schema: schema);
+
+        modelBuilder.Entity<Order>()
+       .ToTable("Order", schema: schema);
+
+        modelBuilder.Entity<Product>()
+       .ToTable("Product", schema: schema);
+
+        modelBuilder.Entity<ProductCategory>()
+       .ToTable("ProductCategory", schema: schema);
+
+        modelBuilder.Entity<ProductImage>()
+       .ToTable("ProductImage", schema: schema);
+
+        modelBuilder.Entity<SupportedCurrency>()
+       .ToTable("SupportedCurrency", schema: schema);
+
+        modelBuilder.Entity<UserDetails>()
+       .ToTable("UserDetails", schema: schema);
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        MapSchemaTables(modelBuilder);
 
         modelBuilder.Entity<Product>()
             .HasOne(p => p.ProductCategory)

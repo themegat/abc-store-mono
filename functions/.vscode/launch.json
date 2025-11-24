@@ -15,7 +15,7 @@
                 "${workspaceFolder}/lib/**/*.js"
             ],
             "preLaunchTask": "serve:functions",
-            "postDebugTask": "terminate:functions"
+            "postDebugTask": "terminate:functions",
         }
     ]
 }
