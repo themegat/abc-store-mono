@@ -35,8 +35,8 @@ steps:
   - --set-secrets=EXCHANGE_RATE_API_KEY=projects/377697024091/secrets/EXCHANGE_RATE_API_KEY:latest
   - --set-secrets=FIREBASE_PROJECT_ID=projects/377697024091/secrets/FIREBASE_PROJECT_ID:latest
   - --set-env-vars=BUILD_VERSION=$SHORT_SHA
-  - --set-env-vars ALLOWED_ORIGINS=${_ALLOW_ORIGINS}
-  - --set-env-vars FIREBASE_FUNCTION_URL=${_FIREBASE_FUNCTION_URL}
+  - --set-env-vars=ALLOWED_ORIGINS=${_ALLOW_ORIGINS}
+  - --set-env-vars=FIREBASE_FUNCTION_URL=${_FIREBASE_FUNCTION_URL}
 
 images:
 - '${_IMAGE}:${SHORT_SHA}'
