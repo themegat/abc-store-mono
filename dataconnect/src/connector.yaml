@@ -1,8 +1,3 @@
 connectorId: abc-store-db
-generate:
-  javascriptSdk:
-  - outputDir: ..\..\abc-store-webapp\src\dataconnect-generated
-    package: "@dataconnect/generated"
-    packageJsonDir: ..\..\abc-store-webapp
-    react: true
-    angular: false
+name: "ABC Store"
+description: "ABC Store Connector"

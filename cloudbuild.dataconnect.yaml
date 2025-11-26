@@ -1,0 +1,12 @@
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+  _DIR: "dataconnect"
+  _ONLY: "dataconnect"
+
+steps:
+- name: "us-docker.pkg.dev/firebase-cli/us/firebase"
+  id: "Deploy Dataconnect"
+  dir: "${_DIR}"
+  args: [ 'deploy', '--project=${PROJECT_ID}', '--only=${_ONLY}' ]
