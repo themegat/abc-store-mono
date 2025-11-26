@@ -1,11 +1,10 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-COPY ["ABCStoreAPI.csproj", "./"]
-RUN dotnet restore "ABCStoreAPI.csproj"
-
-COPY . .
+COPY ABCStoreAPI/. .
 WORKDIR "/src/."
+
+RUN dotnet restore "ABCStoreAPI.csproj"
 RUN dotnet build "ABCStoreAPI.csproj" -c Release -o /app/build
 
 FROM build AS publish
