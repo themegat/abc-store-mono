@@ -75,7 +75,7 @@ const useCart = () => {
       const cart: CartDto = {
         userId: user?.uid ?? '',
         cartProducts: [cartProduct],
-        status: 1,
+        status: 'IN_PROGRESS',
       };
       const newCart = await createCartRequest({ cartDto: cart }).unwrap();
       dispatch(setCart(newCart));
