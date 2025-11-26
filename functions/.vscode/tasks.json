@@ -10,6 +10,9 @@
                 "run",
                 "serve"
             ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
             "isBackground": true,
             "group": {
                 "kind": "build",
@@ -31,14 +34,33 @@
                     "endsPattern": "All emulators ready!"
                 }
             },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
             "detail": "Start the app in development mode"
         },
         {
             "label": "terminate:functions",
             "type": "shell",
-            "command": "${input:terminate} && npm run rename-firebase-export",
-            "problemMatcher": []
+            "command": "${input:terminate} && sleep 4 && npm run rename-firebase-export",
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
         },
+        {
+            "label": "firebase:export",
+            "type": "process",
+            "command": "firebase",
+            "args": [
+                "emulators:export",
+                "./emulator-data",
+                "--only",
+                "auth,storage,functions",
+                "--force"
+            ]
+        }
     ],
     "inputs": [
         {

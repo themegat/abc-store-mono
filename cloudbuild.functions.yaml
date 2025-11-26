@@ -34,4 +34,4 @@ steps:
       --project ${PROJECT_ID} \
       --only ${_ONLY} \
       --non-interactive \
-      --token "$FIREBASE_TOKEN"
+      --token "$$FIREBASE_TOKEN"
