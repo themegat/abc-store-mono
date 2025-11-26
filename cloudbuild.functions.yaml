@@ -27,4 +27,4 @@ steps:
 - name: "us-docker.pkg.dev/firebase-cli/us/firebase"
   id: "Deploy Functions"
   dir: "${_FUNCTIONS_DIR}"
-  args: [ 'deploy', '${PROJECT_ID}', '--only=${_ONLY}' ]
+  args: [ 'deploy', '--project=${PROJECT_ID}', '--only=${_ONLY}' ]
