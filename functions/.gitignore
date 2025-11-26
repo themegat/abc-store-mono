@@ -9,4 +9,4 @@ typings/
 node_modules/
 *.local
 
-functions_data/
+firebase-export/
