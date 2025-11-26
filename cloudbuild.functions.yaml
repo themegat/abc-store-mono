@@ -36,7 +36,6 @@ steps:
 - name: "us-docker.pkg.dev/firebase-cli/us/firebase"
   id: "Deploy"
   args:
-  - -lc
   - |
     deploy ${PROJECT_ID}
     --only=${_ONLY}
