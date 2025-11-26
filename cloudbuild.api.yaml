@@ -9,33 +9,35 @@ substitutions:
   _IMAGE: europe-west1-docker.pkg.dev/abc-store-cf711/abc-store-docker-repo/abc-store-api
 
 steps:
-  # Build container
-  - name: 'gcr.io/cloud-builders/docker'
-    dir: 'abc-store-api'
-    args: ['build','-t','${_IMAGE}:${SHORT_SHA}','-t','${_IMAGE}:latest','.']
+# Build container
+- name: 'gcr.io/cloud-builders/docker'
+  dir: 'abc-store-api'
+  args: [ 'build', '-t', '${_IMAGE}:${SHORT_SHA}', '-t', '${_IMAGE}:latest', '.' ]
 
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push','${_IMAGE}:${SHORT_SHA}']
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push','${_IMAGE}:latest']
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'push', '${_IMAGE}:${SHORT_SHA}' ]
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'push', '${_IMAGE}:latest' ]
 
-  # Deploy to Cloud Run – env comes from Secret Manager as env var
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'gcloud'
-    args:
-      - run
-      - deploy
-      - ${_SERVICE}
-      - --image=${_IMAGE}:${SHORT_SHA}
-      - --region=${_REGION}
-      - --platform=managed
-      - --allow-unauthenticated
-      - --add-cloudsql-instances=abc-store-cf711:europe-west1:abc-store-cf711-instance
-      - --set-secrets=CONNECTION_STRING=projects/377697024091/secrets/CONNECTION_STRING:latest
-      - --set-secrets=EXCHANGE_RATE_API_KEY=projects/377697024091/secrets/EXCHANGE_RATE_API_KEY:latest
-      - --set-secrets=FIREBASE_PROJECT_ID=projects/377697024091/secrets/FIREBASE_PROJECT_ID:latest
-      - --set-env-vars=BUILD_VERSION=$SHORT_SHA
+# Deploy to Cloud Run – env comes from Secret Manager as env var
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: 'gcloud'
+  args:
+  - run
+  - deploy
+  - ${_SERVICE}
+  - --image=${_IMAGE}:${SHORT_SHA}
+  - --region=${_REGION}
+  - --platform=managed
+  - --allow-unauthenticated
+  - --add-cloudsql-instances=abc-store-cf711:europe-west1:abc-store-cf711-instance
+  - --set-secrets=CONNECTION_STRING=projects/377697024091/secrets/CONNECTION_STRING:latest
+  - --set-secrets=EXCHANGE_RATE_API_KEY=projects/377697024091/secrets/EXCHANGE_RATE_API_KEY:latest
+  - --set-secrets=FIREBASE_PROJECT_ID=projects/377697024091/secrets/FIREBASE_PROJECT_ID:latest
+  - --set-env-vars=BUILD_VERSION=$SHORT_SHA
+  - --set-env-vars ALLOWED_ORIGINS=${_ALLOW_ORIGINS}
+  - --set-env-vars FIREBASE_FUNCTION_URL=${_FIREBASE_FUNCTION_URL}
 
 images:
-  - '${_IMAGE}:${SHORT_SHA}'
-  - '${_IMAGE}:latest'
+- '${_IMAGE}:${SHORT_SHA}'
+- '${_IMAGE}:latest'
