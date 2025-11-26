@@ -7,7 +7,7 @@ substitutions:
 
 steps:
 - name: "node:20"
-  id: "Install"
+  id: "NPM Install"
   dir: "${_FUNCTIONS_DIR}"
   entrypoint: bash
   args:
@@ -16,23 +16,15 @@ steps:
     npm i
 
 - name: "node:20"
-  id: "Lint"
+  id: "Install Platform-Specific Dependencies"
   dir: "${_FUNCTIONS_DIR}"
   entrypoint: bash
   args:
   - -lc
   - |
-    npm run lint || true
-
-- name: "node:20"
-  id: "Build"
-  dir: "${_FUNCTIONS_DIR}"
-  entrypoint: bash
-  args:
-  - -lc
-  - |
-    npm run build --if-present
+    npm i --os=linux --libc=musl --cpu=x64 sharp
 
 - name: "us-docker.pkg.dev/firebase-cli/us/firebase"
-  id: "Deploy"
-  args: [ 'deploy', '--project=${PROJECT_ID}', '--only=${_ONLY}' ]
+  id: "Deploy Functions"
+  dir: "${_FUNCTIONS_DIR}"
+  args: [ 'deploy', '${PROJECT_ID}', '--only=${_ONLY}' ]
