@@ -37,5 +37,6 @@ steps:
   id: "Deploy"
   args:
   - |
-    deploy ${PROJECT_ID}
+    deploy 
+    --project=${PROJECT_ID}
     --only=${_ONLY}
