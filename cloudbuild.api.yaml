@@ -11,16 +11,20 @@ substitutions:
 steps:
 # Build container
 - name: 'gcr.io/cloud-builders/docker'
+  id: 'Build Image'
   dir: 'abc-store-api'
   args: [ 'build', '-t', '${_IMAGE}:${SHORT_SHA}', '-t', '${_IMAGE}:latest', '.' ]
 
 - name: 'gcr.io/cloud-builders/docker'
+  id: 'Docker Push'
   args: [ 'push', '${_IMAGE}:${SHORT_SHA}' ]
 - name: 'gcr.io/cloud-builders/docker'
+  id: 'Docker Push Latest'
   args: [ 'push', '${_IMAGE}:latest' ]
 
 # Deploy to Cloud Run – env comes from Secret Manager as env var
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  id: 'Deploy to Cloud Run'
   entrypoint: 'gcloud'
   args:
   - run
