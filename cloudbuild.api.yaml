@@ -11,16 +11,20 @@ substitutions:
 steps:
 # Build container
 - name: 'gcr.io/cloud-builders/docker'
+  id: 'Build Image'
   dir: 'abc-store-api'
   args: [ 'build', '-t', '${_IMAGE}:${SHORT_SHA}', '-t', '${_IMAGE}:latest', '.' ]
 
 - name: 'gcr.io/cloud-builders/docker'
+  id: 'Docker Push'
   args: [ 'push', '${_IMAGE}:${SHORT_SHA}' ]
 - name: 'gcr.io/cloud-builders/docker'
+  id: 'Docker Push Latest'
   args: [ 'push', '${_IMAGE}:latest' ]
 
 # Deploy to Cloud Run – env comes from Secret Manager as env var
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  id: 'Deploy to Cloud Run'
   entrypoint: 'gcloud'
   args:
   - run
@@ -35,8 +39,8 @@ steps:
   - --set-secrets=EXCHANGE_RATE_API_KEY=projects/377697024091/secrets/EXCHANGE_RATE_API_KEY:latest
   - --set-secrets=FIREBASE_PROJECT_ID=projects/377697024091/secrets/FIREBASE_PROJECT_ID:latest
   - --set-env-vars=BUILD_VERSION=$SHORT_SHA
-  - --set-env-vars ALLOWED_ORIGINS=${_ALLOW_ORIGINS}
-  - --set-env-vars FIREBASE_FUNCTION_URL=${_FIREBASE_FUNCTION_URL}
+  - --set-env-vars=ALLOWED_ORIGINS=${_ALLOW_ORIGINS}
+  - --set-env-vars=FIREBASE_FUNCTION_URL=${_FIREBASE_FUNCTION_URL}
 
 images:
 - '${_IMAGE}:${SHORT_SHA}'
