@@ -107,6 +107,7 @@ type Cart @table(name: "Cart", key: ["id"]) {
 
 # public."CartProduct" definition
 type CartProduct @table(name: "CartProduct", key: ["productId", "cartId"]) {
+  id: Int! @col(name: "Id", dataType: "serial")
   quantity: Int! @col(name: "Quantity")
   createdAt: Timestamp! @col(name: "CreatedAt") @default(expr: "request.time")
   updatedAt: Timestamp! @col(name: "UpdatedAt") @default(expr: "request.time")
