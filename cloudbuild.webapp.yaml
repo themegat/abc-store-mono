@@ -1,6 +1,6 @@
 options:
   logging: CLOUD_LOGGING_ONLY
-  
+
 substitutions:
   _REGION: europe-west1
   _SERVICE: "abc-store-webapp"
@@ -8,36 +8,20 @@ substitutions:
   _IMAGE: abc-store-webapp
 
 steps:
-  - name: "gcr.io/cloud-builders/docker"
-    dir: "abc-store-webapp"
-    args:
-      [
-        "build",
-        "-t", "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:${SHORT_SHA}",
-        "-t", "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:latest",
-        "--build-arg", "API_BASE_URL=${_API_BASE_URL}",
-        "--build-arg", "FIREBASE_CONFIG_B64=${_FIREBASE_CONFIG_B64}",
-        "--build-arg", "BUILD_VERSION=${SHORT_SHA}",
-        "."
-      ]
+- name: "gcr.io/cloud-builders/docker"
+  id: "Build Image"
+  dir: "abc-store-webapp"
+  args: [ "build", "-t", "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:${SHORT_SHA}", "-t", "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:latest", "--build-arg", "API_BASE_URL=${_API_BASE_URL}", "--build-arg", "FIREBASE_CONFIG_B64=${_FIREBASE_CONFIG_B64}", "--build-arg", "BUILD_VERSION=${SHORT_SHA}", "." ]
 
-  - name: "gcr.io/cloud-builders/docker"
-    args:
-      ["push", "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:${SHORT_SHA}"]
+- name: "gcr.io/cloud-builders/docker"
+  id: "Push Image"
+  args: [ "push", "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:${SHORT_SHA}" ]
 
-  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
-    entrypoint: gcloud
-    args:
-      [
-        "run","deploy","${_SERVICE}",
-        "--image","${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:${SHORT_SHA}",
-        "--region","${_REGION}",
-        "--platform","managed",
-        "--allow-unauthenticated",
-        "--memory","512Mi",
-        "--port","8080"
-      ]
+- name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+  id: "Deploy to Cloud Run"
+  entrypoint: gcloud
+  args: [ "run", "deploy", "${_SERVICE}", "--image", "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:${SHORT_SHA}", "--region", "${_REGION}", "--platform", "managed", "--allow-unauthenticated", "--memory", "512Mi", "--port", "8080" ]
 
 images:
-  - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:${SHORT_SHA}"
-  - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:latest"
+- "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:${SHORT_SHA}"
+- "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:latest"
