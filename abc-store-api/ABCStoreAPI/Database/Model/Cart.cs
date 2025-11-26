@@ -9,8 +9,14 @@ public enum CartStatus
     COMPLETE
 }
 
-public class CartProduct : BaseEntity
+public class CartProduct
 {
+    //Temporary 
+     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public string CreatedBy { get; set; } = string.Empty;
+    public string UpdatedBy { get; set; } = string.Empty;
+    // ===
     public int ProductId { get; set; }
     public int Quantity { get; set; }
     public int CartId { get; set; }
